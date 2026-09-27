@@ -443,7 +443,7 @@
 <body>
 
   <header>
-    <h1>🎯 OPIc IH 학습 센터 (Day 1 ~ Day 4)</h1>
+    <h1>🎯 OPIc IH 학습 센터 (Day 1 ~ Day 5)</h1>
     <p>문장별 TTS 원어민 음성 재생 · 반복 청취 · 섀도잉 & 녹음 훈련</p>
   </header>
 
@@ -454,6 +454,7 @@
       <button class="tab-btn" onclick="switchTab('day2')">🗣️ Day 2 묘사 패턴</button>
       <button class="tab-btn" onclick="switchTab('day3')">⏱️ Day 3 루틴 패턴</button>
       <button class="tab-btn" onclick="switchTab('day4')">💬 Day 4 과거 경험</button>
+      <button class="tab-btn" onclick="switchTab('day5')">✈️ Day 5 해외 여행</button>
     </div>
   </div>
 
@@ -694,6 +695,51 @@
 
     </div>
 
+    <!-- TAB 5: DAY 5 -->
+    <div id="day5" class="tab-content">
+
+      <!-- Day 5 Japan Family Trip -->
+      <div class="card">
+        <h2>♨️ [맞춤 실전 1] 어머니 생신 기념 일본 온천 가족여행 (Japan Family Trip)</h2>
+        <p class="card-desc">
+          Combo Q1 — <strong>"You indicated in the survey that you enjoy international travel. What countries or cities do you like to visit, and why do you like those places?"</strong>
+        </p>
+
+        <!-- Paragraph Summary Composite Image -->
+        <div class="hero-img-box">
+          <img src="images/day5_japan_composite.jpg" alt="Japan Family Trip Storyboard" loading="lazy">
+        </div>
+
+        <div class="full-paragraph">
+          Well, in my family, we have an <strong>annual tradition</strong> where <strong>my mother, my older sister, my younger sister, and I</strong> take an overseas trip together for <strong>my mother's birthday</strong>. <strong>To be honest</strong>, I'm not a big fan of flying because spending too much time at airports and on planes is exhausting, but <strong>Japan is just right because the flight is so short</strong>. Just this past spring, the four of us traveled to Japan, and we stayed at a wonderful <strong>traditional accommodation with a hot spring</strong>. What made it so relaxing was that <strong>delicious authentic meals were fully provided</strong> right at the lodging, so we didn't have to worry about finding restaurants. Our daily routine was just perfect — <strong>I went for a refreshing morning jog</strong>, we did some sightseeing during the day, and then <strong>soaked in the hot spring after dinner</strong>. <strong>Best of all</strong>, my mother loved every single moment of it, which made the whole trip <strong>deeply meaningful for all of us</strong>.
+        </div>
+
+        <h3 style="font-size: 1.05rem; margin-bottom: 12px; color: #93c5fd;">🔊 문장별 섀도잉 & 녹음 연습 (Japan Family Trip)</h3>
+        <div id="day5JapanSentences"></div>
+      </div>
+
+      <!-- Day 5 Rental Car & Role Division -->
+      <div class="card">
+        <h2>🚗 [맞춤 실전 2] 3남매 역할 분담과 일본 렌트카 운전기 (Preparation & Rental Car)</h2>
+        <p class="card-desc">
+          Combo Q2 / Q3 — <strong>"Tell me about how you prepare for international trips, and describe any memorable experience or challenge you had while traveling."</strong>
+        </p>
+
+        <!-- Paragraph Summary Composite Image -->
+        <div class="hero-img-box">
+          <img src="images/day5_rental_composite.jpg" alt="Rental Car and Roles Storyboard" loading="lazy">
+        </div>
+
+        <div class="full-paragraph">
+          Whenever we prepare for our family trip, <strong>the three of us siblings divide up the roles</strong> to make everything go smoothly. For our recent trip to Japan, <strong>my older sister booked the accommodations</strong>, while <strong>my younger sister took care of the flight tickets</strong>. <strong>My responsibility was reserving a rental car</strong> and getting an <strong>international driving permit</strong> in advance so we could travel comfortably with my mother. When I started driving in Japan, <strong>the steering wheel was on the right side</strong> and we had to drive on the left, so <strong>it took some time to get used to</strong>. At first, I had to concentrate really hard, but <strong>once I got the hang of it</strong>, having a rental car made our trip <strong>incredibly convenient</strong>. We were able to visit scenic hidden spots and move at our own pace <strong>without the hassle of public transit</strong>. <strong>Thanks to our teamwork and the rental car</strong>, it turned out to be one of the smoothest and most enjoyable family trips we've ever had.
+        </div>
+
+        <h3 style="font-size: 1.05rem; margin-bottom: 12px; color: #93c5fd;">🔊 문장별 섀도잉 & 녹음 연습 (Preparation & Rental Car)</h3>
+        <div id="day5RentalSentences"></div>
+      </div>
+
+    </div>
+
   </div>
 
   <script>
@@ -805,6 +851,28 @@
 
     renderSentences(day4ParkData, 'day4ParkSentences');
     renderSentences(day4ConcertData, 'day4ConcertSentences');
+
+    const day5JapanData = [
+      { id: "day5_japan_1", en: "Well, in my family, we have an <mark>annual tradition</mark> where <mark>my mother, my older sister, my younger sister, and I</mark> take an overseas trip together for <mark>my mother's birthday</mark>.", ko: "음, 우리 가족에게는 어머니 생신 때마다 어머니, 누나, 여동생, 그리고 제가 함께 해외여행을 떠나는 연례 전통이 있습니다." },
+      { id: "day5_japan_2", en: "<mark>To be honest</mark>, I'm not a big fan of flying because spending too much time at airports and on planes is exhausting, but <mark>Japan is just right because the flight is so short</mark>.", ko: "솔직히 말해서, 저는 공항과 비행기에서 너무 많은 시간을 보내는 것이 피곤해서 비행기 여행을 별로 좋아하지 않지만, 일본은 비행 시간이 아주 짧아서 다녀오기에 딱 좋습니다." },
+      { id: "day5_japan_3", en: "Just this past spring, the four of us traveled to Japan, and we stayed at a wonderful <mark>traditional accommodation with a hot spring</mark>.", ko: "바로 지난 봄에 우리 넷은 일본으로 여행을 다녀왔고, 온천이 딸린 멋진 전통 숙소(료칸)에 머물렀습니다." },
+      { id: "day5_japan_4", en: "What made it so relaxing was that <mark>delicious authentic meals were fully provided</mark> right at the lodging, so we didn't have to worry about finding restaurants.", ko: "특히 편안했던 점은 숙소에서 맛있는 정통 현지 식사가 완전히 제공되어, 따로 식당을 찾아다닐 걱정을 할 필요가 없었다는 것입니다." },
+      { id: "day5_japan_5", en: "Our daily routine was just perfect — <mark>I went for a refreshing morning jog</mark>, we did some sightseeing during the day, and then <mark>soaked in the hot spring after dinner</mark>.", ko: "우리의 하루 일과는 정말 완벽했습니다 — 저는 아침에 상쾌하게 조깅을 했고, 낮에는 가족들과 관광을 즐겼으며, 저녁 식사 후에는 따뜻하게 온천욕을 즐겼습니다." },
+      { id: "day5_japan_6", en: "<mark>Best of all</mark>, my mother loved every single moment of it, which made the whole trip <mark>deeply meaningful for all of us</mark>.", ko: "무엇보다도 어머니께서 모든 순간을 너무나 좋아하셔서, 우리 가족 모두에게 정말 깊은 의미가 있는 여행이 되었습니다." }
+    ];
+
+    const day5RentalData = [
+      { id: "day5_rental_1", en: "Whenever we prepare for our family trip, <mark>the three of us siblings divide up the roles</mark> to make everything go smoothly.", ko: "우리 가족 여행을 준비할 때마다, 우리 3남매는 모든 일이 순조롭게 진행되도록 각자 역할을 나눕니다." },
+      { id: "day5_rental_2", en: "For our recent trip to Japan, <mark>my older sister booked the accommodations</mark>, while <mark>my younger sister took care of the flight tickets</mark>.", ko: "이번 일본 여행에서는 누나가 숙소 예약을 맡았고, 여동생이 비행기 표 예매를 담당했습니다." },
+      { id: "day5_rental_3", en: "<mark>My responsibility was reserving a rental car</mark> and getting an <mark>international driving permit</mark> in advance so we could travel comfortably with my mother.", ko: "저의 역할은 어머니를 모시고 편안하게 이동할 수 있도록 렌트카를 예약하고 미리 국제운전면허증을 발급받는 것이었습니다." },
+      { id: "day5_rental_4", en: "When I started driving in Japan, <mark>the steering wheel was on the right side</mark> and we had to drive on the left, so <mark>it took some time to get used to</mark>.", ko: "일본에서 운전을 시작했을 때, 한국과 달리 운전석이 오른쪽에 있고 좌측통행을 해야 해서 적응하는 데 시간이 좀 걸렸습니다." },
+      { id: "day5_rental_5", en: "At first, I had to concentrate really hard, but <mark>once I got the hang of it</mark>, having a rental car made our trip <mark>incredibly convenient</mark>.", ko: "처음에는 엄청 집중해야 했지만, 일단 손에 익고 나자 렌트카가 있어서 여행이 믿을 수 없을 만큼 편리해졌습니다." },
+      { id: "day5_rental_6", en: "We were able to visit scenic hidden spots and move at our own pace <mark>without the hassle of public transit</mark>.", ko: "우리는 대중교통의 번거로움 없이 아름다운 숨은 명소들을 방문하고 우리 가족만의 페이스대로 이동할 수 있었습니다." },
+      { id: "day5_rental_7", en: "<mark>Thanks to our teamwork and the rental car</mark>, it turned out to be one of the smoothest and most enjoyable family trips we've ever had.", ko: "3남매의 팀워크와 렌트카 덕분에 지금까지 다녀온 가족 여행 중 가장 매끄럽고 즐거웠던 여행 중 하나가 되었습니다." }
+    ];
+
+    renderSentences(day5JapanData, 'day5JapanSentences');
+    renderSentences(day5RentalData, 'day5RentalSentences');
 
     // Tab Navigation
     function switchTab(tabId) {
