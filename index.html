@@ -501,7 +501,7 @@
 <body class="show-guide">
 
   <header>
-    <h1>🎯 OPIc IH 학습 센터 (Day 1 ~ Day 5) <span style="background: rgba(59, 130, 246, 0.25); color: #60a5fa; font-size: 0.72rem; padding: 2px 8px; border-radius: 9999px; vertical-align: middle;">v1.5.4</span></h1>
+    <h1>🎯 OPIc IH 학습 센터 (Day 1 ~ Day 6) <span style="background: rgba(59, 130, 246, 0.25); color: #60a5fa; font-size: 0.72rem; padding: 2px 8px; border-radius: 9999px; vertical-align: middle;">v1.6</span></h1>
     <p>문장별 TTS 원어민 음성 재생 · 반복 청취 · 섀도잉 & 녹음 훈련</p>
   </header>
 
@@ -513,6 +513,7 @@
       <button class="tab-btn" onclick="switchTab('day3')">⏱️ Day 3 루틴 패턴</button>
       <button class="tab-btn" onclick="switchTab('day4')">💬 Day 4 과거 경험</button>
       <button class="tab-btn" onclick="switchTab('day5')">✈️ Day 5 해외 여행</button>
+      <button class="tab-btn" onclick="switchTab('day6')">🏖️ Day 6 휴일 루틴</button>
     </div>
   </div>
 
@@ -827,6 +828,29 @@
 
         <h3 style="font-size: 1.05rem; margin-bottom: 12px; color: #93c5fd;">🔊 문장별 섀도잉 & 녹음 연습 (Preparation & Rental Car)</h3>
         <div id="day5RentalSentences"></div>
+    </div>
+
+    <!-- TAB 6: DAY 6 -->
+    <div id="day6" class="tab-content">
+
+      <!-- Day 6 Holiday & Staycation Routine -->
+      <div class="card">
+        <h2>🏖️ [맞춤 실전] 평소 휴일 루틴 & 홈 스테이케이션 (Holiday & Weekend Routine)</h2>
+        <p class="card-desc">
+          콤보 빈출 — <strong>"What do you usually do on your holidays or days off? Tell me about your typical holiday routine from morning to night."</strong>
+        </p>
+
+        <!-- Paragraph Summary Composite Image -->
+        <div class="hero-img-box">
+          <img src="images/day6_holiday_composite.jpg" alt="Holiday Routine Storyboard" loading="lazy">
+        </div>
+
+        <div class="full-paragraph">
+          Well, when it comes to my holidays or days off, I usually prefer taking a <strong>relaxing staycation at home</strong>. First of all, I love <strong>sleeping in until around 10 AM</strong> without setting any alarms, and I <strong>make myself a warm cup of coffee</strong>. After having a light brunch, I <strong>put on comfortable loungewear</strong>, play some soft acoustic music, or <strong>binge-watch my favorite movies</strong>. In the late afternoon, if the weather is nice, I head over to the <strong>waterfront park near my house</strong> to <strong>take a leisurely stroll and get some fresh air</strong>. In the evening, I usually <strong>order some delicious food</strong> for dinner and <strong>spend quality time relaxing with my cats</strong>. So, to wrap it up, spending a peaceful day off like this really helps me <strong>de-stress and fully recharge my batteries</strong> for the upcoming week.
+        </div>
+
+        <h3 style="font-size: 1.05rem; margin-bottom: 12px; color: #93c5fd;">🔊 문장별 섀도잉 & 녹음 연습 (Holiday & Staycation)</h3>
+        <div id="day6HolidaySentences"></div>
       </div>
 
     </div>
@@ -1324,6 +1348,53 @@
 
     renderSentences(day5JapanData, 'day5JapanSentences');
     renderSentences(day5RentalData, 'day5RentalSentences');
+
+    const day6HolidayData = [
+      { 
+        id: "day6_holiday_1", 
+        en: "<mark>Well, when it comes to my holidays or days off</mark>, I usually prefer taking a <mark>relaxing staycation at home</mark>.", 
+        ko: "음, 휴일이나 쉬는 날에 대해 말씀드리자면, 저는 보통 집에서 편안한 휴식을 취하는 '홈 스테이케이션'을 선호합니다.",
+        guide: "Well, <span class=\"slash\">/</span> when it <strong>COMES to my HOlidays</strong> or days off, <span class=\"slash\">/</span> I usually prefer taking a <strong>reLAXing stayCAtion</strong> <span class=\"slash\">/</span> at home.",
+        tip: "[도입구] when it comes to ~ [웨닛-컴스-투: ~에 대해 말하자면] | [강세] stay-CA-tion, re-LAX-ing"
+      },
+      { 
+        id: "day6_holiday_2", 
+        en: "First of all, I love <mark>sleeping in until around 10 AM</mark> without setting any alarms, and I <mark>make myself a warm cup of coffee</mark>.", 
+        ko: "우선, 알람을 맞추지 않고 오전 10시쯤까지 늦잠을 푹 자는 것을 좋아하고, 따뜻한 커피 한 잔을 직접 내려 마십니다.",
+        guide: "<strong>FIRST of all</strong>, <span class=\"slash\">/</span> I love <strong>SLEEPing in</strong> <span class=\"slash\">/</span> until around <strong>TEN a.m.</strong> <span class=\"slash\">/</span> without <strong>SETTing any aLARMS</strong>, <span class=\"slash\">/</span> and I make myself a <strong>WARM cup of COFfee</strong>.",
+        tip: "[구동사] sleeping in ➔ [슬리핑-인: 늦잠자기] | [연음] first of all ➔ [퍼-스-터-볼], cup of ➔ [커-퍼]"
+      },
+      { 
+        id: "day6_holiday_3", 
+        en: "After having a light brunch, I <mark>put on comfortable loungewear</mark>, play some soft acoustic music, or <mark>binge-watch my favorite movies</mark>.", 
+        ko: "가벼운 브런치를 먹은 뒤에는 편안한 홈웨어를 입고 잔잔한 어쿠스틱 음악을 틀거나, 좋아하는 영화들을 몰아봅니다.",
+        guide: "After having a <strong>LIGHT BRUNCH</strong>, <span class=\"slash\">/</span> I put on <strong>COMfortable LOUNGEwear</strong>, <span class=\"slash\">/</span> play some <strong>SOFT aCOUStic music</strong>, <span class=\"slash\">/</span> or <strong>BINGE-watch</strong> my <strong>FAvorite movies</strong>.",
+        tip: "[고급표현] binge-watch [빈지-와치: 몰아보다] | comfortable은 [컴프-터블 (3음절⭕)] | acoustic [어-쿠-스틱]"
+      },
+      { 
+        id: "day6_holiday_4", 
+        en: "In the late afternoon, if the weather is nice, I head over to the <mark>waterfront park near my house</mark> to <mark>take a leisurely stroll and get some fresh air</mark>.", 
+        ko: "늦은 오후에 날씨가 좋으면 집 근처 수변 공원으로 향해 여유롭게 산책을 즐기고 신선한 공기를 쐽니다.",
+        guide: "In the <strong>LATE AFternoon</strong>, <span class=\"slash\">/</span> if the <strong>WEATHer is nice</strong>, <span class=\"slash\">/</span> I <strong>HEAD over</strong> to the <strong>WAterfront park</strong> near my house <span class=\"slash\">/</span> to take a <strong>LEI-surely stroll</strong> <span class=\"slash\">/</span> and get some <strong>FRESH AIR</strong>.",
+        tip: "[발음] leisurely [리-저-얼리 또는 레-저-얼리: 여유로운] | head over [헤-도버: 향하다] | fresh air [프레-쉬-에어]"
+      },
+      { 
+        id: "day6_holiday_5", 
+        en: "In the evening, I usually <mark>order some delicious food</mark> for dinner and <mark>spend quality time relaxing with my cats</mark>.", 
+        ko: "저녁에는 보통 맛있는 배달 음식을 시켜 먹고, 고양이들과 함께 뒹굴거리며 힐링하는 소중한 시간을 보냅니다.",
+        guide: "In the <strong>EVening</strong>, <span class=\"slash\">/</span> I usually <strong>ORder some deLIcious food</strong> for dinner <span class=\"slash\">/</span> and <strong>spend QUALity time</strong> <span class=\"slash\">/</span> re-<strong>LAXing with my CATS</strong>.",
+        tip: "[콜로케이션] spend quality time [스펜-퀄리티-타임: 알찬/소중한 시간을 보내다] | [연음] order some [오-더-썸]"
+      },
+      { 
+        id: "day6_holiday_6", 
+        en: "<mark>So, to wrap it up</mark>, spending a peaceful day off like this really helps me <mark>de-stress and fully recharge my batteries</mark> for the upcoming week.", 
+        ko: "그래서 결론을 짓자면, 이렇게 평화로운 휴일을 보내는 것은 스트레스를 풀고 다가오는 한 주를 위해 에너지를 100% 재충전하는 데 큰 도움이 됩니다.",
+        guide: "So, to <strong>WRAP it up</strong>, <span class=\"slash\">/</span> <strong>SPENDing a PEACEful day off</strong> like this <span class=\"slash\">/</span> really <strong>HELPS me de-STRESS</strong> <span class=\"slash\">/</span> and <strong>FULly reCHARGE my BATteries</strong> <span class=\"slash\">/</span> for the <strong>UPcoming week</strong>.",
+        tip: "[마무리 표현] to wrap it up ➔ [투 래-피-덥] | [숙어] recharge my batteries ➔ [리-차-ㄹ지 마이 배-터-리즈]"
+      }
+    ];
+
+    renderSentences(day6HolidayData, 'day6HolidaySentences');
 
     // Toggle Pronunciation Coaching Visibility
     function toggleGuide() {
