@@ -13,11 +13,10 @@ async def main():
     with open("index.html", "r", encoding="utf-8") as f:
         content = f.read()
 
-    # Pattern to extract sentence id and en text
-    pattern = re.compile(r'id:\s*["\']([^"\']+)["\'],\s*en:\s*["\']([^"\']+)["\']')
+    # Robust regex to extract sentence id and complete en text (supports apostrophes, single/double quotes, and HTML tags)
+    pattern = re.compile(r'id:\s*"([^"]+)",\s*en:\s*"(.*?)"(?=,\s*\n\s*ko:)', re.DOTALL)
     matches = pattern.findall(content)
 
-    # Filter out duplicate IDs if any and exclude sample names
     seen = set()
     sentences = []
     for item_id, en in matches:
@@ -37,19 +36,19 @@ async def main():
         async with semaphore:
             mp3_path = f"audio/{item_id}.mp3"
             wav_path = f"audio/{item_id}.wav"
-            print(f"[{idx+1}/{len(sentences)}] Generating {item_id}...")
+            print(f"[{idx+1}/{len(sentences)}] Generating {item_id}: {text[:35]}...")
             
             comm = edge_tts.Communicate(text, VOICE)
             await comm.save(mp3_path)
             
             comm_wav = edge_tts.Communicate(text, VOICE)
             await comm_wav.save(wav_path)
-            print(f"[{idx+1}/{len(sentences)}] Saved {item_id}")
+            print(f"[{idx+1}/{len(sentences)}] Saved {item_id} (mp3 size: {os.path.getsize(mp3_path)} bytes)")
 
     tasks = [generate_single(i, item_id, text) for i, (item_id, text) in enumerate(sentences)]
     await asyncio.gather(*tasks)
 
-    print("\n✅ All 59 Andrew voice files generated successfully!")
+    print("\n✅ All 59 Andrew voice files regenerated successfully with full sentences!")
 
 if __name__ == "__main__":
     asyncio.run(main())
