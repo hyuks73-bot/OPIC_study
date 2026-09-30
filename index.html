@@ -501,7 +501,7 @@
 <body class="show-guide">
 
   <header>
-    <h1>🎯 OPIc IH 학습 센터 (Day 1 ~ Day 5) <span style="background: rgba(59, 130, 246, 0.25); color: #60a5fa; font-size: 0.72rem; padding: 2px 8px; border-radius: 9999px; vertical-align: middle;">v1.5.1</span></h1>
+    <h1>🎯 OPIc IH 학습 센터 (Day 1 ~ Day 5) <span style="background: rgba(59, 130, 246, 0.25); color: #60a5fa; font-size: 0.72rem; padding: 2px 8px; border-radius: 9999px; vertical-align: middle;">v1.5.2</span></h1>
     <p>문장별 TTS 원어민 음성 재생 · 반복 청취 · 섀도잉 & 녹음 훈련</p>
   </header>
 
@@ -1091,7 +1091,7 @@
           <div class="sentence-header">
             <span class="sentence-num">Sentence ${idx + 1}</span>
             <div class="sentence-actions">
-              <button onclick="playSentence('${item.id}', '${escapeQuotes(item.en)}')">🔊 재생</button>
+              <button onclick="playSentence('${item.id}')">🔊 재생</button>
               <button class="btn-record" id="rec_${item.id}" onclick="toggleRecord('${item.id}')">🎙️ 녹음</button>
               <button id="playRec_${item.id}" onclick="playRecorded('${item.id}')" style="display:none; background:#059669;">▶️ 내 목소리</button>
             </div>
@@ -1540,12 +1540,14 @@
     }
 
     // Audio Playing Function for single sentence
-    async function playSentence(id, text) {
+    async function playSentence(id) {
       stopAudio();
       
       const speed = parseFloat(document.getElementById('speedSelect').value) || 1.0;
       const loopCount = parseInt(document.getElementById('loopSelect').value) || 1;
       const card = document.getElementById('card_' + id);
+      const textEl = card ? card.querySelector('.en-text') : null;
+      const text = textEl ? (textEl.innerText || textEl.textContent) : '';
       if (card) {
         card.classList.add('playing');
         card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
