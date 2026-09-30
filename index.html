@@ -449,6 +449,12 @@
       object-fit: cover;
     }
 
+    /* Mobile Data Saver Mode */
+    body.hide-images .img-box,
+    body.hide-images .hero-img-box {
+      display: none !important;
+    }
+
     /* Mobile media query tweaks */
     @media (max-width: 640px) {
       header {
@@ -545,6 +551,13 @@
         <button id="guideToggleBtn" onclick="toggleGuide()" style="display: flex; align-items: center; gap: 6px; padding: 7px 11px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.45); border-radius: 8px; color: #38bdf8; font-size: 0.82rem; font-weight: 600; cursor: pointer;">
           <span>🗣️ 발음·강세 코칭</span>
           <span id="guideBadge" style="background: #0284c7; color: white; padding: 1px 6px; border-radius: 9999px; font-size: 0.7rem; font-weight: 700;">ON</span>
+        </button>
+      </div>
+
+      <div class="control-group">
+        <button id="imageToggleBtn" onclick="toggleImages()" style="display: flex; align-items: center; gap: 6px; padding: 7px 11px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.45); border-radius: 8px; color: #34d399; font-size: 0.82rem; font-weight: 600; cursor: pointer;">
+          <span>🖼️ 이미지</span>
+          <span id="imageBadge" style="background: #059669; color: white; padding: 1px 6px; border-radius: 9999px; font-size: 0.7rem; font-weight: 700;">ON</span>
         </button>
       </div>
 
@@ -664,7 +677,7 @@
 
         <!-- Paragraph Level Summary Infographic Image -->
         <div class="hero-img-box">
-          <img src="images/topic_park_description.jpg" alt="Waterfront Park Storyboard" loading="lazy">
+          <img data-src="images/topic_park_description.jpg" alt="Waterfront Park Storyboard" loading="lazy">
         </div>
 
         <div class="full-paragraph">
@@ -684,7 +697,7 @@
 
         <!-- Paragraph Summary Composite Image (Full Storyboard) -->
         <div class="hero-img-box">
-          <img src="images/day2_bedroom_composite.jpg" alt="Bedroom Full Storyboard" loading="lazy">
+          <img data-src="images/day2_bedroom_composite.jpg" alt="Bedroom Full Storyboard" loading="lazy">
         </div>
 
         <div class="full-paragraph">
@@ -709,7 +722,7 @@
 
         <!-- Paragraph Summary Composite Image (Full Storyboard) -->
         <div class="hero-img-box">
-          <img src="images/day3_park_composite.jpg" alt="Park Routine Full Storyboard" loading="lazy">
+          <img data-src="images/day3_park_composite.jpg" alt="Park Routine Full Storyboard" loading="lazy">
         </div>
 
         <div class="full-paragraph">
@@ -729,7 +742,7 @@
 
         <!-- Paragraph Summary Composite Image (Full Storyboard) -->
         <div class="hero-img-box">
-          <img src="images/day3_music_composite.jpg" alt="Music Routine Full Storyboard" loading="lazy">
+          <img data-src="images/day3_music_composite.jpg" alt="Music Routine Full Storyboard" loading="lazy">
         </div>
 
         <div class="full-paragraph">
@@ -754,7 +767,7 @@
 
         <!-- Paragraph Summary Composite Image -->
         <div class="hero-img-box">
-          <img src="images/day4_park_composite.jpg" alt="Park Experience Storyboard" loading="lazy">
+          <img data-src="images/day4_park_composite.jpg" alt="Park Experience Storyboard" loading="lazy">
         </div>
 
         <div class="full-paragraph">
@@ -774,7 +787,7 @@
 
         <!-- Paragraph Summary Composite Image -->
         <div class="hero-img-box">
-          <img src="images/day4_concert_composite.jpg" alt="Concert Experience Storyboard" loading="lazy">
+          <img data-src="images/day4_concert_composite.jpg" alt="Concert Experience Storyboard" loading="lazy">
         </div>
 
         <div class="full-paragraph">
@@ -799,7 +812,7 @@
 
         <!-- Paragraph Summary Composite Image -->
         <div class="hero-img-box">
-          <img src="images/day5_japan_composite.jpg" alt="Japan Family Trip Storyboard" loading="lazy">
+          <img data-src="images/day5_japan_composite.jpg" alt="Japan Family Trip Storyboard" loading="lazy">
         </div>
 
         <div class="full-paragraph">
@@ -819,7 +832,7 @@
 
         <!-- Paragraph Summary Composite Image -->
         <div class="hero-img-box">
-          <img src="images/day5_rental_composite.jpg" alt="Rental Car and Roles Storyboard" loading="lazy">
+          <img data-src="images/day5_rental_composite.jpg" alt="Rental Car and Roles Storyboard" loading="lazy">
         </div>
 
         <div class="full-paragraph">
@@ -842,7 +855,7 @@
 
         <!-- Paragraph Summary Composite Image -->
         <div class="hero-img-box">
-          <img src="images/day6_holiday_composite.jpg" alt="Holiday Routine Storyboard" loading="lazy">
+          <img data-src="images/day6_holiday_composite.jpg" alt="Holiday Routine Storyboard" loading="lazy">
         </div>
 
         <div class="full-paragraph">
@@ -1104,13 +1117,15 @@
     let recordedChunks = [];
     let isPlayingAll = false;
 
-    // Render Sentences with Flashcard Illustration Images & Pronunciation Coaching Box
+    // Render Sentences with Flashcard Illustration Images & Pronunciation Coaching Box (Mobile Optimized)
     function renderSentences(list, containerId) {
       const container = document.getElementById(containerId);
+      if (!container) return;
+      const isHideImages = document.body.classList.contains('hide-images');
       container.innerHTML = list.map((item, idx) => `
         <div class="sentence-card" id="card_${item.id}">
           <div class="img-box" id="imgbox_${item.id}">
-            <img src="images/${item.id}.jpg" alt="${item.id}" loading="lazy" onerror="document.getElementById('imgbox_${item.id}').style.display='none';">
+            <img ${isHideImages ? `data-src="images/${item.id}.jpg"` : `src="images/${item.id}.jpg"`} alt="${item.id}" loading="lazy" onerror="document.getElementById('imgbox_${item.id}').style.display='none';">
           </div>
           <div class="sentence-header">
             <span class="sentence-num">Sentence ${idx + 1}</span>
@@ -1135,12 +1150,6 @@
     function escapeQuotes(str) {
       return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
     }
-
-    renderSentences(day1Data, 'day1Sentences');
-    renderSentences(parkData, 'parkSentences');
-    renderSentences(bedroomData, 'bedroomSentences');
-    renderSentences(day3ParkData, 'day3ParkSentences');
-    renderSentences(day3MusicData, 'day3MusicSentences');
 
     const day4ParkData = [
       { 
@@ -1246,9 +1255,6 @@
       }
     ];
 
-    renderSentences(day4ParkData, 'day4ParkSentences');
-    renderSentences(day4ConcertData, 'day4ConcertSentences');
-
     const day5JapanData = [
       { 
         id: "day5_japan_1", 
@@ -1346,9 +1352,6 @@
       }
     ];
 
-    renderSentences(day5JapanData, 'day5JapanSentences');
-    renderSentences(day5RentalData, 'day5RentalSentences');
-
     const day6HolidayData = [
       { 
         id: "day6_holiday_1", 
@@ -1394,7 +1397,97 @@
       }
     ];
 
-    renderSentences(day6HolidayData, 'day6HolidaySentences');
+    // Toggle Images / Mobile Data Saver Mode
+    function toggleImages() {
+      const isHiding = document.body.classList.toggle('hide-images');
+      const badge = document.getElementById('imageBadge');
+      const btn = document.getElementById('imageToggleBtn');
+      if (badge && btn) {
+        if (!isHiding) {
+          badge.innerText = 'ON';
+          badge.style.background = '#059669';
+          badge.style.color = '#ffffff';
+          btn.style.background = 'rgba(16, 185, 129, 0.15)';
+          btn.style.borderColor = 'rgba(16, 185, 129, 0.45)';
+          btn.style.color = '#34d399';
+          // Activate images for current active tab
+          const activeTab = document.querySelector('.tab-content.active');
+          if (activeTab) {
+            activeTab.querySelectorAll('img[data-src]').forEach(img => {
+              img.src = img.getAttribute('data-src');
+              img.removeAttribute('data-src');
+            });
+          }
+        } else {
+          badge.innerText = '절약(OFF)';
+          badge.style.background = '#334155';
+          badge.style.color = '#94a3b8';
+          btn.style.background = '#1e293b';
+          btn.style.borderColor = 'var(--border)';
+          btn.style.color = '#94a3b8';
+        }
+      }
+      try {
+        localStorage.setItem('opic_hide_images', isHiding ? '1' : '0');
+      } catch (e) {}
+    }
+
+    // Restore Data Saver preference
+    try {
+      const savedHide = localStorage.getItem('opic_hide_images');
+      if (savedHide === '1') {
+        document.body.classList.add('hide-images');
+        const badge = document.getElementById('imageBadge');
+        const btn = document.getElementById('imageToggleBtn');
+        if (badge && btn) {
+          badge.innerText = '절약(OFF)';
+          badge.style.background = '#334155';
+          badge.style.color = '#94a3b8';
+          btn.style.background = '#1e293b';
+          btn.style.borderColor = 'var(--border)';
+          btn.style.color = '#94a3b8';
+        }
+      }
+    } catch (e) {}
+
+    // On-Demand Tab Initializer (Saves up to 95% mobile network data)
+    const initializedTabs = new Set();
+    function initTab(tabId) {
+      if (!tabId) return;
+      const isHideImages = document.body.classList.contains('hide-images');
+
+      if (!initializedTabs.has(tabId)) {
+        initializedTabs.add(tabId);
+        if (tabId === 'day1') {
+          renderSentences(day1Data, 'day1Sentences');
+        } else if (tabId === 'day2') {
+          renderSentences(parkData, 'parkSentences');
+          renderSentences(bedroomData, 'bedroomSentences');
+        } else if (tabId === 'day3') {
+          renderSentences(day3ParkData, 'day3ParkSentences');
+          renderSentences(day3MusicData, 'day3MusicSentences');
+        } else if (tabId === 'day4') {
+          renderSentences(day4ParkData, 'day4ParkSentences');
+          renderSentences(day4ConcertData, 'day4ConcertSentences');
+        } else if (tabId === 'day5') {
+          renderSentences(day5JapanData, 'day5JapanSentences');
+          renderSentences(day5RentalData, 'day5RentalSentences');
+        } else if (tabId === 'day6') {
+          renderSentences(day6HolidayData, 'day6HolidaySentences');
+        }
+      }
+
+      // Activate any lazy images in this tab if images are enabled
+      if (!isHideImages) {
+        const tabEl = document.getElementById(tabId);
+        if (tabEl) {
+          tabEl.querySelectorAll('img[data-src]').forEach(img => {
+            img.src = img.getAttribute('data-src');
+            img.removeAttribute('data-src');
+          });
+        }
+      }
+    }
 
     // Toggle Pronunciation Coaching Visibility
     function toggleGuide() {
@@ -1484,6 +1577,7 @@
       if (loopSel) loopSel.value = globalRepeatVal;
 
       stopAudio();
+      initTab(tabId);
     }
 
     // Visual Repeat Badge Indicator Helper
@@ -1762,6 +1856,9 @@
         audio.play();
       }
     }
+
+    // Initial page load: Only initialize active tab (Day 1) to conserve mobile data
+    initTab('day1');
   </script>
 </body>
 </html>
