@@ -501,7 +501,7 @@
 <body class="show-guide">
 
   <header>
-    <h1>🎯 OPIc IH 학습 센터 (Day 1 ~ Day 5) <span style="background: rgba(59, 130, 246, 0.25); color: #60a5fa; font-size: 0.72rem; padding: 2px 8px; border-radius: 9999px; vertical-align: middle;">v1.5.2</span></h1>
+    <h1>🎯 OPIc IH 학습 센터 (Day 1 ~ Day 5) <span style="background: rgba(59, 130, 246, 0.25); color: #60a5fa; font-size: 0.72rem; padding: 2px 8px; border-radius: 9999px; vertical-align: middle;">v1.5.3</span></h1>
     <p>문장별 TTS 원어민 음성 재생 · 반복 청취 · 섀도잉 & 녹음 훈련</p>
   </header>
 
@@ -1496,8 +1496,7 @@
 
         player.onended = complete;
 
-        player.onerror = () => {
-        const AUDIO_TAG = 'v=1.5.1';
+        const AUDIO_TAG = 'v=1.5.3';
         // If mp3 fails, fallback to wav
         player.onerror = () => {
           // If wav fails, fallback to speech synthesis
