@@ -501,7 +501,7 @@
 <body class="show-guide">
 
   <header>
-    <h1>🎯 OPIc IH 학습 센터 (Day 1 ~ Day 5) <span style="background: rgba(59, 130, 246, 0.25); color: #60a5fa; font-size: 0.72rem; padding: 2px 8px; border-radius: 9999px; vertical-align: middle;">v1.5</span></h1>
+    <h1>🎯 OPIc IH 학습 센터 (Day 1 ~ Day 5) <span style="background: rgba(59, 130, 246, 0.25); color: #60a5fa; font-size: 0.72rem; padding: 2px 8px; border-radius: 9999px; vertical-align: middle;">v1.5.1</span></h1>
     <p>문장별 TTS 원어민 음성 재생 · 반복 청취 · 섀도잉 & 녹음 훈련</p>
   </header>
 
@@ -1497,19 +1497,21 @@
         player.onended = complete;
 
         player.onerror = () => {
-          // If mp3 fails, fallback to wav
+        const AUDIO_TAG = 'v=1.5.1';
+        // If mp3 fails, fallback to wav
+        player.onerror = () => {
+          // If wav fails, fallback to speech synthesis
           player.onerror = () => {
-            // If wav fails, fallback to speech synthesis
             useWebSpeechAPIPromise(text, speed).then(complete);
           };
-          player.src = `./audio/${id}.wav`;
+          player.src = `./audio/${id}.wav?${AUDIO_TAG}`;
           player.playbackRate = speed;
           player.play().catch(() => {
             useWebSpeechAPIPromise(text, speed).then(complete);
           });
         };
 
-        player.src = `./audio/${id}.mp3`;
+        player.src = `./audio/${id}.mp3?${AUDIO_TAG}`;
         player.playbackRate = speed;
         player.currentTime = 0;
 
@@ -1528,7 +1530,7 @@
       stopAudio();
       const player = getSharedAudio();
       activeAudio = player;
-      player.src = `./audio/${name}.mp3`;
+      player.src = `./audio/${name}.mp3?v=1.5.1`;
       player.playbackRate = parseFloat(document.getElementById('speedSelect').value) || 1.0;
       player.currentTime = 0;
       const p = player.play();
