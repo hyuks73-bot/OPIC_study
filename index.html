@@ -443,7 +443,7 @@
 <body>
 
   <header>
-    <h1>🎯 OPIc IH 학습 센터 (Day 1 ~ Day 5)</h1>
+    <h1>🎯 OPIc IH 학습 센터 (Day 1 ~ Day 5) <span style="background: rgba(59, 130, 246, 0.25); color: #60a5fa; font-size: 0.72rem; padding: 2px 8px; border-radius: 9999px; vertical-align: middle;">v1.3</span></h1>
     <p>문장별 TTS 원어민 음성 재생 · 반복 청취 · 섀도잉 & 녹음 훈련</p>
   </header>
 
@@ -876,30 +876,28 @@
     renderSentences(day5JapanData, 'day5JapanSentences');
     renderSentences(day5RentalData, 'day5RentalSentences');
 
-    // Day-specific repeat settings & Tab Navigation
-    const dayRepeatSettings = {
-      day1: '1',
-      day2: '1',
-      day3: '1',
-      day4: '1',
-      day5: '1'
-    };
-    let currentTabId = 'day1';
+    // Global Shared Audio Engine (Solves mobile Safari/Chrome autoplay restrictions)
+    let sharedAudioPlayer = null;
+    function getSharedAudio() {
+      if (!sharedAudioPlayer) {
+        sharedAudioPlayer = new Audio();
+      }
+      return sharedAudioPlayer;
+    }
 
-    // Restore saved repeat settings from localStorage
+    // Global Repeat Preference across all tabs (Saved in localStorage)
+    let globalRepeatVal = '1';
     try {
-      ['day1', 'day2', 'day3', 'day4', 'day5'].forEach(t => {
-        const saved = localStorage.getItem('opic_repeat_' + t);
-        if (saved) dayRepeatSettings[t] = saved;
-      });
+      const saved = localStorage.getItem('opic_repeat_count');
+      if (saved) globalRepeatVal = saved;
       const loopSel = document.getElementById('loopSelect');
-      if (loopSel) loopSel.value = dayRepeatSettings['day1'] || '1';
+      if (loopSel) loopSel.value = globalRepeatVal;
     } catch (e) {}
 
     function onRepeatChange(val) {
-      dayRepeatSettings[currentTabId] = val;
+      globalRepeatVal = val;
       try {
-        localStorage.setItem('opic_repeat_' + currentTabId, val);
+        localStorage.setItem('opic_repeat_count', val);
       } catch (e) {}
     }
 
@@ -916,11 +914,9 @@
       const targetContent = document.getElementById(tabId);
       if (targetContent) targetContent.classList.add('active');
 
-      // Update currentTabId and restore that Day's specific repeat setting!
-      currentTabId = tabId;
-      const savedRepeat = dayRepeatSettings[tabId] || '1';
+      // Preserve repeat selector value across tabs
       const loopSel = document.getElementById('loopSelect');
-      if (loopSel) loopSel.value = savedRepeat;
+      if (loopSel) loopSel.value = globalRepeatVal;
 
       stopAudio();
     }
@@ -960,26 +956,81 @@
         clearTimeout(allPlayTimeout);
         allPlayTimeout = null;
       }
-      if (activeAudio) {
-        activeAudio.pause();
-        activeAudio = null;
+      if (sharedAudioPlayer) {
+        try {
+          sharedAudioPlayer.pause();
+          sharedAudioPlayer.currentTime = 0;
+          sharedAudioPlayer.onended = null;
+          sharedAudioPlayer.onerror = null;
+        } catch (e) {}
+      }
+      if (activeAudio && activeAudio !== sharedAudioPlayer) {
+        try {
+          activeAudio.pause();
+          activeAudio = null;
+        } catch (e) {}
       }
       if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
+        try { window.speechSynthesis.cancel(); } catch (e) {}
       }
       if (activeCard) {
         activeCard.classList.remove('playing');
         removeRepeatBadge(activeCard);
         activeCard = null;
       }
+      document.querySelectorAll('.sentence-card.playing').forEach(el => el.classList.remove('playing'));
       document.querySelectorAll('.repeat-indicator').forEach(el => el.remove());
       isPlayingAll = false;
       const stopBtn = document.getElementById('stopBtn');
       if (stopBtn) stopBtn.style.display = 'none';
     }
 
+    // Reliable Audio Play Promise using Shared Audio Player
+    function playAudioSource(id, text, speed) {
+      return new Promise((resolve) => {
+        const player = getSharedAudio();
+        activeAudio = player;
+        let isDone = false;
+
+        const complete = () => {
+          if (isDone) return;
+          isDone = true;
+          player.onended = null;
+          player.onerror = null;
+          resolve();
+        };
+
+        player.onended = complete;
+
+        player.onerror = () => {
+          // If mp3 fails, fallback to wav
+          player.onerror = () => {
+            // If wav fails, fallback to speech synthesis
+            useWebSpeechAPIPromise(text, speed).then(complete);
+          };
+          player.src = `./audio/${id}.wav`;
+          player.playbackRate = speed;
+          player.play().catch(() => {
+            useWebSpeechAPIPromise(text, speed).then(complete);
+          });
+        };
+
+        player.src = `./audio/${id}.mp3`;
+        player.playbackRate = speed;
+        player.currentTime = 0;
+
+        const p = player.play();
+        if (p !== undefined) {
+          p.catch((err) => {
+            console.warn('HTMLAudio play failed, fallback to SpeechSynthesis:', err);
+            useWebSpeechAPIPromise(text, speed).then(complete);
+          });
+        }
+      });
+    }
+
     // Audio Playing Function for single sentence
-    function playSentence(id, text) {
+    async function playSentence(id, text) {
       stopAudio();
       
       const speed = parseFloat(document.getElementById('speedSelect').value) || 1.0;
@@ -991,63 +1042,31 @@
         activeCard = card;
       }
 
+      const isInfinite = (loopCount >= 999);
+      const totalRepeats = isInfinite ? 999999 : loopCount;
       let currentLoop = 0;
-      const playNext = () => {
+
+      while (currentLoop < totalRepeats) {
         currentLoop++;
         updateRepeatBadge(card, currentLoop, loopCount);
 
-        const audio = new Audio(`./audio/${id}.mp3`);
-        audio.playbackRate = speed;
-        activeAudio = audio;
+        await playAudioSource(id, text, speed);
 
-        audio.onended = () => {
-          if (currentLoop < loopCount) {
-            allPlayTimeout = setTimeout(playNext, 800);
-          } else {
-            if (card) {
-              card.classList.remove('playing');
-              removeRepeatBadge(card);
-            }
-          }
-        };
+        if (!activeCard || activeCard !== card) break;
 
-        audio.onerror = () => {
-          const wavAudio = new Audio(`./audio/${id}.wav`);
-          wavAudio.playbackRate = speed;
-          activeAudio = wavAudio;
-          wavAudio.onended = audio.onended;
-          wavAudio.onerror = () => useWebSpeechAPI(text, speed, loopCount, card, currentLoop, playNext);
-          wavAudio.play().catch(() => useWebSpeechAPI(text, speed, loopCount, card, currentLoop, playNext));
-        };
-
-        audio.play().catch(() => {
-          useWebSpeechAPI(text, speed, loopCount, card, currentLoop, playNext);
-        });
-      };
-
-      playNext();
-    }
-
-    function useWebSpeechAPI(text, speed, loopCount, card, currentLoop, onNext) {
-      if (!('speechSynthesis' in window)) return;
-
-      const cleanText = text.replace(/<[^>]*>/g, '');
-      const utterance = new SpeechSynthesisUtterance(cleanText);
-      utterance.rate = speed;
-      utterance.lang = 'en-US';
-
-      utterance.onend = () => {
-        if (currentLoop < loopCount && onNext) {
-          allPlayTimeout = setTimeout(onNext, 800);
-        } else {
-          if (card) {
-            card.classList.remove('playing');
-            removeRepeatBadge(card);
-          }
+        if (currentLoop < totalRepeats) {
+          await new Promise(r => {
+            allPlayTimeout = setTimeout(r, 800);
+          });
+          if (!activeCard || activeCard !== card) break;
         }
-      };
+      }
 
-      window.speechSynthesis.speak(utterance);
+      if (activeCard === card) {
+        card.classList.remove('playing');
+        removeRepeatBadge(card);
+        activeCard = null;
+      }
     }
 
     // Play All Sentences in Active Tab with selected repeats per sentence
@@ -1070,6 +1089,7 @@
       do {
         for (let card of cards) {
           if (!isPlayingAll) break;
+
           const id = card.id.replace('card_', '');
           const textEl = card.querySelector('.en-text');
           const text = textEl ? textEl.innerHTML : '';
@@ -1080,26 +1100,17 @@
 
           for (let rep = 1; rep <= repeatPerSentence; rep++) {
             if (!isPlayingAll) break;
-            updateRepeatBadge(card, rep, repeatPerSentence);
+            updateRepeatBadge(card, rep, isInfinite ? 999 : repeatPerSentence);
 
-            await new Promise((resolve) => {
-              const audio = new Audio(`./audio/${id}.mp3`);
-              audio.playbackRate = speed;
-              activeAudio = audio;
+            await playAudioSource(id, text, speed);
 
-              const onDone = () => {
-                const pauseTime = (rep < repeatPerSentence) ? 1000 : 1500;
-                allPlayTimeout = setTimeout(resolve, pauseTime);
-              };
+            if (!isPlayingAll) break;
 
-              audio.onended = onDone;
-              audio.onerror = () => {
-                useWebSpeechAPIPromise(text, speed).then(onDone);
-              };
-
-              audio.play().catch(() => {
-                useWebSpeechAPIPromise(text, speed).then(onDone);
-              });
+            // Pause between repeats of the SAME sentence (1000ms for shadowing)
+            // or pause before moving to the NEXT sentence (1500ms)
+            const pauseTime = (rep < repeatPerSentence) ? 1000 : 1500;
+            await new Promise(r => {
+              allPlayTimeout = setTimeout(r, pauseTime);
             });
           }
 
@@ -1113,11 +1124,16 @@
 
     function useWebSpeechAPIPromise(text, speed) {
       return new Promise((resolve) => {
+        if (!('speechSynthesis' in window)) {
+          resolve();
+          return;
+        }
         const cleanText = text.replace(/<[^>]*>/g, '');
         const utterance = new SpeechSynthesisUtterance(cleanText);
         utterance.rate = speed;
         utterance.lang = 'en-US';
         utterance.onend = resolve;
+        utterance.onerror = resolve;
         window.speechSynthesis.speak(utterance);
       });
     }
@@ -1158,7 +1174,9 @@
 
     function playRecorded(id) {
       if (userRecordings[id]) {
+        stopAudio();
         const audio = new Audio(userRecordings[id]);
+        activeAudio = audio;
         audio.play();
       }
     }
