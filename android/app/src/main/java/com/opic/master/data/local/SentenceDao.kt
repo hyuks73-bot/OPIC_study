@@ -47,5 +47,37 @@ abstract class AppDatabase : RoomDatabase() {
                 instance
             }
         }
+
+        suspend fun seedDatabaseIfEmpty(context: android.content.Context, dao: SentenceDao) {
+            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                if (dao.getSentenceById("day1_1") == null) {
+                    try {
+                        val jsonString = context.assets.open("data_manifest.json").bufferedReader().use { it.readText() }
+                        val manifest = com.google.gson.Gson().fromJson(jsonString, com.opic.master.data.model.ManifestResponse::class.java)
+                        val list = mutableListOf<Sentence>()
+                        for ((dayKey, dayData) in manifest.days) {
+                            for (item in dayData.sentences) {
+                                list.add(
+                                    Sentence(
+                                        id = item.id,
+                                        dayKey = dayKey,
+                                        en = item.en,
+                                        ko = item.ko,
+                                        guide = item.guide,
+                                        tip = item.tip,
+                                        audioUrl = item.audioUrl,
+                                        imageUrl = item.imageUrl,
+                                        isDownloaded = false
+                                    )
+                                )
+                            }
+                        }
+                        dao.insertAll(list)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+        }
     }
 }

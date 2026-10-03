@@ -25,7 +25,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // 1. Trigger background differential GitHub Sync via WorkManager
+        // 1. Seed database from bundled assets if empty
+        androidx.lifecycle.lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            AppDatabase.seedDatabaseIfEmpty(this@MainActivity, db.sentenceDao())
+        }
+
+        // 2. Trigger background differential GitHub Sync via WorkManager
         triggerGitHubSync()
 
         setContent {

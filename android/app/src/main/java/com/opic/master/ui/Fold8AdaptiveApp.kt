@@ -104,6 +104,8 @@ fun Fold8AdaptiveApp(
     }
 
     val isDisplayingFlex = isUnfolded && isManualFlexActive
+    val currentActiveSentence = activeSentence?.takeIf { s -> filteredSentences.any { it.id == s.id } }
+        ?: filteredSentences.firstOrNull()
 
     when {
         !isUnfolded -> {
@@ -112,7 +114,7 @@ fun Fold8AdaptiveApp(
                 selectedDay = selectedDay,
                 onSelectDay = { selectedDay = it },
                 sentences = filteredSentences,
-                activeSentence = activeSentence,
+                activeSentence = currentActiveSentence,
                 isPlaying = isPlaying,
                 currentPlayingId = currentPlayingId,
                 repeatCount = repeatCount,
@@ -134,13 +136,13 @@ fun Fold8AdaptiveApp(
         isDisplayingFlex -> {
             // 2. Flex Mode (Tabletop Posture 90° ~ 115° or Manual Toggle)
             FlexModeLayout(
-                activeSentence = activeSentence,
+                activeSentence = currentActiveSentence,
                 isPlaying = isPlaying,
                 repeatCount = repeatCount,
                 isRecording = isRecording,
                 onTogglePlay = onTogglePlay,
                 onStop = onStop,
-                onPlayCurrent = { activeSentence?.let { onPlaySentence(it, repeatCount) } },
+                onPlayCurrent = { currentActiveSentence?.let { onPlaySentence(it, repeatCount) } },
                 onToggleRecord = { isRecording = !isRecording },
                 onCycleRepeat = { handleRepeatCycle() },
                 onToggleFlexMode = { isManualFlexActive = false }
@@ -152,7 +154,7 @@ fun Fold8AdaptiveApp(
                 selectedDay = selectedDay,
                 onSelectDay = { selectedDay = it },
                 sentences = filteredSentences,
-                activeSentence = activeSentence,
+                activeSentence = currentActiveSentence,
                 isPlaying = isPlaying,
                 currentPlayingId = currentPlayingId,
                 repeatCount = repeatCount,
@@ -289,7 +291,18 @@ fun CoverDisplayLayout(
                                 Icon(Icons.Default.SkipPrevious, contentDescription = "Prev", tint = Color.White)
                             }
                             FilledIconButton(
-                                onClick = onTogglePlay,
+                                onClick = {
+                                    if (isPlaying) {
+                                        onTogglePlay()
+                                    } else if (currentPlayingId != null) {
+                                        onTogglePlay()
+                                    } else {
+                                        val target = activeSentence ?: sentences.firstOrNull()
+                                        if (target != null) {
+                                            onSelectSentence(target)
+                                        }
+                                    }
+                                },
                                 modifier = Modifier.size(44.dp),
                                 colors = IconButtonDefaults.filledIconButtonColors(
                                     containerColor = Color(0xFF6366F1)
@@ -951,7 +964,18 @@ fun MainDualPaneLayout(
                 ) {
                     // Play / Pause Button
                     Button(
-                        onClick = onTogglePlay,
+                        onClick = {
+                            if (isPlaying) {
+                                onTogglePlay()
+                            } else if (currentPlayingId != null) {
+                                onTogglePlay()
+                            } else {
+                                val target = activeSentence ?: sentences.firstOrNull()
+                                if (target != null) {
+                                    onSelectSentence(target)
+                                }
+                            }
+                        },
                         modifier = Modifier.weight(1.2f).height(46.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (isPlaying) Color(0xFF4338CA) else Color(0xFF6366F1)
@@ -1148,7 +1172,15 @@ fun FlexModeLayout(
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
                 // Play / Pause
                 FilledIconButton(
-                    onClick = onTogglePlay,
+                    onClick = {
+                        if (isPlaying) {
+                            onTogglePlay()
+                        } else if (currentPlayingId != null) {
+                            onTogglePlay()
+                        } else {
+                            onPlayCurrent()
+                        }
+                    },
                     modifier = Modifier.size(60.dp),
                     colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color(0xFF6366F1))
                 ) {
