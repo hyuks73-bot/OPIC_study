@@ -186,6 +186,7 @@ fun Fold8AdaptiveApp(
                 isPlaying = isPlaying,
                 currentPlayingId = currentPlayingId,
                 repeatCount = repeatCount,
+                speed = speed,
                 showCoaching = showCoaching,
                 onToggleCoaching = { showCoaching = !showCoaching },
                 onSelectSentence = {
@@ -196,6 +197,7 @@ fun Fold8AdaptiveApp(
                 onTogglePlay = onTogglePlay,
                 onStop = onStop,
                 onCycleRepeat = { handleRepeatCycle() },
+                onCycleSpeed = { handleSpeedCycle() },
                 onPrevSentence = { handlePrevSentence() },
                 onNextSentence = { handleNextSentence() },
                 onSyncGitHub = onSyncGitHub
@@ -279,6 +281,7 @@ fun CoverDisplayLayout(
     isPlaying: Boolean,
     currentPlayingId: String?,
     repeatCount: Int,
+    speed: Float,
     showCoaching: Boolean,
     onToggleCoaching: () -> Unit,
     onSelectSentence: (Sentence) -> Unit,
@@ -286,6 +289,7 @@ fun CoverDisplayLayout(
     onTogglePlay: () -> Unit,
     onStop: () -> Unit,
     onCycleRepeat: () -> Unit,
+    onCycleSpeed: () -> Unit,
     onPrevSentence: () -> Unit,
     onNextSentence: () -> Unit,
     onSyncGitHub: () -> Unit
@@ -422,20 +426,38 @@ fun CoverDisplayLayout(
                             }
                         }
 
-                        OutlinedButton(
-                            onClick = onCycleRepeat,
-                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                            shape = RoundedCornerShape(8.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                containerColor = Color(0xFF1E293B)
-                            )
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                            horizontalAlignment = Alignment.End
                         ) {
-                            Text(
-                                text = "🔁 ${if (repeatCount >= 999) "무한" else "${repeatCount}회"}",
-                                fontSize = 11.sp,
-                                color = Color(0xFFFBBF24),
-                                fontWeight = FontWeight.Bold
-                            )
+                            // Repeat Count Chip
+                            Surface(
+                                color = Color(0xFF1E293B),
+                                shape = RoundedCornerShape(6.dp),
+                                modifier = Modifier.clickable { onCycleRepeat() }
+                            ) {
+                                Text(
+                                    text = "🔁 ${if (repeatCount >= 999) "무한" else "${repeatCount}회"}",
+                                    fontSize = 11.sp,
+                                    color = Color(0xFFFBBF24),
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
+                                )
+                            }
+                            // Playback Speed Chip
+                            Surface(
+                                color = Color(0xFF1E293B),
+                                shape = RoundedCornerShape(6.dp),
+                                modifier = Modifier.clickable { onCycleSpeed() }
+                            ) {
+                                Text(
+                                    text = "⚡ ${speed}x",
+                                    fontSize = 11.sp,
+                                    color = Color(0xFFA5B4FC),
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
+                                )
+                            }
                         }
                     }
                 }
