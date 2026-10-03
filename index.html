@@ -2,15 +2,8 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-  <link rel="manifest" href="./app_manifest.json">
-  <link rel="icon" type="image/png" href="images/favicon.png">
-  <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
-  <meta name="theme-color" content="#4f46e5">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="OPIc Master">
-  <title>OPIc IH 실전 트레이닝 (Day 1 ~ Day 6) · 갤럭시 폴드 최적화</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OPIc IH Day 1 & Day 2 인터랙티브 트레이닝</title>
   <style>
     :root {
       --primary: #6366f1;
@@ -34,18 +27,16 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Samsung Sans", "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Segoe UI", Roboto, sans-serif;
       background-color: var(--bg);
       color: var(--text);
       line-height: 1.6;
-      padding-bottom: max(96px, calc(env(safe-area-inset-bottom) + 84px));
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
+      padding-bottom: 80px;
     }
 
     header {
       background: linear-gradient(135deg, #4f46e5, #7c3aed);
-      padding: max(16px, env(safe-area-inset-top)) 16px 16px 16px;
+      padding: 18px 16px;
       text-align: center;
       box-shadow: 0 4px 16px rgba(0,0,0,0.3);
     }
@@ -67,7 +58,7 @@
     .nav-tabs-wrapper {
       position: sticky;
       top: 0;
-      z-index: 990;
+      z-index: 1000;
       background: rgba(11, 17, 32, 0.94);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
@@ -85,7 +76,6 @@
       scrollbar-width: none;
       max-width: 900px;
       margin: 0 auto;
-      scroll-snap-type: x proximity;
     }
 
     .nav-tabs::-webkit-scrollbar {
@@ -94,7 +84,6 @@
 
     .tab-btn {
       flex: 0 0 auto;
-      scroll-snap-align: center;
       padding: 9px 16px;
       border: 1px solid var(--border);
       background: var(--card-bg);
@@ -466,223 +455,51 @@
       display: none !important;
     }
 
-    /* Floating Thumb-Zone Bottom Player Bar (Galaxy Fold 8 Cover Screen) */
-    .bottom-player-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(15, 23, 42, 0.96);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border-top: 1px solid rgba(99, 102, 241, 0.35);
-      padding: 8px 12px;
-      padding-bottom: max(10px, env(safe-area-inset-bottom));
-      z-index: 1000;
-      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.55);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      max-width: 860px;
-      margin: 0 auto;
-    }
-
-    .bottom-info {
-      display: flex;
-      flex-direction: column;
-      min-width: 72px;
-      max-width: 105px;
-    }
-
-    .bottom-title {
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: #93c5fd;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .bottom-status {
-      font-size: 0.68rem;
-      color: var(--text-muted);
-    }
-
-    .bottom-controls {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .bottom-btn {
-      background: #1e293b;
-      color: var(--text);
-      border: 1px solid var(--border);
-      padding: 6px 12px;
-      border-radius: 10px;
-      font-size: 0.95rem;
-      cursor: pointer;
-      touch-action: manipulation;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 44px;
-      min-height: 44px;
-      transition: all 0.15s ease;
-    }
-
-    .bottom-btn:active {
-      transform: scale(0.92);
-    }
-
-    .bottom-btn-play {
-      background: linear-gradient(135deg, #4f46e5, #6366f1);
-      color: #ffffff;
-      border-color: #6366f1;
-      font-size: 1.15rem;
-      min-width: 50px;
-      min-height: 44px;
-      box-shadow: 0 2px 10px rgba(99, 102, 241, 0.4);
-    }
-
-    .bottom-btn-play:active {
-      background: #4338ca;
-    }
-
-    .bottom-extra {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .bottom-btn-loop {
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 6px 9px;
-      color: #fbbf24;
-      border-color: rgba(245, 158, 11, 0.4);
-      background: rgba(245, 158, 11, 0.12);
-      min-width: unset;
-      min-height: 40px;
-    }
-
-    .bottom-btn-top {
-      font-size: 0.8rem;
-      padding: 6px 10px;
-      min-width: unset;
-      min-height: 40px;
-    }
-
-    /* Mobile & Galaxy Fold 8 Cover Screen Optimization (1248 x 1972 px, ~428 ppi) */
+    /* Mobile media query tweaks */
     @media (max-width: 640px) {
       header {
-        padding: max(14px, env(safe-area-inset-top)) 12px 14px 12px;
+        padding: 14px 12px;
       }
       header h1 {
-        font-size: 1.2rem;
+        font-size: 1.25rem;
       }
-      header p {
-        font-size: 0.78rem;
-      }
-      .container {
-        padding: 0 10px;
-        margin-top: 10px;
-      }
-      /* Compact 2-column Grid for Fold 8 Cover Screen: Saves 100px+ vertical height */
       .global-controls {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
+        flex-direction: column;
+        align-items: stretch;
         gap: 8px;
         padding: 10px;
       }
       .global-controls .control-group {
-        background: var(--card-inner);
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 6px 8px;
         justify-content: space-between;
         width: 100%;
-      }
-      .global-controls .control-group label {
-        font-size: 0.76rem;
       }
       .global-controls select {
-        width: 100%;
-        max-width: none;
-        background-color: transparent;
-        padding: 4px 18px 4px 4px;
-        font-size: 0.8rem;
-        border: none;
-      }
-      .control-pill-btn {
-        width: 100%;
-        justify-content: space-between;
-        padding: 6px 8px;
-        font-size: 0.78rem;
-      }
-      .global-controls .control-group.full-width {
-        grid-column: 1 / -1;
-        background: transparent;
-        border: none;
-        padding: 0;
+        flex: 1;
+        max-width: 180px;
       }
       .btn-play-all {
         width: 100%;
-        padding: 11px;
-        font-size: 0.88rem;
-        border-radius: 10px;
+        padding: 10px;
+        font-size: 0.9rem;
       }
       .checklist {
         grid-template-columns: 1fr;
       }
-      .card {
-        padding: 14px 12px;
-        border-radius: 14px;
-        margin-bottom: 14px;
-      }
-      .card h2 {
-        font-size: 1.08rem;
-      }
-      .full-paragraph {
-        padding: 12px;
-        font-size: 0.94rem;
-        line-height: 1.68;
-      }
-      .sentence-card {
-        padding: 12px 10px;
-        border-radius: 12px;
-      }
       .sentence-header {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        gap: 6px;
+        flex-direction: column;
+        align-items: flex-start;
       }
       .sentence-actions {
-        display: flex;
-        gap: 6px;
-        flex: 1;
-        justify-content: flex-end;
+        width: 100%;
+        justify-content: flex-start;
       }
       .sentence-actions button {
-        padding: 8px 10px;
-        font-size: 0.8rem;
-        min-height: 40px;
-      }
-      .en-text {
-        font-size: 1.04rem;
-        line-height: 1.55;
-      }
-      .ko-text {
-        font-size: 0.85rem;
-        line-height: 1.48;
+        flex: 1;
+        text-align: center;
+        padding: 8px 6px;
       }
       .img-box img {
-        max-height: 180px;
-      }
-      .hero-img-box img {
-        max-height: 200px;
+        max-height: 190px;
       }
     }
   </style>
@@ -690,7 +507,7 @@
 <body class="show-guide">
 
   <header>
-    <h1>🎯 OPIc IH 학습 센터 (Day 1 ~ Day 6) <span style="background: rgba(59, 130, 246, 0.25); color: #60a5fa; font-size: 0.72rem; padding: 2px 8px; border-radius: 9999px; vertical-align: middle;">v1.6.2 · Fold 8 최적화</span></h1>
+    <h1>🎯 OPIc IH 학습 센터 (Day 1 ~ Day 7) <span style="background: rgba(59, 130, 246, 0.25); color: #60a5fa; font-size: 0.72rem; padding: 2px 8px; border-radius: 9999px; vertical-align: middle;">v1.7</span></h1>
     <p>문장별 TTS 원어민 음성 재생 · 반복 청취 · 섀도잉 & 녹음 훈련</p>
   </header>
 
@@ -703,6 +520,7 @@
       <button class="tab-btn" onclick="switchTab('day4')">💬 Day 4 과거 경험</button>
       <button class="tab-btn" onclick="switchTab('day5')">✈️ Day 5 해외 여행</button>
       <button class="tab-btn" onclick="switchTab('day6')">🏖️ Day 6 휴일 루틴</button>
+      <button class="tab-btn" onclick="switchTab('day7')">🎭 Day 7 롤플레이</button>
     </div>
   </div>
 
@@ -731,27 +549,45 @@
       </div>
 
       <div class="control-group">
-        <button id="guideToggleBtn" class="control-pill-btn" onclick="toggleGuide()" style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.45); color: #38bdf8;">
-          <span>🗣️ 발음 코칭</span>
-          <span id="guideBadge" class="badge-pill" style="background: #0284c7;">ON</span>
+        <button id="guideToggleBtn" onclick="toggleGuide()" style="display: flex; align-items: center; gap: 6px; padding: 7px 11px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.45); border-radius: 8px; color: #38bdf8; font-size: 0.82rem; font-weight: 600; cursor: pointer;">
+          <span>🗣️ 발음·강세 코칭</span>
+          <span id="guideBadge" style="background: #0284c7; color: white; padding: 1px 6px; border-radius: 9999px; font-size: 0.7rem; font-weight: 700;">ON</span>
         </button>
       </div>
 
       <div class="control-group">
-        <button id="imageToggleBtn" class="control-pill-btn" onclick="toggleImages()" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.45); color: #34d399;">
+        <button id="imageToggleBtn" onclick="toggleImages()" style="display: flex; align-items: center; gap: 6px; padding: 7px 11px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.45); border-radius: 8px; color: #34d399; font-size: 0.82rem; font-weight: 600; cursor: pointer;">
           <span>🖼️ 이미지</span>
-          <span id="imageBadge" class="badge-pill" style="background: #059669;">ON</span>
+          <span id="imageBadge" style="background: #059669; color: white; padding: 1px 6px; border-radius: 9999px; font-size: 0.7rem; font-weight: 700;">ON</span>
         </button>
       </div>
 
-      <div class="control-group full-width">
-        <button class="btn-primary btn-play-all" onclick="playAllSentences()">▶️ 탭 전체 자동 섀도잉 재생</button>
+      <div class="control-group" style="flex: 1 1 100%; margin-top: 4px;">
+        <button class="btn-primary btn-play-all" onclick="playAllSentences()" style="width: 100%;">▶️ 탭 전체 자동 섀도잉 재생</button>
         <button id="stopBtn" onclick="stopAudio()" style="display:none; background:#dc2626; width: 100%; margin-top: 6px;">⏹️ 재생 정지</button>
       </div>
+    </div>
 
-      <div class="control-group full-width" style="margin-top: 2px;">
-        <button id="btnOfflineSync" onclick="downloadAllAudioOffline()" style="width: 100%; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.45); color: #34d399; padding: 9px 12px; border-radius: 10px; font-size: 0.82rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; touch-action: manipulation;">
-          <span>⚡ 오프라인 음원 전체 내려받기 (비행기 모드 지원)</span>
+    <!-- Voice Sample Comparison Box -->
+    <div class="card" style="margin-bottom: 16px; border: 1px solid rgba(56, 189, 248, 0.35); background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9));">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <h3 style="font-size: 0.95rem; color: #38bdf8; margin: 0; display: flex; align-items: center; gap: 6px;">
+          🎧 원어민 보이스: 👨‍💼 Andrew (생생한 HD 음성) 적용 완료
+        </h3>
+        <span style="font-size: 0.72rem; background: #0284c7; color: #ffffff; padding: 2px 8px; border-radius: 9999px; font-weight: 700;">적용됨</span>
+      </div>
+      <p style="font-size: 0.83rem; color: #94a3b8; margin-bottom: 10px; line-height: 1.5;">
+        전체 문장에 <strong>Andrew HD 보이스</strong>가 적용되었습니다. 아래에서 기존 음성 및 여성 보이스와 음색을 비교해 보실 수 있습니다:
+      </p>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button onclick="playSampleAudio('sample_andrew')" style="flex: 1; min-width: 130px; background: #0284c7; color: white; padding: 9px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; border: none; cursor: pointer;">
+          ▶️ 👨‍💼 Andrew (현재 적용)
+        </button>
+        <button onclick="playSampleAudio('sample_ava')" style="flex: 1; min-width: 130px; background: #334155; color: #f1f5f9; padding: 9px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; border: 1px solid #475569; cursor: pointer;">
+          ▶️ 👩‍💼 Ava (생생한 여성)
+        </button>
+        <button onclick="playSampleAudio('sample_jenny')" style="flex: 1; min-width: 130px; background: #1e293b; color: #94a3b8; padding: 9px 12px; border-radius: 8px; font-size: 0.85rem; border: 1px solid #334155; cursor: pointer;">
+          ▶️ 🤖 기존 Jenny (이전 음성)
         </button>
       </div>
     </div>
@@ -1035,23 +871,51 @@
 
     </div>
 
-  </div>
+    <!-- TAB 7: DAY 7 -->
+    <div id="day7" class="tab-content">
 
-  <!-- Galaxy Fold 8 Cover Screen Floating Quick-Player Bar -->
-  <div class="bottom-player-bar" id="bottomPlayerBar">
-    <div class="bottom-info">
-      <div class="bottom-title" id="bottomSentenceBadge">Sentence 1</div>
-      <div class="bottom-status" id="bottomStatus">대기 중</div>
+      <!-- Day 7 Part 1: Q11 Asking Questions -->
+      <div class="card">
+        <h2>🎭 [롤플레이 11번] 친구에게 공원 조깅 제안 & 질문 3~4가지 (Inviting Friend to Park)</h2>
+        <p class="card-desc">
+          11번 질문하기 — <strong>"You want to go to a nearby park with your friend this weekend. Call your friend and ask three or four questions about the plan."</strong>
+        </p>
+
+        <!-- Paragraph Summary Composite Image (Data-saving lazy loaded) -->
+        <div class="hero-img-box">
+          <img data-src="images/day7_rp1_composite.jpg" alt="Role-Play Q11 Asking Questions Storyboard" loading="lazy">
+        </div>
+
+        <div class="full-paragraph">
+          Hey Min-su, it's Hyuk! <strong>Do you have a minute to talk?</strong> I was wondering if you're <strong>free this Saturday morning</strong>. You know the <strong>waterfront park near my place</strong>? The weather is supposed to be amazing, so I was thinking of going there for a <strong>light jog and a walk</strong>. <strong>What time works best for you?</strong> Would <strong>around 9 or 10 in the morning</strong> be okay? Also, after running, <strong>how about grabbing some brunch</strong> or a <strong>cup of coffee nearby</strong>? Oh, and <strong>should I pick you up in my car</strong>, or do you want to <strong>meet directly at the park entrance</strong>? Give me a call back when you hear this, okay? Bye!
+        </div>
+
+        <h3 style="font-size: 1.05rem; margin-bottom: 12px; color: #93c5fd;">🔊 문장별 섀도잉 & 녹음 연습 (Day 7 RP Part 1 - 질문하기)</h3>
+        <div id="day7RP1Sentences"></div>
+      </div>
+
+      <!-- Day 7 Part 2: Q12 Problem Solving & Alternatives -->
+      <div class="card">
+        <h2>🚨 [롤플레이 12번] 긴급 상황 발생 사과 & 대안 2~3가지 제시 (Canceling & Proposing Alternatives)</h2>
+        <p class="card-desc">
+          12번 문제해결·대안제시 — <strong>"You have an unexpected situation and you cannot go to the park with your friend as planned. Call your friend, explain the situation, and offer two or three alternatives."</strong>
+        </p>
+
+        <!-- Paragraph Summary Composite Image (Data-saving lazy loaded) -->
+        <div class="hero-img-box">
+          <img data-src="images/day7_rp2_composite.jpg" alt="Role-Play Q12 Problem Solving Storyboard" loading="lazy">
+        </div>
+
+        <div class="full-paragraph">
+          Hey Min-su, it's Hyuk again. <strong>I'm really sorry, but something unexpected just came up</strong> and <strong>I don't think I can make it</strong> to the park tomorrow morning. My mother just called and <strong>asked me to help her with an urgent family errand</strong>, so I have to go over there. I feel so bad about this! First of all, <strong>would you be available on Sunday morning instead?</strong> The weather looks great on Sunday as well. If Sunday doesn't work for you, <strong>how about meeting up late tomorrow afternoon</strong> around 5 PM after I finish my errand? Whichever time works for you, <strong>I'll definitely treat you to a delicious lunch and coffee</strong> to <strong>make it up to you</strong>. Let me know what you think, and I'm so sorry again!
+        </div>
+
+        <h3 style="font-size: 1.05rem; margin-bottom: 12px; color: #93c5fd;">🔊 문장별 섀도잉 & 녹음 연습 (Day 7 RP Part 2 - 대안 제시)</h3>
+        <div id="day7RP2Sentences"></div>
+      </div>
+
     </div>
-    <div class="bottom-controls">
-      <button class="bottom-btn" id="bottomPrevBtn" onclick="playPrevSentence()" title="이전 문장 (Prev)">⏮</button>
-      <button class="bottom-btn bottom-btn-play" id="bottomPlayToggleBtn" onclick="toggleBottomPlay()" title="재생 / 정지">▶</button>
-      <button class="bottom-btn" id="bottomNextBtn" onclick="playNextSentence()" title="다음 문장 (Next)">⏭</button>
-    </div>
-    <div class="bottom-extra">
-      <button class="bottom-btn bottom-btn-loop" id="bottomLoopBtn" onclick="cycleBottomRepeat()" title="반복 횟수 전환">🔁 <span id="bottomLoopText">1회</span></button>
-      <button class="bottom-btn bottom-btn-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="맨 위로">🔝</button>
-    </div>
+
   </div>
 
   <script>
@@ -1581,6 +1445,82 @@
       }
     ];
 
+    const day7RP1Data = [
+      {
+        id: "day7_rp1_1",
+        en: "Hey Min-su, it's Hyuk! <mark>Do you have a minute to talk?</mark> I was wondering if you're <mark>free this Saturday morning</mark>.",
+        ko: "민수야 안녕, 나 혁이야! 잠깐 통화할 시간 돼? 이번 주 토요일 아침에 시간 괜찮은지 궁금해서 전화했어.",
+        guide: "Hey Min-su, <span class=\"slash\">/</span> it's Hyuk! <span class=\"slash\">/</span> <strong>Do you have a MINute to talk?</strong> <span class=\"slash\">/</span> I was <strong>WONdering</strong> <span class=\"slash\">/</span> if you're <strong>FREE this Saturday morning</strong>.",
+        tip: "[전화 오프닝] Do you have a minute to talk? [두유해버-미닛투-톡] | I was wondering if ~ [아이워즈-원더링-이프: ~인지 궁금해서]"
+      },
+      {
+        id: "day7_rp1_2",
+        en: "You know the <mark>waterfront park near my place</mark>? The weather is supposed to be amazing, so I was thinking of going there for a <mark>light jog and a walk</mark>.",
+        ko: "우리 집 근처 수변 공원 알지? 날씨가 정말 좋을 거라고 해서, 가볍게 조깅도 하고 산책이나 하러 갈까 생각 중이었거든.",
+        guide: "You know the <strong>WAterfront park</strong> near my place? <span class=\"slash\">/</span> The <strong>WEATHer is supposed to be aMAZing</strong>, <span class=\"slash\">/</span> so I was thinking of going there <span class=\"slash\">/</span> for a <strong>LIGHT JOG and a walk</strong>.",
+        tip: "[제안 표현] I was thinking of ~ing [아이워즈-띵킹-오브: ~할까 생각 중이었어] | supposed to be [서포우스-투비: ~하기로 되어 있다]"
+      },
+      {
+        id: "day7_rp1_3",
+        en: "<mark>What time works best for you?</mark> Would <mark>around 9 or 10 in the morning</mark> be okay?",
+        ko: "몇 시에 만나는 게 제일 편해? 아침 9시나 10시쯤 괜찮을까?",
+        guide: "<strong>WHAT TIME works best for you?</strong> <span class=\"slash\">/</span> Would <strong>around NINE or TEN in the morning</strong> be okay?",
+        tip: "[시간 묻기] What time works best for you? [왓타임 웍스 베스-포유: 언제가 제일 편해?] | Would ~ be okay? [우쥬~ 비 오케이?]"
+      },
+      {
+        id: "day7_rp1_4",
+        en: "Also, after running, <mark>how about grabbing some brunch</mark> or a <mark>cup of coffee nearby</mark>?",
+        ko: "그리고 달리기 끝나고 나서, 근처에서 브런치 먹거나 커피 한잔하는 건 어때?",
+        guide: "Also, <strong>AFter running</strong>, <span class=\"slash\">/</span> <strong>HOW aBOUT grabbing some brunch</strong> <span class=\"slash\">/</span> or a <strong>CUP of COFfee nearby</strong>?",
+        tip: "[캐주얼 제안] grab brunch/coffee [그랩 브런치 / 컵 오브 커피: 간단히 먹다/마시다] | How about ~ing [하우 어바웃 ~잉]"
+      },
+      {
+        id: "day7_rp1_5",
+        en: "Oh, and <mark>should I pick you up in my car</mark>, or do you want to <mark>meet directly at the park entrance</mark>? Give me a call back, bye!",
+        ko: "아, 그리고 내가 차로 너 데리러 갈까, 아니면 공원 입구에서 바로 만날래? 확인하면 전화 줘, 안녕!",
+        guide: "Oh, and <strong>SHOULD I PICK you up in my car</strong>, <span class=\"slash\">/</span> or do you want to <strong>MEET diRECTly at the park ENtrance</strong>? <span class=\"slash\">/</span> <strong>Give me a call back</strong>, bye!",
+        tip: "[교통/픽업] pick you up [피큐업: 차로 태우러 가다] | meet directly [밋 디렉틀리: 바로 만나다] | Give me a call back [기브미 어 콜백]"
+      }
+    ];
+
+    const day7RP2Data = [
+      {
+        id: "day7_rp2_1",
+        en: "Hey Min-su, it's Hyuk again. <mark>I'm really sorry, but something unexpected just came up</mark> and <mark>I don't think I can make it</mark> to the park tomorrow morning.",
+        ko: "민수야, 나 혁이야. 정말 미안한데 갑자기 예기치 못한 일이 생겨서 내일 아침에 공원에 못 갈 것 같아.",
+        guide: "Hey Min-su, it's Hyuk again. <span class=\"slash\">/</span> <strong>I'm REALly SORry</strong>, <span class=\"slash\">/</span> but <strong>something unexPECTed just came up</strong> <span class=\"slash\">/</span> and <strong>I DON'T think I can make it</strong> <span class=\"slash\">/</span> to the park tomorrow morning.",
+        tip: "[문제 발생 필수 표현] something unexpected just came up [썸띵 언익스펙티드 저스트 케임업] | I don't think I can make it [메이킷: 가다/참석하다]"
+      },
+      {
+        id: "day7_rp2_2",
+        en: "My mother just called and <mark>asked me to help her with an urgent family errand</mark>, so I have to go over there.",
+        ko: "방금 어머니한테 전화가 왔는데, 급한 집안일을 좀 도와달라고 하셔서 거기에 다녀와야 할 것 같아.",
+        guide: "My mother just called <span class=\"slash\">/</span> and <strong>ASKED me to help her</strong> <span class=\"slash\">/</span> with an <strong>URgent FAMily errand</strong>, <span class=\"slash\">/</span> so <strong>I have to GO OVER there</strong>.",
+        tip: "[사유 설명] urgent family errand [얼전트 패밀리 에런드: 급한 집안 심부름/볼일] | have to go over there [거기로 가봐야 해]"
+      },
+      {
+        id: "day7_rp2_3",
+        en: "I feel so bad about this! First of all, <mark>would you be available on Sunday morning instead</mark>? The weather looks great on Sunday as well.",
+        ko: "정말 미안해! 우선 혹시 내일 대신 일요일 아침에 시간 괜찮을까? 일요일도 날씨가 아주 좋다고 해.",
+        guide: "<strong>I feel so BAD about this!</strong> <span class=\"slash\">/</span> First of all, <span class=\"slash\">/</span> <strong>would you be aVAILable on Sunday morning inSTEAD?</strong> <span class=\"slash\">/</span> The weather looks great on Sunday as well.",
+        tip: "[대안 1 질문] Would you be available on ~ instead? [우쥬비 어베일러블 온 ~ 인스테드?] | feel bad [미안하게 생각하다]"
+      },
+      {
+        id: "day7_rp2_4",
+        en: "If Sunday doesn't work for you, <mark>how about meeting up late tomorrow afternoon</mark> around 5 PM after I finish my errand?",
+        ko: "만약 일요일이 안 된다면, 내일 볼일을 다 마친 후 늦은 오후 5시쯤 만나는 건 어때?",
+        guide: "If Sunday doesn't work for you, <span class=\"slash\">/</span> <strong>HOW aBOUT meeting up</strong> <span class=\"slash\">/</span> <strong>LATE tomorrow AFternoon around 5 p.m.</strong> <span class=\"slash\">/</span> after I finish my errand?",
+        tip: "[대안 2 제안] If ~ doesn't work for you [이프 ~ 더즌 웍 포유: ~가 안 된다면] | late afternoon [늦은 오후]"
+      },
+      {
+        id: "day7_rp2_5",
+        en: "Whichever time works for you, <mark>I'll definitely treat you to a delicious lunch and coffee</mark> to <mark>make it up to you</mark>. Let me know!",
+        ko: "둘 중 언제든 너 편한 시간에 맞출게, 미안한 마음을 갚을 수 있게 맛있는 점심이랑 커피는 내가 꼭 살게. 어떻게 생각하는지 알려줘!",
+        guide: "<strong>WHICHever time works for you</strong>, <span class=\"slash\">/</span> <strong>I'll DEFinitely TREAT you</strong> <span class=\"slash\">/</span> to a <strong>deLIcious LUNCH and coffee</strong> <span class=\"slash\">/</span> to <strong>MAKE IT UP to you</strong>. <span class=\"slash\">/</span> Let me know!",
+        tip: "[고급 보상 표현] treat you to [트릿 유 투: 밥/커피를 사다] | make it up to you [메이킷 업투유: 만회하다/보상하다]"
+      }
+    ];
+
     // Toggle Images / Mobile Data Saver Mode
     function toggleImages() {
       const isHiding = document.body.classList.toggle('hide-images');
@@ -1658,6 +1598,9 @@
           renderSentences(day5RentalData, 'day5RentalSentences');
         } else if (tabId === 'day6') {
           renderSentences(day6HolidayData, 'day6HolidaySentences');
+        } else if (tabId === 'day7') {
+          renderSentences(day7RP1Data, 'day7RP1Sentences');
+          renderSentences(day7RP2Data, 'day7RP2Sentences');
         }
       }
 
@@ -1826,68 +1769,6 @@
       isPlayingAll = false;
       const stopBtn = document.getElementById('stopBtn');
       if (stopBtn) stopBtn.style.display = 'none';
-      if (typeof releaseAudioBackground === 'function') releaseAudioBackground();
-      if (typeof updateBottomPlayerUI === 'function') updateBottomPlayerUI();
-    }
-
-    // Background Screen-Off Audio Anchor & MediaSession Support (Galaxy Fold 8)
-    let bgSilentAudio = null;
-    function keepAudioActiveBackground() {
-      try {
-        if (!bgSilentAudio) {
-          bgSilentAudio = new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==");
-          bgSilentAudio.loop = true;
-        }
-        bgSilentAudio.play().catch(() => {});
-      } catch (e) {}
-    }
-
-    function releaseAudioBackground() {
-      try {
-        if (bgSilentAudio) {
-          bgSilentAudio.pause();
-        }
-        if ('mediaSession' in navigator) {
-          navigator.mediaSession.playbackState = 'paused';
-        }
-      } catch (e) {}
-    }
-
-    function updateMediaSession(title, subtitle) {
-      if ('mediaSession' in navigator) {
-        try {
-          navigator.mediaSession.metadata = new MediaMetadata({
-            title: title || 'OPIc Shadowing Sentence',
-            artist: subtitle || 'Andrew HD Neural Voice',
-            album: 'OPIc Master IH (Galaxy Fold 8)',
-            artwork: [
-              { src: 'images/day1_composite.jpg', sizes: '512x512', type: 'image/jpeg' }
-            ]
-          });
-          navigator.mediaSession.playbackState = 'playing';
-        } catch (e) {}
-      }
-    }
-
-    // Register Lockscreen & Bluetooth Earbuds Media Controls
-    if ('mediaSession' in navigator) {
-      try {
-        navigator.mediaSession.setActionHandler('play', () => {
-          if (typeof toggleBottomPlay === 'function') toggleBottomPlay();
-        });
-        navigator.mediaSession.setActionHandler('pause', () => {
-          stopAudio();
-        });
-        navigator.mediaSession.setActionHandler('stop', () => {
-          stopAudio();
-        });
-        navigator.mediaSession.setActionHandler('previoustrack', () => {
-          if (typeof playPrevSentence === 'function') playPrevSentence();
-        });
-        navigator.mediaSession.setActionHandler('nexttrack', () => {
-          if (typeof playNextSentence === 'function') playNextSentence();
-        });
-      } catch (e) {}
     }
 
     // Reliable Audio Play Promise using Shared Audio Player
@@ -1907,7 +1788,7 @@
 
         player.onended = complete;
 
-        const AUDIO_TAG = 'v=1.6.1';
+        const AUDIO_TAG = 'v=1.7';
         // If mp3 fails, fallback to wav
         player.onerror = () => {
           // If wav fails, fallback to speech synthesis
@@ -1935,6 +1816,20 @@
       });
     }
 
+    // Play Voice Sample Audio
+    function playSampleAudio(name) {
+      stopAudio();
+      const player = getSharedAudio();
+      activeAudio = player;
+      player.src = `./audio/${name}.mp3?v=1.7`;
+      player.playbackRate = parseFloat(document.getElementById('speedSelect').value) || 1.0;
+      player.currentTime = 0;
+      const p = player.play();
+      if (p !== undefined) {
+        p.catch(e => console.warn('Sample play failed:', e));
+      }
+    }
+
     // Audio Playing Function for single sentence
     async function playSentence(id) {
       stopAudio();
@@ -1948,10 +1843,6 @@
         card.classList.add('playing');
         card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         activeCard = card;
-        keepAudioActiveBackground();
-        const cleanTitle = text.replace(/\s+/g, ' ').trim() || id;
-        updateMediaSession(cleanTitle, `Sentence ${id.replace(/^[a-z0-9]+_/, '')}`);
-        if (typeof updateBottomPlayerUI === 'function') updateBottomPlayerUI();
       }
 
       const isInfinite = (loopCount >= 999);
@@ -1978,8 +1869,6 @@
         card.classList.remove('playing');
         removeRepeatBadge(card);
         activeCard = null;
-        releaseAudioBackground();
-        if (typeof updateBottomPlayerUI === 'function') updateBottomPlayerUI();
       }
     }
 
@@ -1987,10 +1876,8 @@
     async function playAllSentences() {
       stopAudio();
       isPlayingAll = true;
-      keepAudioActiveBackground();
       const stopBtn = document.getElementById('stopBtn');
       if (stopBtn) stopBtn.style.display = 'block';
-      if (typeof updateBottomPlayerUI === 'function') updateBottomPlayerUI();
 
       const activeTab = document.querySelector('.tab-content.active');
       if (!activeTab) return;
@@ -2009,13 +1896,10 @@
           const id = card.id.replace('card_', '');
           const textEl = card.querySelector('.en-text');
           const text = textEl ? textEl.innerHTML : '';
-          const cleanText = textEl ? textEl.innerText.replace(/\s+/g, ' ').trim() : id;
 
           card.classList.add('playing');
           card.scrollIntoView({ behavior: 'smooth', block: 'center' });
           activeCard = card;
-          updateMediaSession(cleanText, `전체 섀도잉 (${id})`);
-          if (typeof updateBottomPlayerUI === 'function') updateBottomPlayerUI();
 
           for (let rep = 1; rep <= repeatPerSentence; rep++) {
             if (!isPlayingAll) break;
@@ -2100,158 +1984,8 @@
       }
     }
 
-    // Galaxy Fold 8 Cover Screen Floating Quick-Player Controller Functions
-    function updateBottomPlayerUI() {
-      const bottomBadge = document.getElementById('bottomSentenceBadge');
-      const bottomStatus = document.getElementById('bottomStatus');
-      const bottomPlayBtn = document.getElementById('bottomPlayToggleBtn');
-      const bottomLoopText = document.getElementById('bottomLoopText');
-      const loopSel = document.getElementById('loopSelect');
-
-      if (bottomLoopText && loopSel) {
-        bottomLoopText.innerText = (loopSel.value === '999') ? '무한' : `${loopSel.value}회`;
-      }
-
-      if (activeCard) {
-        const numEl = activeCard.querySelector('.sentence-num');
-        if (bottomBadge && numEl) {
-          bottomBadge.innerText = numEl.innerText;
-        }
-      } else {
-        const activeTab = document.querySelector('.tab-content.active');
-        if (bottomBadge) {
-          if (activeTab && activeTab.id) {
-            bottomBadge.innerText = activeTab.id.toUpperCase();
-          } else {
-            bottomBadge.innerText = 'Sentence';
-          }
-        }
-      }
-
-      if (isPlayingAll) {
-        if (bottomStatus) bottomStatus.innerText = '전체 섀도잉 중';
-        if (bottomPlayBtn) bottomPlayBtn.innerHTML = '⏹';
-      } else if (activeCard) {
-        if (bottomStatus) bottomStatus.innerText = '재생 중';
-        if (bottomPlayBtn) bottomPlayBtn.innerHTML = '⏹';
-      } else {
-        if (bottomStatus) bottomStatus.innerText = '대기 중';
-        if (bottomPlayBtn) bottomPlayBtn.innerHTML = '▶';
-      }
-    }
-
-    function toggleBottomPlay() {
-      if (isPlayingAll || activeCard) {
-        stopAudio();
-      } else {
-        const activeTab = document.querySelector('.tab-content.active');
-        if (!activeTab) return;
-        const cards = Array.from(activeTab.querySelectorAll('.sentence-card'));
-        if (cards.length === 0) return;
-        const firstCardId = cards[0].id.replace('card_', '');
-        playSentence(firstCardId);
-      }
-    }
-
-    function playPrevSentence() {
-      const activeTab = document.querySelector('.tab-content.active');
-      if (!activeTab) return;
-      const cards = Array.from(activeTab.querySelectorAll('.sentence-card'));
-      if (cards.length === 0) return;
-
-      let targetIdx = 0;
-      if (activeCard) {
-        const curIdx = cards.indexOf(activeCard);
-        targetIdx = (curIdx > 0) ? curIdx - 1 : cards.length - 1;
-      }
-      const targetId = cards[targetIdx].id.replace('card_', '');
-      playSentence(targetId);
-    }
-
-    function playNextSentence() {
-      const activeTab = document.querySelector('.tab-content.active');
-      if (!activeTab) return;
-      const cards = Array.from(activeTab.querySelectorAll('.sentence-card'));
-      if (cards.length === 0) return;
-
-      let targetIdx = 0;
-      if (activeCard) {
-        const curIdx = cards.indexOf(activeCard);
-        targetIdx = (curIdx < cards.length - 1) ? curIdx + 1 : 0;
-      }
-      const targetId = cards[targetIdx].id.replace('card_', '');
-      playSentence(targetId);
-    }
-
-    function cycleBottomRepeat() {
-      const loopSel = document.getElementById('loopSelect');
-      if (!loopSel) return;
-      const vals = ['1', '3', '5', '10', '999'];
-      let curIdx = vals.indexOf(loopSel.value);
-      if (curIdx === -1) curIdx = 0;
-      const nextVal = vals[(curIdx + 1) % vals.length];
-      loopSel.value = nextVal;
-      onRepeatChange(nextVal);
-      updateBottomPlayerUI();
-    }
-
-    // Offline Differential Audio Downloader
-    async function downloadAllAudioOffline() {
-      const btn = document.getElementById('btnOfflineSync');
-      if (!btn) return;
-      if (!('caches' in window)) {
-        alert('이 브라우저는 오프라인 캐싱 기능을 지원하지 않습니다.');
-        return;
-      }
-      btn.disabled = true;
-      btn.style.opacity = '0.9';
-      btn.innerHTML = '<span>⏳ 음원 목록 확인 중...</span>';
-
-      try {
-        const resp = await fetch('./data_manifest.json');
-        const manifest = await resp.json();
-        const urls = [];
-        for (let dayKey in manifest.days) {
-          manifest.days[dayKey].sentences.forEach(s => {
-            if (s.audio_url) urls.push(`./${s.audio_url}`);
-          });
-        }
-        const cache = await caches.open('opic-master-ih-v1.7.0');
-        let completed = 0;
-        for (let url of urls) {
-          try {
-            const match = await cache.match(url);
-            if (!match) {
-              const audioResp = await fetch(url);
-              if (audioResp.ok) {
-                await cache.put(url, audioResp);
-              }
-            }
-          } catch (e) {}
-          completed++;
-          btn.innerHTML = `<span>⏳ 오프라인 다운로드 중: ${completed}/${urls.length} (${Math.round((completed/urls.length)*100)}%)</span>`;
-        }
-        btn.style.background = '#059669';
-        btn.style.borderColor = '#10b981';
-        btn.style.color = '#ffffff';
-        btn.innerHTML = '<span>✅ 전체 65개 음원 100% 오프라인 저장 완료! (비행기 모드 지원)</span>';
-      } catch (err) {
-        console.error('Download offline audio failed:', err);
-        btn.innerHTML = '<span>⚠️ 다운로드 실패 (인터넷 연결을 확인하세요)</span>';
-        btn.disabled = false;
-      }
-    }
-
-    // Service Worker Registration for Offline Playback
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
-      });
-    }
-
     // Initial page load: Only initialize active tab (Day 1) to conserve mobile data
     initTab('day1');
-    updateBottomPlayerUI();
   </script>
 </body>
 </html>
