@@ -31,6 +31,15 @@ interface SentenceDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDays(days: List<DayEntity>)
 
+    @Query("DELETE FROM days WHERE dayKey NOT IN (:activeDayKeys)")
+    suspend fun deleteDaysNotIn(activeDayKeys: List<String>)
+
+    @Query("DELETE FROM sentences WHERE dayKey NOT IN (:activeDayKeys)")
+    suspend fun deleteSentencesNotInDays(activeDayKeys: List<String>)
+
+    @Query("DELETE FROM sentences WHERE id NOT IN (:activeSentenceIds)")
+    suspend fun deleteSentencesNotIn(activeSentenceIds: List<String>)
+
     @Query("SELECT * FROM sentences")
     suspend fun getAllSentencesList(): List<Sentence>
 

@@ -44,12 +44,17 @@ class GitHubSyncWorker(
                     gson.fromJson(response.body!!.string(), ManifestResponse::class.java)
                 }
 
-                // 2. IMMEDIATELY Save Days to Room Database (Instant UI tab update!)
-                var dayOrderCounter = 0
-                val dayEntities = manifest.days.map { (dayKey, dayData) ->
-                    AppDatabase.createDayEntity(dayKey, dayData.title, dayOrderCounter++)
+                // 2. IMMEDIATELY Save Days & clean up deleted Days from Room Database
+                val activeDayKeys = manifest.days.keys.toList()
+                if (activeDayKeys.isNotEmpty()) {
+                    var dayOrderCounter = 0
+                    val dayEntities = manifest.days.map { (dayKey, dayData) ->
+                        AppDatabase.createDayEntity(dayKey, dayData.title, dayOrderCounter++)
+                    }
+                    dao.insertDays(dayEntities)
+                    dao.deleteDaysNotIn(activeDayKeys)
+                    dao.deleteSentencesNotInDays(activeDayKeys)
                 }
-                dao.insertDays(dayEntities)
 
                 // 3. Prepare audio directory & existing records to preserve user settings
                 val audioDir = File(context.filesDir, "audio").apply {
@@ -87,8 +92,21 @@ class GitHubSyncWorker(
                     }
                 }
 
-                // IMMEDIATELY Save Sentences to Room Database!
+                // IMMEDIATELY Save Sentences & clean up removed sentences
                 dao.insertAll(sentenceEntities)
+                val activeSentenceIds = sentenceEntities.map { it.id }
+                if (activeSentenceIds.isNotEmpty()) {
+                    dao.deleteSentencesNotIn(activeSentenceIds)
+                }
+
+                // Clean up orphaned audio files for deleted sentences
+                val removedSentenceIds = existingSentences.keys - activeSentenceIds.toSet()
+                for (removedId in removedSentenceIds) {
+                    val orphanedFile = File(audioDir, "$removedId.mp3")
+                    if (orphanedFile.exists()) {
+                        orphanedFile.delete()
+                    }
+                }
 
                 // 4. Download any missing MP3 audio files in the background
                 for (sentence in sentenceEntities) {
