@@ -13,9 +13,10 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
-import com.opic.master.R
 import com.opic.master.ui.MainActivity
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class PlaybackService : MediaSessionService() {
 
@@ -27,13 +28,46 @@ class PlaybackService : MediaSessionService() {
     private var currentRepeat = 0
     private var isShadowingPauseActive = false
 
+    // Playlist Mode State
+    private var isPlaylistMode = false
+    private var playlistPaths = listOf<String>()
+    private var playlistTitles = listOf<String>()
+    private var playlistIds = listOf<String>()
+    private var currentPlaylistIndex = 0
+
     companion object {
         const val NOTIFICATION_ID = 1001
         const val CHANNEL_ID = "opic_shadowing_channel"
+
         const val ACTION_PLAY_SENTENCE = "ACTION_PLAY_SENTENCE"
+        const val ACTION_PLAY_ALL = "ACTION_PLAY_ALL"
+        const val ACTION_TOGGLE_PLAY = "ACTION_TOGGLE_PLAY"
+        const val ACTION_PAUSE = "ACTION_PAUSE"
+        const val ACTION_RESUME = "ACTION_RESUME"
+        const val ACTION_PREV = "ACTION_PREV"
+        const val ACTION_NEXT = "ACTION_NEXT"
+
         const val EXTRA_AUDIO_PATH = "EXTRA_AUDIO_PATH"
         const val EXTRA_SENTENCE_TITLE = "EXTRA_SENTENCE_TITLE"
+        const val EXTRA_SENTENCE_ID = "EXTRA_SENTENCE_ID"
         const val EXTRA_REPEAT_COUNT = "EXTRA_REPEAT_COUNT"
+
+        const val EXTRA_AUDIO_PATHS = "EXTRA_AUDIO_PATHS"
+        const val EXTRA_SENTENCE_TITLES = "EXTRA_SENTENCE_TITLES"
+        const val EXTRA_SENTENCE_IDS = "EXTRA_SENTENCE_IDS"
+
+        // Reactive StateFlows for Compose UI
+        private val _isPlayingFlow = MutableStateFlow(false)
+        val isPlayingFlow = _isPlayingFlow.asStateFlow()
+
+        private val _currentPlayingSentenceId = MutableStateFlow<String?>(null)
+        val currentPlayingSentenceId = _currentPlayingSentenceId.asStateFlow()
+
+        private val _currentPlayingTitle = MutableStateFlow("")
+        val currentPlayingTitle = _currentPlayingTitle.asStateFlow()
+
+        private val _currentRepeatFlow = MutableStateFlow(1)
+        val currentRepeatFlow = _currentRepeatFlow.asStateFlow()
     }
 
     override fun onCreate() {
@@ -52,25 +86,45 @@ class PlaybackService : MediaSessionService() {
             .setWakeMode(C.WAKE_MODE_LOCAL)
             .build()
 
-        // 2. Custom Player Listener for Shadowing Repeat with 1.2s Pause
+        // 2. Custom Player Listener for Shadowing Repeat with 1.2s Pause & Playlist Advance
         player.addListener(object : Player.Listener {
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                _isPlayingFlow.value = isPlaying
+            }
+
             override fun onPlaybackStateChanged(playbackState: Int) {
                 if (playbackState == Player.STATE_ENDED) {
                     currentRepeat++
+                    _currentRepeatFlow.value = currentRepeat + 1
+
                     if (currentRepeat < repeatTargetCount) {
                         // 1.2-second smart pause for learner's vocal shadowing
                         serviceScope.launch {
                             isShadowingPauseActive = true
                             delay(1200)
-                            if (isShadowingPauseActive) {
+                            if (isShadowingPauseActive && player.playbackState == Player.STATE_ENDED) {
                                 player.seekTo(0)
                                 player.play()
                                 isShadowingPauseActive = false
                             }
                         }
                     } else {
-                        // Loop complete
+                        // Current sentence repeats completed
                         currentRepeat = 0
+                        _currentRepeatFlow.value = 1
+
+                        if (isPlaylistMode) {
+                            if (currentPlaylistIndex + 1 < playlistPaths.size) {
+                                currentPlaylistIndex++
+                                playCurrentPlaylistItem()
+                            } else {
+                                // Entire tab playlist complete
+                                _isPlayingFlow.value = false
+                                _currentPlayingSentenceId.value = null
+                            }
+                        } else {
+                            _isPlayingFlow.value = false
+                        }
                     }
                 }
             }
@@ -91,30 +145,120 @@ class PlaybackService : MediaSessionService() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
-        
-        val action = intent?.action
-        if (action == ACTION_PLAY_SENTENCE) {
-            val audioPath = intent.getStringExtra(EXTRA_AUDIO_PATH) ?: return START_STICKY
-            val title = intent.getStringExtra(EXTRA_SENTENCE_TITLE) ?: "OPIc Sentence"
-            repeatTargetCount = intent.getIntExtra(EXTRA_REPEAT_COUNT, 3)
-            currentRepeat = 0
-            isShadowingPauseActive = false
 
-            val mediaItem = MediaItem.fromUri(audioPath)
-            player.setMediaItem(mediaItem)
-            player.prepare()
-            player.play()
+        when (intent?.action) {
+            ACTION_PLAY_SENTENCE -> {
+                isPlaylistMode = false
+                val audioPath = intent.getStringExtra(EXTRA_AUDIO_PATH) ?: return START_STICKY
+                val title = intent.getStringExtra(EXTRA_SENTENCE_TITLE) ?: "OPIc Sentence"
+                val sentenceId = intent.getStringExtra(EXTRA_SENTENCE_ID)
+                repeatTargetCount = intent.getIntExtra(EXTRA_REPEAT_COUNT, 3)
+                currentRepeat = 0
+                _currentRepeatFlow.value = 1
+                isShadowingPauseActive = false
 
-            startForeground(NOTIFICATION_ID, buildNotification(title))
+                _currentPlayingSentenceId.value = sentenceId
+                _currentPlayingTitle.value = title
+
+                val mediaItem = MediaItem.fromUri(audioPath)
+                player.setMediaItem(mediaItem)
+                player.prepare()
+                player.play()
+
+                startForeground(NOTIFICATION_ID, buildNotification(title, "반복: ${repeatTargetCount}회 · 화면 꺼짐 연속 재생"))
+            }
+
+            ACTION_PLAY_ALL -> {
+                val paths = intent.getStringArrayListExtra(EXTRA_AUDIO_PATHS) ?: return START_STICKY
+                val titles = intent.getStringArrayListExtra(EXTRA_SENTENCE_TITLES) ?: return START_STICKY
+                val ids = intent.getStringArrayListExtra(EXTRA_SENTENCE_IDS) ?: return START_STICKY
+                if (paths.isEmpty()) return START_STICKY
+
+                isPlaylistMode = true
+                playlistPaths = paths
+                playlistTitles = titles
+                playlistIds = ids
+                currentPlaylistIndex = 0
+                repeatTargetCount = intent.getIntExtra(EXTRA_REPEAT_COUNT, 3)
+                currentRepeat = 0
+                _currentRepeatFlow.value = 1
+                isShadowingPauseActive = false
+
+                playCurrentPlaylistItem()
+            }
+
+            ACTION_TOGGLE_PLAY -> {
+                if (player.isPlaying) {
+                    player.pause()
+                    _isPlayingFlow.value = false
+                } else if (player.playbackState == Player.STATE_ENDED) {
+                    player.seekTo(0)
+                    player.play()
+                    _isPlayingFlow.value = true
+                } else {
+                    player.play()
+                    _isPlayingFlow.value = true
+                }
+            }
+
+            ACTION_PAUSE -> {
+                player.pause()
+                _isPlayingFlow.value = false
+            }
+
+            ACTION_RESUME -> {
+                player.play()
+                _isPlayingFlow.value = true
+            }
+
+            ACTION_PREV -> {
+                if (isPlaylistMode && currentPlaylistIndex > 0) {
+                    currentPlaylistIndex--
+                    currentRepeat = 0
+                    playCurrentPlaylistItem()
+                } else {
+                    player.seekTo(0)
+                }
+            }
+
+            ACTION_NEXT -> {
+                if (isPlaylistMode && currentPlaylistIndex + 1 < playlistPaths.size) {
+                    currentPlaylistIndex++
+                    currentRepeat = 0
+                    playCurrentPlaylistItem()
+                }
+            }
         }
 
         return START_STICKY
     }
 
-    private fun buildNotification(title: String) =
+    private fun playCurrentPlaylistItem() {
+        if (currentPlaylistIndex !in playlistPaths.indices) return
+
+        val audioPath = playlistPaths[currentPlaylistIndex]
+        val title = playlistTitles.getOrNull(currentPlaylistIndex) ?: "OPIc Sentence"
+        val sentenceId = playlistIds.getOrNull(currentPlaylistIndex)
+
+        _currentPlayingSentenceId.value = sentenceId
+        _currentPlayingTitle.value = title
+        currentRepeat = 0
+        _currentRepeatFlow.value = 1
+        isShadowingPauseActive = false
+
+        val mediaItem = MediaItem.fromUri(audioPath)
+        player.setMediaItem(mediaItem)
+        player.prepare()
+        player.play()
+
+        val progressInfo = "탭 전체 재생 [${currentPlaylistIndex + 1}/${playlistPaths.size}] · 반복 ${repeatTargetCount}회"
+        startForeground(NOTIFICATION_ID, buildNotification(title, progressInfo))
+    }
+
+    private fun buildNotification(title: String, subtitle: String) =
         NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("OPIc 섀도잉: $title")
-            .setContentText("반복: ${repeatTargetCount}회 · 화면 꺼짐 연속 재생 중")
+            .setContentText(subtitle)
             .setSmallIcon(android.R.drawable.ic_media_play)
             .setOngoing(true)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -127,7 +271,7 @@ class PlaybackService : MediaSessionService() {
                 "OPIc Shadowing Player",
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "화면이 꺼진 상태에서도 문장 섀도잉 음원을 재생합니다."
+                description = "화면이 꺼진 상태에서도 문장 섀도잉 음원을 무중단 연속 재생합니다."
             }
             val manager = getSystemService(NotificationManager::class.java)
             manager.createNotificationChannel(channel)
@@ -138,6 +282,8 @@ class PlaybackService : MediaSessionService() {
 
     override fun onDestroy() {
         serviceScope.cancel()
+        _isPlayingFlow.value = false
+        _currentPlayingSentenceId.value = null
         mediaSession?.run {
             player.release()
             release()

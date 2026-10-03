@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.*
 import androidx.window.layout.FoldingFeature
 import androidx.window.layout.WindowInfoTracker
@@ -21,12 +22,16 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
 
         // 1. Trigger background differential GitHub Sync via WorkManager
         triggerGitHubSync()
 
         setContent {
             val sentences by db.sentenceDao().getAllSentences().collectAsState(initial = emptyList())
+            val isPlaying by PlaybackService.isPlayingFlow.collectAsState()
+            val currentPlayingId by PlaybackService.currentPlayingSentenceId.collectAsState()
+
             var isUnfolded by remember { mutableStateOf(false) }
             var isFlexMode by remember { mutableStateOf(false) }
 
@@ -52,8 +57,28 @@ class MainActivity : ComponentActivity() {
                 sentences = sentences,
                 isUnfolded = isUnfolded,
                 isFlexMode = isFlexMode,
-                onPlaySentence = { sentence ->
-                    playSentenceViaService(sentence)
+                isPlaying = isPlaying,
+                currentPlayingId = currentPlayingId,
+                onPlaySentence = { sentence, repeatCount ->
+                    playSentenceViaService(sentence, repeatCount)
+                },
+                onPlayAll = { daySentences, repeatCount ->
+                    playAllViaService(daySentences, repeatCount)
+                },
+                onTogglePlay = {
+                    togglePlayback()
+                },
+                onPrev = {
+                    val intent = Intent(this, PlaybackService::class.java).apply {
+                        action = PlaybackService.ACTION_PREV
+                    }
+                    startService(intent)
+                },
+                onNext = {
+                    val intent = Intent(this, PlaybackService::class.java).apply {
+                        action = PlaybackService.ACTION_NEXT
+                    }
+                    startService(intent)
                 },
                 onSyncGitHub = {
                     triggerGitHubSync()
@@ -67,15 +92,38 @@ class MainActivity : ComponentActivity() {
         WorkManager.getInstance(this).enqueue(syncRequest)
     }
 
-    private fun playSentenceViaService(sentence: Sentence) {
-        // Prefer local offline MP3 path if downloaded, fallback to assets/network
+    private fun playSentenceViaService(sentence: Sentence, repeatCount: Int) {
         val path = sentence.localAudioPath ?: "https://raw.githubusercontent.com/hyuks73-bot/OPIC_study/main/${sentence.audioUrl}"
         val intent = Intent(this, PlaybackService::class.java).apply {
             action = PlaybackService.ACTION_PLAY_SENTENCE
             putExtra(PlaybackService.EXTRA_AUDIO_PATH, path)
             putExtra(PlaybackService.EXTRA_SENTENCE_TITLE, sentence.en.replace(Regex("<.*?>"), ""))
-            putExtra(PlaybackService.EXTRA_REPEAT_COUNT, sentence.repeatCount)
+            putExtra(PlaybackService.EXTRA_SENTENCE_ID, sentence.id)
+            putExtra(PlaybackService.EXTRA_REPEAT_COUNT, repeatCount)
         }
         startForegroundService(intent)
+    }
+
+    private fun playAllViaService(sentences: List<Sentence>, repeatCount: Int) {
+        if (sentences.isEmpty()) return
+        val paths = ArrayList(sentences.map { it.localAudioPath ?: "https://raw.githubusercontent.com/hyuks73-bot/OPIC_study/main/${it.audioUrl}" })
+        val titles = ArrayList(sentences.map { it.en.replace(Regex("<.*?>"), "") })
+        val ids = ArrayList(sentences.map { it.id })
+
+        val intent = Intent(this, PlaybackService::class.java).apply {
+            action = PlaybackService.ACTION_PLAY_ALL
+            putStringArrayListExtra(PlaybackService.EXTRA_AUDIO_PATHS, paths)
+            putStringArrayListExtra(PlaybackService.EXTRA_SENTENCE_TITLES, titles)
+            putStringArrayListExtra(PlaybackService.EXTRA_SENTENCE_IDS, ids)
+            putExtra(PlaybackService.EXTRA_REPEAT_COUNT, repeatCount)
+        }
+        startForegroundService(intent)
+    }
+
+    private fun togglePlayback() {
+        val intent = Intent(this, PlaybackService::class.java).apply {
+            action = PlaybackService.ACTION_TOGGLE_PLAY
+        }
+        startService(intent)
     }
 }
