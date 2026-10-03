@@ -1,0 +1,622 @@
+{
+  "version": "1.7.0",
+  "last_updated": "2026-10-03",
+  "total_sentences": 65,
+  "days": {
+    "day1": {
+      "title": "Day 1: 서베이 전략 & 기초 입트기",
+      "sentences": [
+        {
+          "id": "day1_1",
+          "en": "I live alone in a two-bedroom apartment.",
+          "ko": "나는 2룸 아파트에서 혼자 살고 있습니다.",
+          "guide": "I live <strong>aLONE</strong> <span class=\"slash\">/</span> in a <strong>two-bedroom aPARTment</strong>.",
+          "tip": "[연음] live alone ➔ [리-벌론] | [강세] a-LONE, a-PART-ment (2음절 강세)",
+          "audio_url": "audio/day1_1.mp3",
+          "image_url": "images/day1_1.jpg"
+        },
+        {
+          "id": "day1_2",
+          "en": "I like <mark>watching movies</mark>, <mark>going to parks</mark>, and <mark>listening to music</mark>.",
+          "ko": "나는 영화 보기, 공원 가기, 음악 듣기를 좋아합니다.",
+          "guide": "I like <strong>WATCHing movies</strong> ↗, <span class=\"slash\">/</span> <strong>GOing to parks</strong> ↗, <span class=\"slash\">/</span> and <strong>LIS-tening to music</strong> ↘.",
+          "tip": "[나열 억양] A↗, B↗, and C↘ 끝만 내려 읽기 | [묵음] listening에서 t는 묵음 [리스닝]",
+          "audio_url": "audio/day1_2.mp3",
+          "image_url": "images/day1_2.jpg"
+        },
+        {
+          "id": "day1_3",
+          "en": "I enjoy taking a walk and jogging at the <mark>waterfront park</mark> every weekend.",
+          "ko": "나는 매주 주말 수변 공원에서 산책하고 조깅하는 것을 즐깁니다.",
+          "guide": "I enjoy <strong>TAKing a walk</strong> <span class=\"slash\">/</span> and <strong>JOGging</strong> <span class=\"slash\">/</span> at the <strong>WAterfront park</strong> <span class=\"slash\">/</span> <strong>EVery weekend</strong>.",
+          "tip": "[연음] taking a ➔ [테이킹어] | [강세] WA-ter-front (앞음절 강세) | jogging은 [좌-깅]",
+          "audio_url": "audio/day1_3.mp3",
+          "image_url": "images/day1_3.jpg"
+        },
+        {
+          "id": "day1_4",
+          "en": "I prefer taking a <mark>staycation</mark> at home and listening to soft music.",
+          "ko": "나는 집에서 휴식을 취하며 잔잔한 음악을 듣는 것을 선호합니다.",
+          "guide": "I prefer <strong>TAKing a stayCAtion</strong> at home <span class=\"slash\">/</span> and <strong>LIS-tening</strong> <span class=\"slash\">/</span> to <strong>SOFT music</strong>.",
+          "tip": "[발음] staycation ➔ [스테이-케이-션] | [연음] at home ➔ [앳 홈]",
+          "audio_url": "audio/day1_4.mp3",
+          "image_url": "images/day1_4.jpg"
+        },
+        {
+          "id": "day1_5",
+          "en": "I love going to concerts and watching live shows.",
+          "ko": "나는 콘서트에 가고 라이브 공연 보는 것을 좋아합니다.",
+          "guide": "I love <strong>GOing to CONcerts</strong> <span class=\"slash\">/</span> and <strong>WATCHing LIVE shows</strong>.",
+          "tip": "[발음] live는 형용사이므로 [리브❌ ➔ 라이브⭕] | concerts는 [칸-서-ㄹ츠]",
+          "audio_url": "audio/day1_5.mp3",
+          "image_url": "images/day1_5.jpg"
+        }
+      ]
+    },
+    "day2": {
+      "title": "Day 2: 묘사 패턴 (수변공원 & 내 방)",
+      "sentences": [
+        {
+          "id": "park_1",
+          "en": "<mark>Well, speaking of my favorite park</mark>, there is a lovely <mark>waterfront park</mark> located very close to my house.",
+          "ko": "음, 제가 가장 좋아하는 공원에 대해 말하자면, 집에서 매우 가까운 곳에 어여쁜 수변 공원이 있습니다.",
+          "guide": "Well, <span class=\"slash\">/</span> <strong>SPEAKing</strong> of my <strong>FAvorite park</strong>, <span class=\"slash\">/</span> there is a <strong>LOVEly waterfront park</strong> <span class=\"slash\">/</span> located <strong>VEry CLOSE</strong> to my house.",
+          "tip": "[연음] speaking of ➔ [스피킹-오브], there is a ➔ [데어-리-저] | [강세] FAvorite [페이-브릿]",
+          "audio_url": "audio/park_1.mp3",
+          "image_url": "images/park_1.jpg"
+        },
+        {
+          "id": "park_2",
+          "en": "It's quite long, and it <mark>stretches for about 5 kilometers</mark> along the water.",
+          "ko": "꽤 길고, 물길을 따라 약 5킬로미터 정도 이어져 있습니다.",
+          "guide": "It's <strong>quite LONG</strong>, <span class=\"slash\">/</span> and it <strong>STRETCHes</strong> <span class=\"slash\">/</span> for about <strong>FIVE kiLOMeters</strong> <span class=\"slash\">/</span> a-<strong>LONG the water</strong>.",
+          "tip": "[연음] stretches for ➔ [스트레치스-퍼], about 5 ➔ [어바웃-파이브] | kilometers [킬-라-미터즈]",
+          "audio_url": "audio/park_2.mp3",
+          "image_url": "images/park_2.jpg"
+        },
+        {
+          "id": "park_3",
+          "en": "<mark>You know</mark>, I visit this park <mark>every single weekend to go jogging</mark>.",
+          "ko": "있잖아요, 나는 달리기를 하러 매주 주말마다 이 공원을 찾습니다.",
+          "guide": "You know, <span class=\"slash\">/</span> I <strong>VISit this park</strong> <span class=\"slash\">/</span> <strong>EVery single weekend</strong> <span class=\"slash\">/</span> to <strong>go JOGging</strong>.",
+          "tip": "[호흡] You know 뒤에서 0.5초 뜸들이기 | every single weekend를 한 덩어리로 리듬감 있게",
+          "audio_url": "audio/park_3.mp3",
+          "image_url": "images/park_3.jpg"
+        },
+        {
+          "id": "park_4",
+          "en": "A <mark>round trip</mark> usually takes me about <mark>an hour</mark>, which is just the right amount of exercise for me.",
+          "ko": "왕복으로 보통 1시간 정도 걸리는데, 저에게 딱 적당한 운동량입니다.",
+          "guide": "A <strong>ROUND trip</strong> <span class=\"slash\">/</span> usually takes me <strong>about an HOUR</strong>, <span class=\"slash\">/</span> which is <strong>JUST the RIGHT amount</strong> of <strong>EXercise</strong> for me.",
+          "tip": "[연음] takes me about an hour ➔ [테익스 미 어바우-런 아워] | [강세] EX-er-cise",
+          "audio_url": "audio/park_4.mp3",
+          "image_url": "images/park_4.jpg"
+        },
+        {
+          "id": "park_5",
+          "en": "<mark>What I love most about this park is that</mark> there are so many <mark>beautiful flowers and lush trees</mark> along the trail.",
+          "ko": "이 공원에서 제가 가장 좋아하는 점은 산책로를 따라 아름다운 꽃과 무성한 나무가 참 많다는 것입니다.",
+          "guide": "<strong>What I LOVE most</strong> about this park <span class=\"slash\">/</span> is that there are <strong>so many BEAUTiful FLOWers</strong> <span class=\"slash\">/</span> and <strong>LUSH trees</strong> <span class=\"slash\">/</span> along the <strong>TRAIL</strong>.",
+          "tip": "[연음] What I love ➔ [와-라이 러브], most about ➔ [모스-터바웃] | lush [러쉬: 무성한]",
+          "audio_url": "audio/park_5.mp3",
+          "image_url": "images/park_5.jpg"
+        },
+        {
+          "id": "park_6",
+          "en": "Because the scenery is so nice, running there <mark>never gets boring at all</mark>.",
+          "ko": "풍경이 너무 멋지기 때문에, 거기서 달리는 것은 전혀 지루하지 않습니다.",
+          "guide": "Because the <strong>SCENery is so nice</strong>, <span class=\"slash\">/</span> running there <span class=\"slash\">/</span> <strong>NEVer gets BORing</strong> <span class=\"slash\">/</span> <strong>at ALL</strong>.",
+          "tip": "[발음] scenery ➔ [씨-너-리] | [연음] at all ➔ [애-톨 / 애-롤]",
+          "audio_url": "audio/park_6.mp3",
+          "image_url": "images/park_6.jpg"
+        },
+        {
+          "id": "park_7",
+          "en": "<mark>So, thanks to this park</mark>, I think I am able to stick to my weekend running routine and <mark>stay in shape</mark>.",
+          "ko": "그래서 이 공원 덕분에 주말마다 달리기 루틴을 계속 지키고 건강을 유지할 수 있는 것 같습니다.",
+          "guide": "So, <strong>THANKS to this park</strong>, <span class=\"slash\">/</span> I think I am <strong>ABle to STICK</strong> to my weekend running routine <span class=\"slash\">/</span> and <strong>STAY in shape</strong>.",
+          "tip": "[연음] stick to ➔ [스띡-투], stay in shape ➔ [스테이-인-쉐입] (건강을 유지하다)",
+          "audio_url": "audio/park_7.mp3",
+          "image_url": "images/park_7.jpg"
+        },
+        {
+          "id": "park_8",
+          "en": "It's definitely my favorite spot in my neighborhood.",
+          "ko": "단언컨대 우리 동네에서 제가 가장 좋아하는 장소입니다.",
+          "guide": "It's <strong>DEFinitely</strong> <span class=\"slash\">/</span> my <strong>FAvorite spot</strong> <span class=\"slash\">/</span> in my <strong>NEIGHborhood</strong>.",
+          "tip": "[발음] definitely ➔ 데피니틀리❌ [데-퍼-늣-리⭕ (t소리 탈락)] | neighborhood [네이버-훗]",
+          "audio_url": "audio/park_8.mp3",
+          "image_url": "images/park_8.jpg"
+        },
+        {
+          "id": "bed_1",
+          "en": "<mark>Well, speaking of my bedroom</mark>, it's definitely my favorite space in the house.",
+          "ko": "음, 제 침실에 대해 말하자면, 집에서 단연 제가 가장 좋아하는 공간입니다.",
+          "guide": "Well, <strong>SPEAKing of my BEDroom</strong>, <span class=\"slash\">/</span> it's <strong>DEFinitely</strong> my <strong>FAvorite space</strong> <span class=\"slash\">/</span> in the house.",
+          "tip": "[강세] BED-room, FA-vor-ite | definitely는 1음절 [데-]에 강세",
+          "audio_url": "audio/bed_1.mp3",
+          "image_url": "images/bed_1.jpg"
+        },
+        {
+          "id": "bed_2",
+          "en": "I have a <mark>king-size bed</mark>, and right next to it, there's a small side table for my phone and smartwatch chargers.",
+          "ko": "킹사이즈 침대가 있고, 바로 옆에는 핸드폰과 스마트워치 충전기가 있는 작은 사이드 테이블이 있습니다.",
+          "guide": "I have a <strong>KING-size bed</strong>, <span class=\"slash\">/</span> and <strong>right NEXT to it</strong>, <span class=\"slash\">/</span> there's a <strong>SMALL side table</strong> <span class=\"slash\">/</span> for my <strong>PHONE</strong> and <strong>SMARTwatch CHARGers</strong>.",
+          "tip": "[연음] have a ➔ [해-버], next to it ➔ [넥스-투-잇]",
+          "audio_url": "audio/bed_2.mp3",
+          "image_url": "images/bed_2.jpg"
+        },
+        {
+          "id": "bed_3",
+          "en": "<mark>What's really cool is that</mark> my room light has a <mark>built-in ceiling fan</mark> controlled by a remote.",
+          "ko": "정말 멋진 것은 방 전등에 리모컨으로 조작하는 실링팬이 내장되어 있다는 점입니다.",
+          "guide": "<strong>What's REALly cool</strong> is that <span class=\"slash\">/</span> my room light has a <strong>built-in CEILing fan</strong> <span class=\"slash\">/</span> con-<strong>TROLLED by a reMOTE</strong>.",
+          "tip": "[연음] built-in ➔ [빌-틴] | [강세] CEIL-ing fan [씰링 팬], re-MOTE [리-모트]",
+          "audio_url": "audio/bed_3.mp3",
+          "image_url": "images/bed_3.jpg"
+        },
+        {
+          "id": "bed_4",
+          "en": "Because of the ceiling fan, my room stays <mark>very cool in the summer</mark> even without a standing fan.",
+          "ko": "실링팬 덕분에 선풍기가 없이도 여름에 방이 매우 시원하게 유지됩니다.",
+          "guide": "Because of the <strong>CEILing fan</strong>, <span class=\"slash\">/</span> my room stays <strong>VEry COOL</strong> in the summer <span class=\"slash\">/</span> even <strong>withOUT a standing fan</strong>.",
+          "tip": "[연음] because of ➔ [비커-조브], without a ➔ [위다우-러] | [강세] with-OUT",
+          "audio_url": "audio/bed_4.mp3",
+          "image_url": "images/bed_4.jpg"
+        },
+        {
+          "id": "bed_5",
+          "en": "Also, the light <mark>turns on automatically every morning</mark>, which helps me wake up right away.",
+          "ko": "또한 매일 아침 조명이 자동으로 켜져서 바로 기상하는 데 도움이 됩니다.",
+          "guide": "Also, the light <strong>TURNS ON</strong> <span class=\"slash\">/</span> <strong>autoMATically</strong> every morning, <span class=\"slash\">/</span> which helps me <strong>WAKE UP</strong> <span class=\"slash\">/</span> <strong>right aWAY</strong>.",
+          "tip": "[연음] turns on ➔ [턴-존], wake up ➔ [웨이-껍], right away ➔ [라이-러-웨이] | auto-MAT-ically",
+          "audio_url": "audio/bed_5.mp3",
+          "image_url": "images/bed_5.jpg"
+        },
+        {
+          "id": "bed_6",
+          "en": "<mark>Another great thing is that</mark> I have an <mark>attached bathroom</mark> in my room.",
+          "ko": "또 다른 좋은 점은 방 안에 전용 욕실이 있다는 것입니다.",
+          "guide": "<strong>aNOTHer great thing</strong> is that <span class=\"slash\">/</span> I have an <strong>atTACHED BATHroom</strong> <span class=\"slash\">/</span> in my room.",
+          "tip": "[연음] have an ➔ [해-번] | [발음] attached bathroom ➔ [어-태취-뜨 배쓰룸]",
+          "audio_url": "audio/bed_6.mp3",
+          "image_url": "images/bed_6.jpg"
+        },
+        {
+          "id": "bed_7",
+          "en": "Even when I wake up early to take a shower and get ready for work, <mark>I don't disturb my family members</mark>.",
+          "ko": "아침 일찍 일어나 샤워하고 출근 준비를 해도 다른 식구들을 방해하지 않습니다.",
+          "guide": "Even when I <strong>WAKE UP EARly</strong> <span class=\"slash\">/</span> to <strong>take a SHOWer</strong> <span class=\"slash\">/</span> and <strong>get READy for work</strong>, <span class=\"slash\">/</span> I don't <strong>disTURB</strong> my family members.",
+          "tip": "[연음] wake up early ➔ [웨이-꺼-펄리], take a ➔ [테이-커] | [강세] dis-TURB [디스-터-ㄹ브]",
+          "audio_url": "audio/bed_7.mp3",
+          "image_url": "images/bed_7.jpg"
+        },
+        {
+          "id": "bed_8",
+          "en": "Sometimes while I'm sleeping, my <mark>cats sneak into my room</mark> and sleep right between my legs.",
+          "ko": "가끔 자고 있을 때 고양이들이 방으로 몰래 들어와 내 다리 사이에서 자곤 합니다.",
+          "guide": "Sometimes while I'm sleeping, <span class=\"slash\">/</span> my <strong>CATS SNEAK</strong> into my room <span class=\"slash\">/</span> and <strong>SLEEP</strong> <span class=\"slash\">/</span> right <strong>beTWEEN my legs</strong>.",
+          "tip": "[연음] sneak into ➔ [스니-킨-투] | [강세] SNEAK(살금살금 들어오다), be-TWEEN",
+          "audio_url": "audio/bed_8.mp3",
+          "image_url": "images/bed_8.jpg"
+        },
+        {
+          "id": "bed_9",
+          "en": "They are super cute, but I occasionally wake up in the middle of the night because <mark>I feel too hot!</mark>",
+          "ko": "녀석들이 너무 귀엽지만, 가끔 자다가 너무 더워서 깨기도 합니다!",
+          "guide": "They are <strong>SUper CUTE</strong>, <span class=\"slash\">/</span> but I <strong>ocCAsionally WAKE UP</strong> <span class=\"slash\">/</span> in the <strong>MIDdle of the night</strong> <span class=\"slash\">/</span> because I <strong>feel TOO HOT</strong>!",
+          "tip": "[발음] occasionally ➔ [어-케이-져-널리] | [연음] middle of ➔ [미-들-러브]",
+          "audio_url": "audio/bed_9.mp3",
+          "image_url": "images/bed_9.jpg"
+        },
+        {
+          "id": "bed_10",
+          "en": "<mark>So, all in all</mark>, my bedroom is <mark>super comfortable and convenient</mark> for my daily life.",
+          "ko": "그래서 전반적으로 제 침실은 제 일상생활에 정말 편안하고 편리합니다.",
+          "guide": "So, <strong>ALL in ALL</strong>, <span class=\"slash\">/</span> my bedroom is <strong>SUper COMFortable</strong> <span class=\"slash\">/</span> and <strong>conVENient</strong> <span class=\"slash\">/</span> for my <strong>DAILy life</strong>.",
+          "tip": "[핵심발음] comfortable ➔ 컴포터블(4음절❌) [컴프-터-블(3음절⭕)] | con-VEN-ient [컨-비-니언트]",
+          "audio_url": "audio/bed_10.mp3",
+          "image_url": "images/bed_10.jpg"
+        }
+      ]
+    },
+    "day3": {
+      "title": "Day 3: 루틴 패턴 (조깅 & 음악감상)",
+      "sentences": [
+        {
+          "id": "day3_park_1",
+          "en": "<mark>Well, as I mentioned before</mark>, I tend to visit the waterfront park near my house <mark>every single weekend</mark>.",
+          "ko": "음, 아까 말씀드렸듯이, 저는 매주 주말마다 집 근처 수변 공원을 찾는 편입니다.",
+          "guide": "Well, as I <strong>MENtioned before</strong>, <span class=\"slash\">/</span> I <strong>TEND to VISit</strong> the waterfront park <span class=\"slash\">/</span> near my house <span class=\"slash\">/</span> <strong>EVery single weekend</strong>.",
+          "tip": "[발음] as I mentioned before ➔ [애즈 아이 멘-션-드 비-포-어] (자연스러운 필러 표현)",
+          "audio_url": "audio/day3_park_1.mp3",
+          "image_url": "images/day3_park_1.jpg"
+        },
+        {
+          "id": "day3_park_2",
+          "en": "<mark>First of all</mark>, before heading out, I put on my running shoes and <mark>grab my wireless earbuds and smartwatch</mark>.",
+          "ko": "우선, 밖으로 나가기 전에 러닝화를 신은 뒤 무선 이어폰과 스마트워치를 챙깁니다.",
+          "guide": "<strong>FIRST of all</strong>, <span class=\"slash\">/</span> before <strong>HEADing out</strong>, <span class=\"slash\">/</span> I <strong>PUT ON</strong> my running shoes <span class=\"slash\">/</span> and <strong>GRAB</strong> my <strong>WIREless EARbuds</strong> and <strong>SMARTwatch</strong>.",
+          "tip": "[연음] First of all ➔ [퍼스-터-볼], heading out ➔ [헤딩-아웃], put on ➔ [푸-톤]",
+          "audio_url": "audio/day3_park_2.mp3",
+          "image_url": "images/day3_park_2.jpg"
+        },
+        {
+          "id": "day3_park_3",
+          "en": "<mark>Once I get to the park</mark>, I run the trail all the way and back — a <mark>round trip of about 10 kilometers</mark> in total.",
+          "ko": "일단 공원에 도착하면, 산책로를 끝까지 달리고 돌아옵니다 — 왕복 총 약 10킬로미터입니다.",
+          "guide": "<strong>Once I GET to the park</strong>, <span class=\"slash\">/</span> I <strong>RUN the trail</strong> <span class=\"slash\">/</span> <strong>ALL the way and BACK</strong> — <span class=\"slash\">/</span> a <strong>ROUND TRIP</strong> of about <strong>TEN kiLOMeters</strong> in total.",
+          "tip": "[연음] Once I ➔ [원-사이], get to ➔ [겟-투], trip of about ➔ [트리-퍼-바웃]",
+          "audio_url": "audio/day3_park_3.mp3",
+          "image_url": "images/day3_park_3.jpg"
+        },
+        {
+          "id": "day3_park_4",
+          "en": "<mark>Right after running</mark>, I do a light <mark>cooldown walk</mark> for about 5 minutes to catch my breath, and then I head back home.",
+          "ko": "달리기를 마친 직후에는 가쁜 숨을 고르기 위해 약 5분간 가볍게 쿨다운 산책을 한 다음 집으로 돌아옵니다.",
+          "guide": "<strong>Right AFter running</strong>, <span class=\"slash\">/</span> I do a <strong>LIGHT COOLdown walk</strong> <span class=\"slash\">/</span> for about 5 minutes <span class=\"slash\">/</span> to <strong>CATCH my breath</strong>, <span class=\"slash\">/</span> and then I <strong>HEAD back home</strong>.",
+          "tip": "[연음] Right after ➔ [라이-래프터] | [숙어] catch my breath [캐취 마이 브레쓰: 숨을 고르다]",
+          "audio_url": "audio/day3_park_4.mp3",
+          "image_url": "images/day3_park_4.jpg"
+        },
+        {
+          "id": "day3_park_5",
+          "en": "<mark>All in all</mark>, this running routine is the <mark>perfect way to kick off my weekend</mark> and stay healthy.",
+          "ko": "전반적으로, 이 달리기 루틴은 주말을 활기차게 시작하고 건강을 유지하는 완벽한 방법입니다.",
+          "guide": "<strong>ALL in ALL</strong>, <span class=\"slash\">/</span> this <strong>RUNning routine</strong> <span class=\"slash\">/</span> is the <strong>PERfect way</strong> <span class=\"slash\">/</span> to <strong>KICK OFF</strong> my weekend <span class=\"slash\">/</span> and <strong>STAY HEALthy</strong>.",
+          "tip": "[연음] kick off ➔ [키-코프: 활기차게 시작하다] | [강세] PER-fect, HEAL-thy",
+          "audio_url": "audio/day3_park_5.mp3",
+          "image_url": "images/day3_park_5.jpg"
+        },
+        {
+          "id": "day3_music_1",
+          "en": "<mark>Well, whenever I want to unwind at home</mark>, listening to music is my go-to routine.",
+          "ko": "음, 집에서 편하게 쉬고 싶을 때마다 음악을 듣는 것이 저의 단골 루틴입니다.",
+          "guide": "Well, whenever I want to <strong>unWIND</strong> at home, <span class=\"slash\">/</span> <strong>LIS-tening to music</strong> <span class=\"slash\">/</span> is my <strong>GO-TO routine</strong>.",
+          "tip": "[강세] un-WIND [언-와인드: 긴장을 풀다], GO-TO routine [단골/애용 루틴]",
+          "audio_url": "audio/day3_music_1.mp3",
+          "image_url": "images/day3_music_1.jpg"
+        },
+        {
+          "id": "day3_music_2",
+          "en": "<mark>First off</mark>, I change into comfortable clothes and <mark>turn on my Bluetooth speaker</mark> in my bedroom.",
+          "ko": "우선, 편안한 옷으로 갈아입고 내 방에 있는 블루투스 스피커를 켭니다.",
+          "guide": "<strong>FIRST off</strong>, <span class=\"slash\">/</span> I <strong>CHANGE</strong> into <strong>COMFortable clothes</strong> <span class=\"slash\">/</span> and <strong>TURN ON</strong> my <strong>BLUETOOTH speak-er</strong> <span class=\"slash\">/</span> in my bedroom.",
+          "tip": "[연음] First off ➔ [퍼스-토프], turn on ➔ [터-논] | clothes는 [클로-즈]",
+          "audio_url": "audio/day3_music_2.mp3",
+          "image_url": "images/day3_music_2.jpg"
+        },
+        {
+          "id": "day3_music_3",
+          "en": "<mark>After that</mark>, I usually lie down on my king-size bed and <mark>play a playlist of soft acoustic music</mark>.",
+          "ko": "그 후에 저는 보통 킹사이즈 침대에 누워 잔잔한 어쿠스틱 음악 플레이리스트를 재생합니다.",
+          "guide": "<strong>AFter that</strong>, <span class=\"slash\">/</span> I usually <strong>LIE DOWN</strong> on my <strong>KING-size bed</strong> <span class=\"slash\">/</span> and <strong>PLAY a playlist</strong> <span class=\"slash\">/</span> of <strong>SOFT aCOUSTic music</strong>.",
+          "tip": "[연음] lie down on ➔ [라이 다운-논] | [강세] a-COUS-tic [어-쿠스-틱]",
+          "audio_url": "audio/day3_music_3.mp3",
+          "image_url": "images/day3_music_3.jpg"
+        },
+        {
+          "id": "day3_music_4",
+          "en": "<mark>So, to wrap it up</mark>, listening to music at home really helps me <mark>de-stress and recharge my batteries</mark> after a long week.",
+          "ko": "그래서 마무리하자면, 집에서 음악을 듣는 것은 긴 한 주를 보낸 후 스트레스를 풀고 재충전하는 데 큰 도움이 됩니다.",
+          "guide": "So, to <strong>WRAP it up</strong>, <span class=\"slash\">/</span> listening to music at home <span class=\"slash\">/</span> really helps me <strong>de-STRESS</strong> <span class=\"slash\">/</span> and <strong>reCHARGE my BATteries</strong> <span class=\"slash\">/</span> after a long week.",
+          "tip": "[연음] wrap it up ➔ [래-피-덥: 마무리하자면] | de-stress [디-스트레스], recharge [리-차-ㄹ지]",
+          "audio_url": "audio/day3_music_4.mp3",
+          "image_url": "images/day3_music_4.jpg"
+        }
+      ]
+    },
+    "day4": {
+      "title": "Day 4: 과거 경험 (15km 조깅 & YB 락콘서트)",
+      "sentences": [
+        {
+          "id": "day4_park_1",
+          "en": "I remember one particularly <mark>memorable experience</mark> at the waterfront park near my house.",
+          "ko": "집 근처 수변 공원에서 있었던 특별히 기억에 남는 경험이 하나 있습니다.",
+          "guide": "I re<strong>MEMber</strong> <span class=\"slash\">/</span> one par-<strong>TICularly MEMorable experience</strong> <span class=\"slash\">/</span> at the <strong>WAterfront park</strong> near my house.",
+          "tip": "[발음] particularly [파-티-큘-럴리], memorable [메-머-러-블 (3음절⭕)]",
+          "audio_url": "audio/day4_park_1.mp3",
+          "image_url": "images/day4_park_1.jpg"
+        },
+        {
+          "id": "day4_park_2",
+          "en": "It was about <mark>six months ago on a Sunday morning</mark> — I headed out for my usual weekend jog along the waterfront trail.",
+          "ko": "약 6개월 전 일요일 아침이었어요 — 평소처럼 수변 산책로를 따라 주말 조깅을 하러 나갔습니다.",
+          "guide": "It was about <strong>SIX months aGO</strong> <span class=\"slash\">/</span> on a <strong>SUNday morning</strong> — <span class=\"slash\">/</span> I <strong>HEADed out</strong> <span class=\"slash\">/</span> for my <strong>USual weekend JOG</strong> <span class=\"slash\">/</span> along the waterfront trail.",
+          "tip": "[연음] headed out ➔ [헤-디-다웃] | [강세] U-su-al [유-주얼]",
+          "audio_url": "audio/day4_park_2.mp3",
+          "image_url": "images/day4_park_2.jpg"
+        },
+        {
+          "id": "day4_park_3",
+          "en": "At some point, I discovered a <mark>newly extended path</mark> that I had never seen before, so I decided to explore it and ran for about an extra 15 minutes.",
+          "ko": "어느 순간 이전에 본 적 없는 새로 연장된 길을 발견했고, 탐험해 보기로 결심해 약 15분을 더 달렸습니다.",
+          "guide": "At <strong>SOME point</strong>, <span class=\"slash\">/</span> I dis<strong>COVered</strong> a <strong>NEWly exTENDed path</strong> <span class=\"slash\">/</span> that I had <strong>NEVer seen before</strong>, <span class=\"slash\">/</span> so I de<strong>CIDed to exPLORE it</strong> <span class=\"slash\">/</span> and ran for about an <strong>EXtra 15 minutes</strong>.",
+          "tip": "[연음] explore it ➔ [익스-플로-릿], about an ➔ [어-바우-턴] | [강세] ex-TEND-ed, ex-PLORE",
+          "audio_url": "audio/day4_park_3.mp3",
+          "image_url": "images/day4_park_3.jpg"
+        },
+        {
+          "id": "day4_park_4",
+          "en": "But on the way back, I somehow <mark>took a wrong turn</mark> and ended up on an unfamiliar path — I was completely lost.",
+          "ko": "그런데 돌아오는 길에 어쩌다 길을 잘못 들어 낯선 길로 접어들게 됐어요 — 완전히 길을 잃어버렸습니다.",
+          "guide": "But on the <strong>WAY back</strong>, <span class=\"slash\">/</span> I somehow <strong>TOOK a WRONG turn</strong> <span class=\"slash\">/</span> and <strong>ENDed up</strong> <span class=\"slash\">/</span> on an <strong>unfaMILiar path</strong> — <span class=\"slash\">/</span> I was <strong>comPLETEly LOST</strong>.",
+          "tip": "[연음] took a ➔ [투-커], ended up on ➔ [엔-디-덥-폰] | unfamiliar [언-퍼-밀-리어]",
+          "audio_url": "audio/day4_park_4.mp3",
+          "image_url": "images/day4_park_4.jpg"
+        },
+        {
+          "id": "day4_park_5",
+          "en": "I kept <mark>running around trying to find my way back</mark>, and before I knew it, I had run a total of <mark>15 kilometers</mark>.",
+          "ko": "계속 길을 찾아 이리저리 뛰어다녔고, 어느새 총 15킬로미터를 달려 있었습니다.",
+          "guide": "I kept <strong>RUNning aROUND</strong> <span class=\"slash\">/</span> trying to <strong>FIND my way back</strong>, <span class=\"slash\">/</span> and <strong>beFORE I knew it</strong>, <span class=\"slash\">/</span> I had run a <strong>TOtal of 15 kiLOMeters</strong>.",
+          "tip": "[연음] running around ➔ [러-닝-어-라운드], total of ➔ [토-틀-러브] | [숙어] before I knew it (어느새)",
+          "audio_url": "audio/day4_park_5.mp3",
+          "image_url": "images/day4_park_5.jpg"
+        },
+        {
+          "id": "day4_park_6",
+          "en": "My legs <mark>completely gave out</mark> after that, and I had no choice but to walk the rest of the way home.",
+          "ko": "그 이후로 다리에 힘이 완전히 빠져서, 나머지 길은 걸어서 집에 돌아올 수밖에 없었습니다.",
+          "guide": "My legs <strong>comPLETEly GAVE OUT</strong> after that, <span class=\"slash\">/</span> and I had <strong>NO CHOICE</strong> <span class=\"slash\">/</span> but to <strong>WALK the REST</strong> of the way home.",
+          "tip": "[연음] gave out ➔ [게이-바웃: 힘이 빠지다], had no choice but to ➔ [해드 노 초이스 버-투]",
+          "audio_url": "audio/day4_park_6.mp3",
+          "image_url": "images/day4_park_6.jpg"
+        },
+        {
+          "id": "day4_park_7",
+          "en": "It was the <mark>first time in my life</mark> that I had ever run 15 kilometers — even if it was by accident.",
+          "ko": "비록 우연이었지만, 15킬로미터를 달린 건 살면서 처음 있는 일이었습니다.",
+          "guide": "It was the <strong>FIRST TIME in my life</strong> <span class=\"slash\">/</span> that I had <strong>EV-er run 15 kiLOMeters</strong> — <span class=\"slash\">/</span> even if it was <strong>by ACcident</strong>.",
+          "tip": "[연음] time in my ➔ [타이-민-마이], if it was ➔ [이-핏-워즈] | [강세] AC-ci-dent [액-씨-던트]",
+          "audio_url": "audio/day4_park_7.mp3",
+          "image_url": "images/day4_park_7.jpg"
+        },
+        {
+          "id": "day4_park_8",
+          "en": "But strangely, that experience gave me <mark>real confidence</mark> — I thought, if I can run 15km by accident, with a little more training, I could actually <mark>complete a half marathon</mark> someday.",
+          "ko": "신기하게도, 그 경험이 진짜 자신감을 불어넣어 줬어요 — 우연히 15km를 달릴 수 있다면, 조금만 더 훈련하면 언젠가는 하프 마라톤도 완주할 수 있을 것 같다고 생각했습니다.",
+          "guide": "But <strong>STRANGEly</strong>, <span class=\"slash\">/</span> that ex<strong>PERience</strong> gave me <strong>REAL CONfidence</strong> — <span class=\"slash\">/</span> I thought, <span class=\"slash\">/</span> if I can run 15k by accident, <span class=\"slash\">/</span> with a <strong>LITtle more training</strong>, <span class=\"slash\">/</span> I could <strong>ACTually comPLETE</strong> <span class=\"slash\">/</span> a <strong>HALF MARathon</strong> someday.",
+          "tip": "[발음] confidence [칸-피-던스], marathon [매-러-싼] | actually [액-츄-얼리]",
+          "audio_url": "audio/day4_park_8.mp3",
+          "image_url": "images/day4_park_8.jpg"
+        },
+        {
+          "id": "day4_concert_1",
+          "en": "Actually, I have a really <mark>memorable experience</mark> related to music — it was a rock concert I attended <mark>before I got married</mark>.",
+          "ko": "사실 음악과 관련해 아직도 기억에 남는 경험이 하나 있어요 — 결혼 전에 참석했던 락 콘서트입니다.",
+          "guide": "<strong>ACTually</strong>, <span class=\"slash\">/</span> I have a <strong>REALly MEMorable experience</strong> <span class=\"slash\">/</span> re-<strong>LATed to music</strong> — <span class=\"slash\">/</span> it was a <strong>ROCK CONcert</strong> <span class=\"slash\">/</span> I at<strong>TENDed</strong> before I <strong>got MARried</strong>.",
+          "tip": "[강세] ACT-u-al-ly, re-LAT-ed, at-TEND-ed | concert [칸-서-ㄹ트]",
+          "audio_url": "audio/day4_concert_1.mp3",
+          "image_url": "images/day4_concert_1.jpg"
+        },
+        {
+          "id": "day4_concert_2",
+          "en": "My wife — who was my girlfriend at the time — and I went to see <mark>Yoon Do-hyun Band</mark>, one of Korea's most legendary rock bands, <mark>live in concert</mark>.",
+          "ko": "당시 여자친구였던 아내와 함께, 한국 최고의 전설적인 락밴드 중 하나인 윤도현 밴드의 라이브 콘서트를 보러 갔습니다.",
+          "guide": "My <strong>WIFE</strong> — <span class=\"slash\">/</span> who was my <strong>GIRLfriend at the time</strong> — <span class=\"slash\">/</span> and I <strong>WENT to see</strong> Yoon Do-hyun Band, <span class=\"slash\">/</span> one of Korea's most <strong>LEGendary rock bands</strong>, <span class=\"slash\">/</span> <strong>LIVE in concert</strong>.",
+          "tip": "[발음] legendary ➔ [레-전-대-리], live ➔ 라이브 [laɪv]",
+          "audio_url": "audio/day4_concert_2.mp3",
+          "image_url": "images/day4_concert_2.jpg"
+        },
+        {
+          "id": "day4_concert_3",
+          "en": "We had <mark>standing seats right next to the speakers</mark>, so the music was absolutely <mark>thunderously loud</mark> — you could feel it in your chest.",
+          "ko": "스피커 바로 옆 스탠딩 좌석이었기 때문에, 음악이 정말 엄청나게 크게 들렸어요 — 가슴으로 진동이 느껴질 정도였습니다.",
+          "guide": "We had <strong>STANDing seats</strong> <span class=\"slash\">/</span> <strong>right NEXT to the speak-ers</strong>, <span class=\"slash\">/</span> so the music was <strong>ABsolutely THUNderously LOUD</strong> — <span class=\"slash\">/</span> you could <strong>FEEL it in your chest</strong>.",
+          "tip": "[발음] absolutely [앱-설-루-틀리], thunderously [썬-더-러스-리] | [연음] feel it in ➔ [피-리-틴]",
+          "audio_url": "audio/day4_concert_3.mp3",
+          "image_url": "images/day4_concert_3.jpg"
+        },
+        {
+          "id": "day4_concert_4",
+          "en": "The whole crowd was <mark>singing along passionately</mark> to every single song, and the energy in the venue was just electric.",
+          "ko": "관중 전체가 모든 노래를 열정적으로 따라 불렀고, 공연장 안의 에너지가 정말 전기가 흐르는 것 같았습니다.",
+          "guide": "The <strong>WHOLE CROWD</strong> <span class=\"slash\">/</span> was <strong>SINGing aLONG PASsionately</strong> <span class=\"slash\">/</span> to <strong>EVery single song</strong>, <span class=\"slash\">/</span> and the <strong>ENergy</strong> in the venue <span class=\"slash\">/</span> was <strong>JUST eLEC-tric</strong>.",
+          "tip": "[연음] singing along ➔ [씽-잉-어-롱] | [강세] PAS-sion-ate-ly [패-셔-넛-리], e-LEC-tric",
+          "audio_url": "audio/day4_concert_4.mp3",
+          "image_url": "images/day4_concert_4.jpg"
+        },
+        {
+          "id": "day4_concert_5",
+          "en": "At that moment, it felt like <mark>everyone in the venue — thousands of complete strangers — had all become one</mark>.",
+          "ko": "그 순간, 공연장 안의 모든 사람들 — 수천 명의 완전한 낯선 이들이 — 모두 하나가 된 것 같은 느낌이 들었습니다.",
+          "guide": "At <strong>THAT MOment</strong>, <span class=\"slash\">/</span> it <strong>FELT like EVeryone</strong> in the venue — <span class=\"slash\">/</span> <strong>THOU-sands of comPLETE STRANgers</strong> — <span class=\"slash\">/</span> had <strong>ALL beCOME ONE</strong>.",
+          "tip": "[연음] thousands of ➔ [싸우-전-저브] | [강세] complete strangers [컴-플릿 스트레인-저스]",
+          "audio_url": "audio/day4_concert_5.mp3",
+          "image_url": "images/day4_concert_5.jpg"
+        },
+        {
+          "id": "day4_concert_6",
+          "en": "It was such a <mark>special and unforgettable memory</mark>, not just because of the incredible music, but because I got to share that moment with the person who later became my wife.",
+          "ko": "그것은 정말 특별하고 잊을 수 없는 추억이었어요. 놀라운 음악 때문만이 아니라, 나중에 제 아내가 된 사람과 그 순간을 함께 나눌 수 있었기 때문입니다.",
+          "guide": "It was such a <strong>SPEcial</strong> and <strong>unforGETtable memory</strong>, <span class=\"slash\">/</span> not just because of the <strong>inCREDible music</strong>, <span class=\"slash\">/</span> but because I <strong>GOT to SHARE that moment</strong> <span class=\"slash\">/</span> with the person who later <strong>beCAME my WIFE</strong>.",
+          "tip": "[강세] unfor-GET-ta-ble, in-CRED-i-ble | [연음] got to share ➔ [갇-투 쉐어]",
+          "audio_url": "audio/day4_concert_6.mp3",
+          "image_url": "images/day4_concert_6.jpg"
+        }
+      ]
+    },
+    "day5": {
+      "title": "Day 5: 해외 여행 (일본 온천 가족여행 & 렌트카)",
+      "sentences": [
+        {
+          "id": "day5_japan_1",
+          "en": "Well, in my family, we have an <mark>annual tradition</mark> where <mark>my mother, my older sister, my younger sister, and I</mark> take an overseas trip together for <mark>my mother's birthday</mark>.",
+          "ko": "음, 우리 가족에게는 어머니 생신 때마다 어머니, 누나, 여동생, 그리고 제가 함께 해외여행을 떠나는 연례 전통이 있습니다.",
+          "guide": "Well, in my family, <span class=\"slash\">/</span> we have an <strong>ANnual traDItion</strong> <span class=\"slash\">/</span> where my <strong>MOther</strong> ↗, my <strong>OLder sister</strong> ↗, my <strong>YOUNGer sister</strong> ↗, and <strong>I</strong> ↘ <span class=\"slash\">/</span> take an <strong>OVerseas trip</strong> together <span class=\"slash\">/</span> for my mother's <strong>BIRTHday</strong>.",
+          "tip": "[연음] have an ➔ [해-번], take an ➔ [테이-컨] | [나열억양] 3남매 나열할 때 끝 올리고(↗), and I에서 내림(↘)",
+          "audio_url": "audio/day5_japan_1.mp3",
+          "image_url": "images/day5_japan_1.jpg"
+        },
+        {
+          "id": "day5_japan_2",
+          "en": "<mark>To be honest</mark>, I'm not a big fan of flying because spending too much time at airports and on planes is exhausting, but <mark>Japan is just right because the flight is so short</mark>.",
+          "ko": "솔직히 말해서, 저는 공항과 비행기에서 너무 많은 시간을 보내는 것이 피곤해서 비행기 여행을 별로 좋아하지 않지만, 일본은 비행 시간이 아주 짧아서 다녀오기에 딱 좋습니다.",
+          "guide": "<strong>To be HONest</strong>, <span class=\"slash\">/</span> I'm <strong>NOT a big fan</strong> of flying <span class=\"slash\">/</span> because spending <strong>TOO MUCH TIME</strong> at airports <span class=\"slash\">/</span> is ex<strong>HAUSTing</strong>, <span class=\"slash\">/</span> but Japan is <strong>JUST RIGHT</strong> <span class=\"slash\">/</span> because the <strong>FLIGHT is SO SHORT</strong>.",
+          "tip": "[연음] not a ➔ [나-러], at airports ➔ [앳 에어포-ㄹ츠] | [강세] ex-HAUST-ing [익-조-스팅]",
+          "audio_url": "audio/day5_japan_2.mp3",
+          "image_url": "images/day5_japan_2.jpg"
+        },
+        {
+          "id": "day5_japan_3",
+          "en": "Just this past spring, the four of us traveled to Japan, and we stayed at a wonderful <mark>traditional accommodation with a hot spring</mark>.",
+          "ko": "바로 지난 봄에 우리 넷은 일본으로 여행을 다녀왔고, 온천이 딸린 멋진 전통 숙소(료칸)에 머물렀습니다.",
+          "guide": "Just this <strong>PAST SPRING</strong>, <span class=\"slash\">/</span> the <strong>FOUR of us</strong> traveled to Japan, <span class=\"slash\">/</span> and we <strong>STAYED at a WONderful</strong> <span class=\"slash\">/</span> <strong>traDItional accommoDAtion</strong> <span class=\"slash\">/</span> with a <strong>HOT SPRING</strong>.",
+          "tip": "[연음] four of us ➔ [포-러-버스], stayed at a ➔ [스테이-대-러] | accommodation [어-카-머-데이-션]",
+          "audio_url": "audio/day5_japan_3.mp3",
+          "image_url": "images/day5_japan_3.jpg"
+        },
+        {
+          "id": "day5_japan_4",
+          "en": "What made it so relaxing was that <mark>delicious authentic meals were fully provided</mark> right at the lodging, so we didn't have to worry about finding restaurants.",
+          "ko": "특히 편안했던 점은 숙소에서 맛있는 정통 현지 식사가 완전히 제공되어, 따로 식당을 찾아다닐 걱정을 할 필요가 없었다는 것입니다.",
+          "guide": "<strong>What MADE it so reLAXing</strong> <span class=\"slash\">/</span> was that <strong>deLICious auTHENtic meals</strong> <span class=\"slash\">/</span> were <strong>FULly proVIDed</strong> <span class=\"slash\">/</span> <strong>RIGHT at the LODGing</strong>, <span class=\"slash\">/</span> so we <strong>didn't HAVE to WORry</strong> about finding restaurants.",
+          "tip": "[연음] made it ➔ [메이-딧], right at the ➔ [라이-랫 더] | authentic [어-쎈-틱], lodging [라-징]",
+          "audio_url": "audio/day5_japan_4.mp3",
+          "image_url": "images/day5_japan_4.jpg"
+        },
+        {
+          "id": "day5_japan_5",
+          "en": "Our daily routine was just perfect — <mark>I went for a refreshing morning jog</mark>, we did some sightseeing during the day, and then <mark>soaked in the hot spring after dinner</mark>.",
+          "ko": "우리의 하루 일과는 정말 완벽했습니다 — 저는 아침에 상쾌하게 조깅을 했고, 낮에는 가족들과 관광을 즐겼으며, 저녁 식사 후에는 따뜻하게 온천욕을 즐겼습니다.",
+          "guide": "Our daily routine was <strong>JUST PERfect</strong> — <span class=\"slash\">/</span> I went for a <strong>reFRESHing MORning JOG</strong>, <span class=\"slash\">/</span> we did some <strong>SIGHTseeing</strong> during the day, <span class=\"slash\">/</span> and then <strong>SOAKED in the hot spring</strong> <span class=\"slash\">/</span> after dinner.",
+          "tip": "[연음] soaked in ➔ [쏘-킨: 몸을 푹 담그다] | [강세] re-FRESH-ing, SIGHT-see-ing",
+          "audio_url": "audio/day5_japan_5.mp3",
+          "image_url": "images/day5_japan_5.jpg"
+        },
+        {
+          "id": "day5_japan_6",
+          "en": "<mark>Best of all</mark>, my mother loved every single moment of it, which made the whole trip <mark>deeply meaningful for all of us</mark>.",
+          "ko": "무엇보다도 어머니께서 모든 순간을 너무나 좋아하셔서, 우리 가족 모두에게 정말 깊은 의미가 있는 여행이 되었습니다.",
+          "guide": "<strong>BEST of all</strong>, <span class=\"slash\">/</span> my mother <strong>LOVED EVery single moment</strong> of it, <span class=\"slash\">/</span> which made the whole trip <span class=\"slash\">/</span> <strong>DEEPly MEANingful</strong> <span class=\"slash\">/</span> for <strong>ALL of us</strong>.",
+          "tip": "[연음] Best of all ➔ [베스-터-볼], moment of it ➔ [모-먼-터-빗], all of us ➔ [올-러-버스]",
+          "audio_url": "audio/day5_japan_6.mp3",
+          "image_url": "images/day5_japan_6.jpg"
+        },
+        {
+          "id": "day5_rental_1",
+          "en": "Whenever we prepare for our family trip, <mark>the three of us siblings divide up the roles</mark> to make everything go smoothly.",
+          "ko": "우리 가족 여행을 준비할 때마다, 우리 3남매는 모든 일이 순조롭게 진행되도록 각자 역할을 나눕니다.",
+          "guide": "Whenever we prepare for our family trip, <span class=\"slash\">/</span> the <strong>THREE of us siblings</strong> <span class=\"slash\">/</span> <strong>diVIDE UP the ROLES</strong> <span class=\"slash\">/</span> to make <strong>EVerything go SMOOTHly</strong>.",
+          "tip": "[연음] three of us ➔ [쓰리-어-버스], divide up ➔ [디-바이-덥: 역할을 분담하다]",
+          "audio_url": "audio/day5_rental_1.mp3",
+          "image_url": "images/day5_rental_1.jpg"
+        },
+        {
+          "id": "day5_rental_2",
+          "en": "For our recent trip to Japan, <mark>my older sister booked the accommodations</mark>, while <mark>my younger sister took care of the flight tickets</mark>.",
+          "ko": "이번 일본 여행에서는 누나가 숙소 예약을 맡았고, 여동생이 비행기 표 예매를 담당했습니다.",
+          "guide": "For our <strong>REcent trip to Japan</strong>, <span class=\"slash\">/</span> my <strong>OLder sister</strong> <span class=\"slash\">/</span> <strong>BOOKED the accommoDAtions</strong>, <span class=\"slash\">/</span> while my <strong>YOUNGer sister</strong> <span class=\"slash\">/</span> <strong>TOOK CARE of</strong> the <strong>FLIGHT tickets</strong>.",
+          "tip": "[연음] booked the ➔ [북-더], took care of ➔ [툭-케어-러브] | [강세] RE-cent [리-슨트]",
+          "audio_url": "audio/day5_rental_2.mp3",
+          "image_url": "images/day5_rental_2.jpg"
+        },
+        {
+          "id": "day5_rental_3",
+          "en": "<mark>My responsibility was reserving a rental car</mark> and getting an <mark>international driving permit</mark> in advance so we could travel comfortably with my mother.",
+          "ko": "저의 역할은 어머니를 모시고 편안하게 이동할 수 있도록 렌트카를 예약하고 미리 국제운전면허증을 발급받는 것이었습니다.",
+          "guide": "My re<strong>sponsiBILity</strong> <span class=\"slash\">/</span> was <strong>reSERVing a RENtal car</strong> <span class=\"slash\">/</span> and <strong>GETting an</strong> <span class=\"slash\">/</span> <strong>interNAtional DRIVing permit</strong> in advance <span class=\"slash\">/</span> so we could <strong>TRAVel COMFortably</strong> with my mother.",
+          "tip": "[연음] getting an ➔ [게-팅-언], in advance ➔ [인-어드-밴스] | comfortably [컴프-터-블리]",
+          "audio_url": "audio/day5_rental_3.mp3",
+          "image_url": "images/day5_rental_3.jpg"
+        },
+        {
+          "id": "day5_rental_4",
+          "en": "When I started driving in Japan, <mark>the steering wheel was on the right side</mark> and we had to drive on the left, so <mark>it took some time to get used to</mark>.",
+          "ko": "일본에서 운전을 시작했을 때, 한국과 달리 운전석이 오른쪽에 있고 좌측통행을 해야 해서 적응하는 데 시간이 좀 걸렸습니다.",
+          "guide": "When I <strong>STARted DRIVing in Japan</strong>, <span class=\"slash\">/</span> the <strong>STEERing wheel</strong> was on the <strong>RIGHT side</strong> <span class=\"slash\">/</span> and we had to <strong>DRIVE on the left</strong>, <span class=\"slash\">/</span> so it <strong>TOOK SOME TIME</strong> <span class=\"slash\">/</span> to <strong>get USED TO</strong>.",
+          "tip": "[연음] was on the ➔ [워-존더], drive on ➔ [드라이-본] | [숙어] get used to [겟 유스-투: 익숙해지다]",
+          "audio_url": "audio/day5_rental_4.mp3",
+          "image_url": "images/day5_rental_4.jpg"
+        },
+        {
+          "id": "day5_rental_5",
+          "en": "At first, I had to concentrate really hard, but <mark>once I got the hang of it</mark>, having a rental car made our trip <mark>incredibly convenient</mark>.",
+          "ko": "처음에는 엄청 집중해야 했지만, 일단 손에 익고 나자 렌트카가 있어서 여행이 믿을 수 없을 만큼 편리해졌습니다.",
+          "guide": "<strong>At FIRST</strong>, <span class=\"slash\">/</span> I had to <strong>CONcentrate REALly HARD</strong>, <span class=\"slash\">/</span> but <strong>ONCE I got the HANG of it</strong>, <span class=\"slash\">/</span> having a rental car <span class=\"slash\">/</span> made our trip <span class=\"slash\">/</span> <strong>inCREDibly conVENient</strong>.",
+          "tip": "[연음/핵심] once I got the hang of it ➔ [원사이 갇더 행-어-빗: 감을 잡다] 한 번에 연결!",
+          "audio_url": "audio/day5_rental_5.mp3",
+          "image_url": "images/day5_rental_5.jpg"
+        },
+        {
+          "id": "day5_rental_6",
+          "en": "We were able to visit scenic hidden spots and move at our own pace <mark>without the hassle of public transit</mark>.",
+          "ko": "우리는 대중교통의 번거로움 없이 아름다운 숨은 명소들을 방문하고 우리 가족만의 페이스대로 이동할 수 있었습니다.",
+          "guide": "We were <strong>ABle to VISit</strong> <span class=\"slash\">/</span> <strong>SCE-nic HIDden spots</strong> <span class=\"slash\">/</span> and <strong>MOVE at our own PACE</strong> <span class=\"slash\">/</span> <strong>withOUT the HASsle</strong> <span class=\"slash\">/</span> of <strong>PUBlic TRANsit</strong>.",
+          "tip": "[발음] scenic [씨-닉: 경치 좋은], hassle [해-슬: 번거로움] | [연음] move at our ➔ [무-배-라워]",
+          "audio_url": "audio/day5_rental_6.mp3",
+          "image_url": "images/day5_rental_6.jpg"
+        },
+        {
+          "id": "day5_rental_7",
+          "en": "<mark>Thanks to our teamwork and the rental car</mark>, it turned out to be one of the smoothest and most enjoyable family trips we've ever had.",
+          "ko": "3남매의 팀워크와 렌트카 덕분에 지금까지 다녀온 가족 여행 중 가장 매끄럽고 즐거웠던 여행 중 하나가 되었습니다.",
+          "guide": "<strong>THANKS to our TEAMwork</strong> and the rental car, <span class=\"slash\">/</span> it <strong>TURNED OUT to be</strong> <span class=\"slash\">/</span> <strong>ONE of the SMOOTHest</strong> <span class=\"slash\">/</span> and <strong>MOST enJOYable</strong> family trips <span class=\"slash\">/</span> we've <strong>EV-er HAD</strong>.",
+          "tip": "[연음] turned out to be ➔ [턴-다웃-투-비], one of the ➔ [워-너브-더], ever had ➔ [에-버-해드]",
+          "audio_url": "audio/day5_rental_7.mp3",
+          "image_url": "images/day5_rental_7.jpg"
+        }
+      ]
+    },
+    "day6": {
+      "title": "Day 6: 휴일 루틴 & 홈 스테이케이션",
+      "sentences": [
+        {
+          "id": "day6_holiday_1",
+          "en": "<mark>Well, when it comes to my holidays or weekends</mark>, I usually like to <mark>keep a healthy and productive routine</mark>.",
+          "ko": "음, 휴일이나 주말에 대해 말씀드리자면, 저는 보통 건강하고 생산적인 루틴을 유지하는 것을 좋아합니다.",
+          "guide": "Well, <span class=\"slash\">/</span> when it <strong>COMES to my HOlidays</strong> or weekends, <span class=\"slash\">/</span> I usually like to keep a <strong>HEALTHy and proDUC-tive routine</strong>.",
+          "tip": "[도입구] when it comes to ~ [웨닛-컴스-투: ~에 대해 말하자면] | [강세] pro-DUC-tive (2음절 강세)",
+          "audio_url": "audio/day6_holiday_1.mp3",
+          "image_url": "images/day6_holiday_1.jpg"
+        },
+        {
+          "id": "day6_holiday_2",
+          "en": "Even on holidays, I <mark>wake up around 8 AM</mark>, have a <mark>light salad and yogurt</mark>, and head over to the waterfront park to <mark>go jogging</mark>.",
+          "ko": "휴일에도 8시쯤 일어나서 간단한 샐러드와 요거트를 챙겨 먹은 후, 근처 수변공원에 조깅을 하러 갑니다.",
+          "guide": "<strong>EVen on holidays</strong>, <span class=\"slash\">/</span> I <strong>WAKE UP around eight a.m.</strong>, <span class=\"slash\">/</span> have a <strong>LIGHT SAlad and YO-gurt</strong>, <span class=\"slash\">/</span> and <strong>HEAD OVER to the waterfront park</strong> <span class=\"slash\">/</span> to <strong>GO JOGging</strong>.",
+          "tip": "[연음] wake up around ➔ [웨이-커-퍼-라운드], head over ➔ [헤-도버] | salad [샐-러드], yogurt [요-거-ㄹ트]",
+          "audio_url": "audio/day6_holiday_2.mp3",
+          "image_url": "images/day6_holiday_2.jpg"
+        },
+        {
+          "id": "day6_holiday_3",
+          "en": "After getting back from the run, I <mark>take a refreshing shower</mark> and enjoy a <mark>delicious lunch with my family</mark>.",
+          "ko": "달리기를 마치고 돌아온 뒤에는 시원하게 샤워를 하고 식구들과 함께 맛있는 점심을 먹습니다.",
+          "guide": "After getting <strong>BACK from the run</strong>, <span class=\"slash\">/</span> I take a <strong>reFRESHing SHOWer</strong> <span class=\"slash\">/</span> and enjoy a <strong>deLIcious LUNCH</strong> <span class=\"slash\">/</span> <strong>with my FAM-i-ly</strong>.",
+          "tip": "[발음] refreshing [리-프레-싱: 상쾌한] | delicious [디-리-셔스] | family [패-밀리 (3음절)]",
+          "audio_url": "audio/day6_holiday_3.mp3",
+          "image_url": "images/day6_holiday_3.jpg"
+        },
+        {
+          "id": "day6_holiday_4",
+          "en": "In the afternoon, I relax in my room to <mark>watch some movies</mark> or <mark>spend an hour or two studying English</mark>.",
+          "ko": "오후에는 방에서 편안하게 영화를 보거나, 한두 시간 정도 영어 공부를 하며 시간을 보냅니다.",
+          "guide": "In the <strong>AFternoon</strong>, <span class=\"slash\">/</span> I re<strong>LAX in my room</strong> <span class=\"slash\">/</span> to <strong>WATCH some MOVies</strong> <span class=\"slash\">/</span> or spend an <strong>HOUR or TWO</strong> <span class=\"slash\">/</span> <strong>STUDYing ENGlish</strong>.",
+          "tip": "[연음] hour or two ➔ [아워-러-투: 한두 시간] | [강세] ENG-lish (앞음절 강세)",
+          "audio_url": "audio/day6_holiday_4.mp3",
+          "image_url": "images/day6_holiday_4.jpg"
+        },
+        {
+          "id": "day6_holiday_5",
+          "en": "In the evening, I usually <mark>order some delicious food</mark> for dinner and <mark>spend quality time relaxing with my cats</mark>.",
+          "ko": "저녁에는 보통 맛있는 배달 음식을 시켜 먹고, 고양이들과 함께 뒹굴거리며 힐링하는 소중한 시간을 보냅니다.",
+          "guide": "In the <strong>EVening</strong>, <span class=\"slash\">/</span> I usually <strong>ORder some deLIcious food</strong> for dinner <span class=\"slash\">/</span> and <strong>spend QUALity time</strong> <span class=\"slash\">/</span> re-<strong>LAXing with my CATS</strong>.",
+          "tip": "[콜로케이션] spend quality time [스펜-퀄리티-타임: 알찬/소중한 시간을 보내다] | [연음] order some [오-더-썸]",
+          "audio_url": "audio/day6_holiday_5.mp3",
+          "image_url": "images/day6_holiday_5.jpg"
+        },
+        {
+          "id": "day6_holiday_6",
+          "en": "<mark>So, to wrap it up</mark>, spending a peaceful day off like this really helps me <mark>de-stress and fully recharge my batteries</mark> for the upcoming week.",
+          "ko": "그래서 결론을 짓자면, 이렇게 평화로운 휴일을 보내는 것은 스트레스를 풀고 다가오는 한 주를 위해 에너지를 100% 재충전하는 데 큰 도움이 됩니다.",
+          "guide": "So, to <strong>WRAP it up</strong>, <span class=\"slash\">/</span> <strong>SPENDing a PEACEful day off</strong> like this <span class=\"slash\">/</span> really <strong>HELPS me de-STRESS</strong> <span class=\"slash\">/</span> and <strong>FULly reCHARGE my BATteries</strong> <span class=\"slash\">/</span> for the <strong>UPcoming week</strong>.",
+          "tip": "[마무리 표현] to wrap it up ➔ [투 래-피-덥] | [숙어] recharge my batteries ➔ [리-차-ㄹ지 마이 배-터-리즈]",
+          "audio_url": "audio/day6_holiday_6.mp3",
+          "image_url": "images/day6_holiday_6.jpg"
+        }
+      ]
+    }
+  }
+}

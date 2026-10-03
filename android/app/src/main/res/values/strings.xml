@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">OPIc Master IH</string>
+    <string name="channel_name">오픽 섀도잉 백그라운드 재생</string>
+    <string name="channel_description">화면이 꺼진 상태에서도 문장 섀도잉 음원을 연속 재생합니다.</string>
+</resources>
