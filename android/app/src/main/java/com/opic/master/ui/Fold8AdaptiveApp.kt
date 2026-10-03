@@ -333,7 +333,7 @@ fun Fold8AdaptiveApp(
         }
     }
 
-    val handleToggleOrPlayActive = {
+    val handleToggleOrPlayActive: () -> Unit = {
         if (isPlaying) {
             onTogglePlay()
         } else if (currentPlayingId != null && currentPlayingId == currentActiveSentence?.id) {
