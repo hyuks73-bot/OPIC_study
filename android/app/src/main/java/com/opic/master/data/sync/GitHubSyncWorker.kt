@@ -109,6 +109,7 @@ class GitHubSyncWorker(
                 }
 
                 // 4. Download any missing MP3 audio files in the background
+                var allAudioDownloaded = true
                 for (sentence in sentenceEntities) {
                     val audioFile = File(audioDir, "${sentence.id}.mp3")
                     if (!audioFile.exists() || audioFile.length() == 0L) {
@@ -121,15 +122,17 @@ class GitHubSyncWorker(
                                         audioResp.body!!.byteStream().copyTo(output)
                                     }
                                     dao.updateAudioDownloaded(sentence.id, audioFile.absolutePath)
+                                } else {
+                                    allAudioDownloaded = false
                                 }
                             }
                         } catch (e: Exception) {
-                            // Retry later
+                            allAudioDownloaded = false
                         }
                     }
                 }
 
-                true
+                allAudioDownloaded
             } catch (e: Exception) {
                 e.printStackTrace()
                 false
@@ -141,6 +144,6 @@ class GitHubSyncWorker(
 
     override suspend fun doWork(): Result {
         val success = performSync(applicationContext)
-        return if (success) Result.success() else Result.failure()
+        return if (success) Result.success() else Result.retry()
     }
 }
