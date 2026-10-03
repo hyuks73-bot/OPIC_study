@@ -31,20 +31,20 @@ class GitHubSyncWorker(
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
-            // 1. Fetch manifest.json
+            // 1. Fetch manifest.json safely with auto-closeable response
             val request = Request.Builder().url(MANIFEST_URL).build()
-            val response = client.newCall(request).execute()
-            if (!response.isSuccessful || response.body == null) {
-                return@withContext Result.retry()
+            val manifest = client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful || response.body == null) {
+                    return@withContext Result.retry()
+                }
+                gson.fromJson(response.body!!.string(), ManifestResponse::class.java)
             }
 
-            val jsonString = response.body!!.string()
-            val manifest = gson.fromJson(jsonString, ManifestResponse::class.java)
-
-            // 2. Prepare audio storage directory
+            // 2. Prepare audio storage directory & get existing records to preserve user preferences
             val audioDir = File(applicationContext.filesDir, "audio").apply {
                 if (!exists()) mkdirs()
             }
+            val existingSentences = dao.getAllSentencesList().associateBy { it.id }
 
             val sentenceEntities = mutableListOf<Sentence>()
             var syncOrderCounter = 0
@@ -59,18 +59,20 @@ class GitHubSyncWorker(
                         val audioUrl = "$GITHUB_RAW_BASE/${item.audioUrl}"
                         val audioReq = Request.Builder().url(audioUrl).build()
                         try {
-                            val audioResp = client.newCall(audioReq).execute()
-                            if (audioResp.isSuccessful && audioResp.body != null) {
-                                FileOutputStream(audioFile).use { output ->
-                                    audioResp.body!!.byteStream().copyTo(output)
+                            client.newCall(audioReq).execute().use { audioResp ->
+                                if (audioResp.isSuccessful && audioResp.body != null) {
+                                    FileOutputStream(audioFile).use { output ->
+                                        audioResp.body!!.byteStream().copyTo(output)
+                                    }
+                                    isDownloaded = true
                                 }
-                                isDownloaded = true
                             }
                         } catch (e: Exception) {
                             // Audio download can retry later
                         }
                     }
 
+                    val existing = existingSentences[item.id]
                     sentenceEntities.add(
                         Sentence(
                             id = item.id,
@@ -83,7 +85,10 @@ class GitHubSyncWorker(
                             audioUrl = item.audioUrl,
                             imageUrl = item.imageUrl,
                             localAudioPath = if (isDownloaded) audioFile.absolutePath else null,
-                            isDownloaded = isDownloaded
+                            localImagePath = existing?.localImagePath,
+                            isDownloaded = isDownloaded,
+                            bookmark = existing?.bookmark ?: false,
+                            repeatCount = existing?.repeatCount ?: 3
                         )
                     )
                 }

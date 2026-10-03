@@ -20,6 +20,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+private val HTML_TAG_REGEX = Regex("<.*?>")
+
 class MainActivity : ComponentActivity() {
 
     private val db by lazy { AppDatabase.getDatabase(this) }
@@ -88,18 +90,6 @@ class MainActivity : ComponentActivity() {
                 onUpdateSpeed = { speed ->
                     updatePlaybackSpeed(speed)
                 },
-                onPrev = {
-                    val intent = Intent(this, PlaybackService::class.java).apply {
-                        action = PlaybackService.ACTION_PREV
-                    }
-                    startService(intent)
-                },
-                onNext = {
-                    val intent = Intent(this, PlaybackService::class.java).apply {
-                        action = PlaybackService.ACTION_NEXT
-                    }
-                    startService(intent)
-                },
                 onSyncGitHub = {
                     triggerGitHubSync()
                 }
@@ -117,7 +107,7 @@ class MainActivity : ComponentActivity() {
         val intent = Intent(this, PlaybackService::class.java).apply {
             action = PlaybackService.ACTION_PLAY_SENTENCE
             putExtra(PlaybackService.EXTRA_AUDIO_PATH, path)
-            putExtra(PlaybackService.EXTRA_SENTENCE_TITLE, sentence.en.replace(Regex("<.*?>"), ""))
+            putExtra(PlaybackService.EXTRA_SENTENCE_TITLE, sentence.en.replace(HTML_TAG_REGEX, ""))
             putExtra(PlaybackService.EXTRA_SENTENCE_ID, sentence.id)
             putExtra(PlaybackService.EXTRA_REPEAT_COUNT, repeatCount)
         }
@@ -127,7 +117,7 @@ class MainActivity : ComponentActivity() {
     private fun playAllViaService(sentences: List<Sentence>, repeatCount: Int) {
         if (sentences.isEmpty()) return
         val paths = ArrayList(sentences.map { it.localAudioPath ?: "https://raw.githubusercontent.com/hyuks73-bot/OPIC_study/main/${it.audioUrl}" })
-        val titles = ArrayList(sentences.map { it.en.replace(Regex("<.*?>"), "") })
+        val titles = ArrayList(sentences.map { it.en.replace(HTML_TAG_REGEX, "") })
         val ids = ArrayList(sentences.map { it.id })
 
         val intent = Intent(this, PlaybackService::class.java).apply {

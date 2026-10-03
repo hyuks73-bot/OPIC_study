@@ -27,6 +27,7 @@ class PlaybackService : MediaSessionService() {
     private var repeatTargetCount = 3
     private var currentRepeat = 0
     private var isShadowingPauseActive = false
+    private var shadowingJob: Job? = null
 
     // Playlist Mode State
     private var isPlaylistMode = false
@@ -34,6 +35,12 @@ class PlaybackService : MediaSessionService() {
     private var playlistTitles = listOf<String>()
     private var playlistIds = listOf<String>()
     private var currentPlaylistIndex = 0
+
+    private fun cancelShadowingPause() {
+        shadowingJob?.cancel()
+        shadowingJob = null
+        isShadowingPauseActive = false
+    }
 
     companion object {
         const val NOTIFICATION_ID = 1001
@@ -96,6 +103,17 @@ class PlaybackService : MediaSessionService() {
                 _isPlayingFlow.value = isPlaying
             }
 
+            override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
+                cancelShadowingPause()
+                if (isPlaylistMode && currentPlaylistIndex + 1 < playlistPaths.size) {
+                    currentPlaylistIndex++
+                    playCurrentPlaylistItem()
+                } else {
+                    _isPlayingFlow.value = false
+                    _currentPlayingSentenceId.value = null
+                }
+            }
+
             override fun onPlaybackStateChanged(playbackState: Int) {
                 if (playbackState == Player.STATE_ENDED) {
                     currentRepeat++
@@ -103,8 +121,9 @@ class PlaybackService : MediaSessionService() {
 
                     if (currentRepeat < repeatTargetCount) {
                         // 1.2-second smart pause for learner's vocal shadowing
-                        serviceScope.launch {
-                            isShadowingPauseActive = true
+                        cancelShadowingPause()
+                        isShadowingPauseActive = true
+                        shadowingJob = serviceScope.launch {
                             delay(1200)
                             if (isShadowingPauseActive && player.playbackState == Player.STATE_ENDED) {
                                 player.seekTo(0)
@@ -116,6 +135,7 @@ class PlaybackService : MediaSessionService() {
                         // Current sentence repeats completed
                         currentRepeat = 0
                         _currentRepeatFlow.value = 1
+                        cancelShadowingPause()
 
                         if (isPlaylistMode) {
                             if (currentPlaylistIndex + 1 < playlistPaths.size) {
@@ -125,6 +145,7 @@ class PlaybackService : MediaSessionService() {
                                 // Entire tab playlist complete
                                 _isPlayingFlow.value = false
                                 _currentPlayingSentenceId.value = null
+                                stopForeground(STOP_FOREGROUND_REMOVE)
                             }
                         } else {
                             _isPlayingFlow.value = false
@@ -152,6 +173,7 @@ class PlaybackService : MediaSessionService() {
 
         when (intent?.action) {
             ACTION_PLAY_SENTENCE -> {
+                cancelShadowingPause()
                 isPlaylistMode = false
                 val audioPath = intent.getStringExtra(EXTRA_AUDIO_PATH) ?: return START_STICKY
                 val title = intent.getStringExtra(EXTRA_SENTENCE_TITLE) ?: "OPIc Sentence"
@@ -159,7 +181,6 @@ class PlaybackService : MediaSessionService() {
                 repeatTargetCount = intent.getIntExtra(EXTRA_REPEAT_COUNT, 3)
                 currentRepeat = 0
                 _currentRepeatFlow.value = 1
-                isShadowingPauseActive = false
 
                 _currentPlayingSentenceId.value = sentenceId
                 _currentPlayingTitle.value = title
@@ -173,6 +194,7 @@ class PlaybackService : MediaSessionService() {
             }
 
             ACTION_PLAY_ALL -> {
+                cancelShadowingPause()
                 val paths = intent.getStringArrayListExtra(EXTRA_AUDIO_PATHS) ?: return START_STICKY
                 val titles = intent.getStringArrayListExtra(EXTRA_SENTENCE_TITLES) ?: return START_STICKY
                 val ids = intent.getStringArrayListExtra(EXTRA_SENTENCE_IDS) ?: return START_STICKY
@@ -186,32 +208,29 @@ class PlaybackService : MediaSessionService() {
                 repeatTargetCount = intent.getIntExtra(EXTRA_REPEAT_COUNT, 3)
                 currentRepeat = 0
                 _currentRepeatFlow.value = 1
-                isShadowingPauseActive = false
 
                 playCurrentPlaylistItem()
             }
 
             ACTION_TOGGLE_PLAY -> {
                 if (player.isPlaying) {
+                    cancelShadowingPause()
                     player.pause()
-                    _isPlayingFlow.value = false
                 } else if (player.playbackState == Player.STATE_ENDED) {
+                    cancelShadowingPause()
                     player.seekTo(0)
                     player.play()
-                    _isPlayingFlow.value = true
                 } else {
                     player.play()
-                    _isPlayingFlow.value = true
                 }
             }
 
             ACTION_STOP -> {
-                isShadowingPauseActive = false
+                cancelShadowingPause()
                 isPlaylistMode = false
                 currentRepeat = 0
                 player.stop()
                 player.clearMediaItems()
-                _isPlayingFlow.value = false
                 _currentPlayingSentenceId.value = null
                 _currentPlayingTitle.value = ""
                 _currentRepeatFlow.value = 1
@@ -229,16 +248,16 @@ class PlaybackService : MediaSessionService() {
             }
 
             ACTION_PAUSE -> {
+                cancelShadowingPause()
                 player.pause()
-                _isPlayingFlow.value = false
             }
 
             ACTION_RESUME -> {
                 player.play()
-                _isPlayingFlow.value = true
             }
 
             ACTION_PREV -> {
+                cancelShadowingPause()
                 if (isPlaylistMode && currentPlaylistIndex > 0) {
                     currentPlaylistIndex--
                     currentRepeat = 0
@@ -249,6 +268,7 @@ class PlaybackService : MediaSessionService() {
             }
 
             ACTION_NEXT -> {
+                cancelShadowingPause()
                 if (isPlaylistMode && currentPlaylistIndex + 1 < playlistPaths.size) {
                     currentPlaylistIndex++
                     currentRepeat = 0
@@ -267,6 +287,7 @@ class PlaybackService : MediaSessionService() {
 
     private fun playCurrentPlaylistItem() {
         if (currentPlaylistIndex !in playlistPaths.indices) return
+        cancelShadowingPause()
 
         val audioPath = playlistPaths[currentPlaylistIndex]
         val title = playlistTitles.getOrNull(currentPlaylistIndex) ?: "OPIc Sentence"
@@ -276,7 +297,6 @@ class PlaybackService : MediaSessionService() {
         _currentPlayingTitle.value = title
         currentRepeat = 0
         _currentRepeatFlow.value = 1
-        isShadowingPauseActive = false
 
         val mediaItem = MediaItem.fromUri(audioPath)
         player.setMediaItem(mediaItem)
@@ -313,9 +333,12 @@ class PlaybackService : MediaSessionService() {
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? = mediaSession
 
     override fun onDestroy() {
+        cancelShadowingPause()
         serviceScope.cancel()
         _isPlayingFlow.value = false
         _currentPlayingSentenceId.value = null
+        _currentPlayingTitle.value = ""
+        _currentRepeatFlow.value = 1
         mediaSession?.run {
             player.release()
             release()

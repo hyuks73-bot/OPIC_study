@@ -29,6 +29,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.opic.master.data.model.Sentence
 
+// =========================================================================
+// DATA MODELS & PRECOMPILED REGEX UTILITIES (Optimized for Zero-GC in UI)
+// =========================================================================
+
 data class DayMeta(
     val key: String,
     val tabLabel: String,
@@ -45,18 +49,28 @@ val APP_DAYS = listOf(
     DayMeta("day6", "Day 6", "휴일 루틴 & 홈캉스", "🏖️")
 )
 
-private val naturalOrderRegex = Regex("^(.*?)(?:_|-|)(\\d+)$")
+private val HTML_TAG_REGEX = Regex("<.*?>")
+private val SLASH_TAG_REGEX = Regex("<span class=\"slash\">/</span>")
+private val MULTI_SPACE_REGEX = Regex("\\s+")
+private val NATURAL_ORDER_REGEX = Regex("^(.*?)(?:_|-|)(\\d+)$")
+
+fun cleanSentenceText(text: String): String =
+    text.replace(HTML_TAG_REGEX, "").trim()
+
+fun cleanGuideText(guide: String): String =
+    guide.replace(SLASH_TAG_REGEX, " / ")
+        .replace(HTML_TAG_REGEX, " ")
+        .replace(MULTI_SPACE_REGEX, " ")
+        .trim()
 
 fun naturalSentenceComparator(): Comparator<Sentence> = Comparator { a, b ->
     if (a.orderIndex != b.orderIndex) {
         return@Comparator a.orderIndex.compareTo(b.orderIndex)
     }
-    val matchA = naturalOrderRegex.find(a.id)
-    val matchB = naturalOrderRegex.find(b.id)
+    val matchA = NATURAL_ORDER_REGEX.find(a.id)
+    val matchB = NATURAL_ORDER_REGEX.find(b.id)
     if (matchA != null && matchB != null) {
-        val prefixA = matchA.groupValues[1]
-        val prefixB = matchB.groupValues[1]
-        val prefixComp = prefixA.compareTo(prefixB)
+        val prefixComp = matchA.groupValues[1].compareTo(matchB.groupValues[1])
         if (prefixComp != 0) return@Comparator prefixComp
         val numA = matchA.groupValues[2].toIntOrNull() ?: 0
         val numB = matchB.groupValues[2].toIntOrNull() ?: 0
@@ -65,6 +79,181 @@ fun naturalSentenceComparator(): Comparator<Sentence> = Comparator { a, b ->
     }
     a.id.compareTo(b.id)
 }
+
+// =========================================================================
+// REUSABLE UI COMPONENTS (Minimizing Redundant Layout Code)
+// =========================================================================
+
+@Composable
+fun DaySelectorTabs(
+    selectedDay: String,
+    onSelectDay: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    horizontalPadding: Int = 12
+) {
+    LazyRow(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = horizontalPadding.dp, vertical = 6.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(APP_DAYS) { meta ->
+            val isSelected = selectedDay == meta.key
+            Surface(
+                shape = CircleShape,
+                color = if (isSelected) Color(0xFF6366F1) else Color(0xFF1E293B),
+                modifier = Modifier.clickable { onSelectDay(meta.key) }
+            ) {
+                Text(
+                    text = "${meta.emoji} ${meta.tabLabel}",
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
+                    color = if (isSelected) Color.White else Color(0xFF94A3B8),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun RepeatSpeedBadges(
+    repeatCount: Int,
+    speed: Float,
+    onCycleRepeat: () -> Unit,
+    onCycleSpeed: () -> Unit,
+    modifier: Modifier = Modifier,
+    isVertical: Boolean = false
+) {
+    val items = @Composable {
+        Surface(
+            color = Color(0xFF1E293B),
+            shape = RoundedCornerShape(6.dp),
+            modifier = Modifier.clickable { onCycleRepeat() }
+        ) {
+            Text(
+                text = "🔁 ${if (repeatCount >= 999) "무한" else "${repeatCount}회"}",
+                fontSize = 11.sp,
+                color = Color(0xFFFBBF24),
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
+            )
+        }
+        Surface(
+            color = Color(0xFF1E293B),
+            shape = RoundedCornerShape(6.dp),
+            modifier = Modifier.clickable { onCycleSpeed() }
+        ) {
+            Text(
+                text = "⚡ ${speed}x",
+                fontSize = 11.sp,
+                color = Color(0xFFA5B4FC),
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
+            )
+        }
+    }
+
+    if (isVertical) {
+        Column(
+            modifier = modifier,
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalAlignment = Alignment.End
+        ) {
+            items()
+        }
+    } else {
+        Row(
+            modifier = modifier,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            items()
+        }
+    }
+}
+
+@Composable
+fun CoachingGuideCard(
+    guide: String,
+    tip: String,
+    modifier: Modifier = Modifier,
+    containerColor: Color = Color(0xFF0B1120),
+    borderColor: Color = Color(0xFF1E3A5F)
+) {
+    val cleanGuide = remember(guide) { cleanGuideText(guide) }
+    if (cleanGuide.isEmpty() && tip.isEmpty()) return
+
+    Surface(
+        color = containerColor,
+        shape = RoundedCornerShape(10.dp),
+        border = BorderStroke(1.dp, borderColor),
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(10.dp)) {
+            if (cleanGuide.isNotEmpty()) {
+                Text(
+                    text = "🗣️ 낭독·강세: $cleanGuide",
+                    color = Color(0xFF7DD3FC),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    lineHeight = 16.sp
+                )
+            }
+            if (tip.isNotEmpty()) {
+                if (cleanGuide.isNotEmpty()) Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "💡 팁: $tip",
+                    color = Color(0xFF94A3B8),
+                    fontSize = 11.sp,
+                    lineHeight = 15.sp
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun <T> SelectionPillsRow(
+    items: List<Pair<T, String>>,
+    selectedItem: T,
+    onSelect: (T) -> Unit,
+    selectedColor: Color,
+    selectedBorderColor: Color,
+    modifier: Modifier = Modifier,
+    heightDp: Int = 36
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items.forEach { (value, label) ->
+            val isSelected = selectedItem == value
+            Surface(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(heightDp.dp)
+                    .clickable { onSelect(value) },
+                color = if (isSelected) selectedColor else Color(0xFF1E293B),
+                shape = RoundedCornerShape(10.dp),
+                border = if (isSelected) BorderStroke(1.dp, selectedBorderColor) else null
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Text(
+                        text = label,
+                        color = if (isSelected) Color.White else Color(0xFF94A3B8),
+                        fontSize = 12.sp,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                    )
+                }
+            }
+        }
+    }
+}
+
+// =========================================================================
+// MAIN ADAPTIVE APP CONTAINER (Galaxy Fold 8 Screen Posture Handler)
+// =========================================================================
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,8 +269,6 @@ fun Fold8AdaptiveApp(
     onStop: () -> Unit,
     onUpdateRepeatCount: (Int) -> Unit,
     onUpdateSpeed: (Float) -> Unit = {},
-    onPrev: () -> Unit,
-    onNext: () -> Unit,
     onSyncGitHub: () -> Unit
 ) {
     var selectedDay by remember { mutableStateOf("day1") }
@@ -101,11 +288,7 @@ fun Fold8AdaptiveApp(
     fun handlePrevSentence() {
         if (filteredSentences.isEmpty()) return
         val currentIndex = filteredSentences.indexOfFirst { it.id == currentActiveSentence?.id }
-        val prevIndex = if (currentIndex > 0) {
-            currentIndex - 1
-        } else {
-            filteredSentences.size - 1
-        }
+        val prevIndex = if (currentIndex > 0) currentIndex - 1 else filteredSentences.size - 1
         val prev = filteredSentences[prevIndex]
         activeSentence = prev
         onPlaySentence(prev, repeatCount)
@@ -114,11 +297,7 @@ fun Fold8AdaptiveApp(
     fun handleNextSentence() {
         if (filteredSentences.isEmpty()) return
         val currentIndex = filteredSentences.indexOfFirst { it.id == currentActiveSentence?.id }
-        val nextIndex = if (currentIndex in filteredSentences.indices && currentIndex + 1 < filteredSentences.size) {
-            currentIndex + 1
-        } else {
-            0
-        }
+        val nextIndex = if (currentIndex in filteredSentences.indices && currentIndex + 1 < filteredSentences.size) currentIndex + 1 else 0
         val next = filteredSentences[nextIndex]
         activeSentence = next
         onPlaySentence(next, repeatCount)
@@ -154,13 +333,21 @@ fun Fold8AdaptiveApp(
         }
     }
 
-    // Auto-update active sentence when playing or day changes
+    val handleToggleOrPlayActive = {
+        if (isPlaying) {
+            onTogglePlay()
+        } else if (currentPlayingId != null && currentPlayingId == currentActiveSentence?.id) {
+            onTogglePlay()
+        } else {
+            currentActiveSentence?.let { onPlaySentence(it, repeatCount) }
+        }
+    }
+
+    // Auto-sync active sentence with player state or day change
     LaunchedEffect(currentPlayingId, filteredSentences) {
         if (currentPlayingId != null) {
             val matched = filteredSentences.find { it.id == currentPlayingId }
-            if (matched != null) {
-                activeSentence = matched
-            }
+            if (matched != null) activeSentence = matched
         } else if (activeSentence == null && filteredSentences.isNotEmpty()) {
             activeSentence = filteredSentences.first()
         } else if (filteredSentences.isNotEmpty() && filteredSentences.none { it.id == activeSentence?.id }) {
@@ -171,29 +358,23 @@ fun Fold8AdaptiveApp(
     var isManualFlexActive by remember { mutableStateOf(false) }
 
     LaunchedEffect(isFlexMode) {
-        if (isFlexMode) {
-            isManualFlexActive = true
-        }
+        if (isFlexMode) isManualFlexActive = true
     }
 
     LaunchedEffect(isUnfolded) {
-        if (!isUnfolded) {
-            isManualFlexActive = false
-        }
+        if (!isUnfolded) isManualFlexActive = false
     }
 
     val isDisplayingFlex = isUnfolded && (isFlexMode || isManualFlexActive)
 
     when {
         !isUnfolded -> {
-            // 1. Cover Display (Folded Compact Thumb-Zone 1248 x 1972)
             CoverDisplayLayout(
                 selectedDay = selectedDay,
                 onSelectDay = { handleSelectDay(it) },
                 sentences = filteredSentences,
                 activeSentence = currentActiveSentence,
                 isPlaying = isPlaying,
-                currentPlayingId = currentPlayingId,
                 repeatCount = repeatCount,
                 speed = speed,
                 showCoaching = showCoaching,
@@ -203,7 +384,7 @@ fun Fold8AdaptiveApp(
                     onPlaySentence(it, repeatCount)
                 },
                 onPlayAll = { onPlayAll(filteredSentences, repeatCount) },
-                onTogglePlay = onTogglePlay,
+                onTogglePlay = handleToggleOrPlayActive,
                 onStop = onStop,
                 onCycleRepeat = { handleRepeatCycle() },
                 onCycleSpeed = { handleSpeedCycle() },
@@ -213,25 +394,15 @@ fun Fold8AdaptiveApp(
             )
         }
         isDisplayingFlex -> {
-            // 2. Flex Mode (Tabletop Posture 90° ~ 115° or Manual Toggle)
             FlexModeLayout(
                 selectedDay = selectedDay,
                 onSelectDay = { handleSelectDay(it) },
                 activeSentence = currentActiveSentence,
                 sentences = filteredSentences,
                 isPlaying = isPlaying,
-                currentPlayingId = currentPlayingId,
                 repeatCount = repeatCount,
                 speed = speed,
-                onTogglePlay = {
-                    if (isPlaying) {
-                        onTogglePlay()
-                    } else if (currentPlayingId != null && currentPlayingId == currentActiveSentence?.id) {
-                        onTogglePlay()
-                    } else {
-                        currentActiveSentence?.let { onPlaySentence(it, repeatCount) }
-                    }
-                },
+                onTogglePlay = handleToggleOrPlayActive,
                 onStop = onStop,
                 onPlaySentence = { s ->
                     activeSentence = s
@@ -251,14 +422,12 @@ fun Fold8AdaptiveApp(
             )
         }
         else -> {
-            // 3. Main Display (Unfolded Dual-Pane Studio 2448 x 1848)
             MainDualPaneLayout(
                 selectedDay = selectedDay,
                 onSelectDay = { handleSelectDay(it) },
                 sentences = filteredSentences,
                 activeSentence = currentActiveSentence,
                 isPlaying = isPlaying,
-                currentPlayingId = currentPlayingId,
                 repeatCount = repeatCount,
                 speed = speed,
                 onSelectSentence = {
@@ -266,8 +435,10 @@ fun Fold8AdaptiveApp(
                     onPlaySentence(it, repeatCount)
                 },
                 onPlayAll = { onPlayAll(filteredSentences, repeatCount) },
-                onTogglePlay = onTogglePlay,
+                onTogglePlay = handleToggleOrPlayActive,
                 onStop = onStop,
+                onPrev = { handlePrevSentence() },
+                onNext = { handleNextSentence() },
                 onCycleRepeat = { handleRepeatCycle() },
                 onCycleSpeed = { handleSpeedCycle() },
                 onToggleFlexMode = { isManualFlexActive = true },
@@ -277,9 +448,10 @@ fun Fold8AdaptiveApp(
     }
 }
 
-// -------------------------------------------------------------
-// 1. COVER DISPLAY LAYOUT (1248 x 1972 Thumb-Zone Optimized)
-// -------------------------------------------------------------
+// =========================================================================
+// 1. COVER DISPLAY LAYOUT (1248 x 1972 Folded Thumb-Zone Optimized)
+// =========================================================================
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoverDisplayLayout(
@@ -288,7 +460,6 @@ fun CoverDisplayLayout(
     sentences: List<Sentence>,
     activeSentence: Sentence?,
     isPlaying: Boolean,
-    currentPlayingId: String?,
     repeatCount: Int,
     speed: Float,
     showCoaching: Boolean,
@@ -332,15 +503,10 @@ fun CoverDisplayLayout(
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF0F172A),
-                    titleContentColor = Color.White,
-                    actionIconContentColor = Color(0xFF34D399)
-                )
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF0F172A))
             )
         },
         bottomBar = {
-            // Pinned Floating Bottom Player Bar (Thumb-Zone)
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 color = Color(0xFF0F172A),
@@ -385,7 +551,7 @@ fun CoverDisplayLayout(
                             }
                         }
 
-                        // Central Player Controls: Prev, Play/Pause, Stop, Next
+                        // Central Player Controls
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(4.dp),
                             verticalAlignment = Alignment.CenterVertically
@@ -394,22 +560,9 @@ fun CoverDisplayLayout(
                                 Icon(Icons.Default.SkipPrevious, contentDescription = "Prev", tint = Color.White)
                             }
                             FilledIconButton(
-                                onClick = {
-                                    if (isPlaying) {
-                                        onTogglePlay()
-                                    } else if (currentPlayingId != null && currentPlayingId == activeSentence?.id) {
-                                        onTogglePlay()
-                                    } else {
-                                        val target = activeSentence ?: sentences.firstOrNull()
-                                        if (target != null) {
-                                            onSelectSentence(target)
-                                        }
-                                    }
-                                },
+                                onClick = onTogglePlay,
                                 modifier = Modifier.size(44.dp),
-                                colors = IconButtonDefaults.filledIconButtonColors(
-                                    containerColor = Color(0xFF6366F1)
-                                )
+                                colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color(0xFF6366F1))
                             ) {
                                 Icon(
                                     imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
@@ -418,56 +571,21 @@ fun CoverDisplayLayout(
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
-                            // Stop Button
-                            IconButton(
-                                onClick = onStop,
-                                modifier = Modifier.size(36.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Stop,
-                                    contentDescription = "Stop",
-                                    tint = Color(0xFFEF4444),
-                                    modifier = Modifier.size(24.dp)
-                                )
+                            IconButton(onClick = onStop, modifier = Modifier.size(36.dp)) {
+                                Icon(Icons.Default.Stop, contentDescription = "Stop", tint = Color(0xFFEF4444), modifier = Modifier.size(24.dp))
                             }
                             IconButton(onClick = onNextSentence, modifier = Modifier.size(36.dp)) {
                                 Icon(Icons.Default.SkipNext, contentDescription = "Next", tint = Color.White)
                             }
                         }
 
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(4.dp),
-                            horizontalAlignment = Alignment.End
-                        ) {
-                            // Repeat Count Chip
-                            Surface(
-                                color = Color(0xFF1E293B),
-                                shape = RoundedCornerShape(6.dp),
-                                modifier = Modifier.clickable { onCycleRepeat() }
-                            ) {
-                                Text(
-                                    text = "🔁 ${if (repeatCount >= 999) "무한" else "${repeatCount}회"}",
-                                    fontSize = 11.sp,
-                                    color = Color(0xFFFBBF24),
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
-                                )
-                            }
-                            // Playback Speed Chip
-                            Surface(
-                                color = Color(0xFF1E293B),
-                                shape = RoundedCornerShape(6.dp),
-                                modifier = Modifier.clickable { onCycleSpeed() }
-                            ) {
-                                Text(
-                                    text = "⚡ ${speed}x",
-                                    fontSize = 11.sp,
-                                    color = Color(0xFFA5B4FC),
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
-                                )
-                            }
-                        }
+                        RepeatSpeedBadges(
+                            repeatCount = repeatCount,
+                            speed = speed,
+                            onCycleRepeat = onCycleRepeat,
+                            onCycleSpeed = onCycleSpeed,
+                            isVertical = true
+                        )
                     }
                 }
             }
@@ -479,32 +597,9 @@ fun CoverDisplayLayout(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            // 1. Day Selector Tabs Row
-            LazyRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 6.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(APP_DAYS) { meta ->
-                    val isSelected = selectedDay == meta.key
-                    Surface(
-                        shape = CircleShape,
-                        color = if (isSelected) Color(0xFF6366F1) else Color(0xFF1E293B),
-                        modifier = Modifier.clickable { onSelectDay(meta.key) }
-                    ) {
-                        Text(
-                            text = "${meta.emoji} ${meta.tabLabel}",
-                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
-                            color = if (isSelected) Color.White else Color(0xFF94A3B8),
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
-                }
-            }
+            DaySelectorTabs(selectedDay = selectedDay, onSelectDay = onSelectDay)
 
-            // 2. Tab Action & Play-All Bar
+            // Play-All Bar & Coaching Toggle
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -520,33 +615,21 @@ fun CoverDisplayLayout(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Play All In Tab Button
                     Button(
                         onClick = onPlayAll,
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6366F1)),
                         shape = RoundedCornerShape(10.dp),
                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.PlayArrow,
-                            contentDescription = "Play All",
-                            modifier = Modifier.size(16.dp),
-                            tint = Color.White
-                        )
+                        Icon(Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.White)
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "▶ 탭 전체 연속 재생",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
+                        Text("▶ 탭 전체 연속 재생", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
                     }
 
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Coaching Guide Toggle
                         Surface(
                             shape = RoundedCornerShape(8.dp),
                             color = if (showCoaching) Color(0xFF0369A1) else Color(0xFF1E293B),
@@ -560,18 +643,12 @@ fun CoverDisplayLayout(
                                 fontWeight = FontWeight.Bold
                             )
                         }
-
-                        // Sentences count badge
-                        Text(
-                            text = "${sentences.size}개 문장",
-                            fontSize = 11.sp,
-                            color = Color(0xFF94A3B8)
-                        )
+                        Text("${sentences.size}개 문장", fontSize = 11.sp, color = Color(0xFF94A3B8))
                     }
                 }
             }
 
-            // 3. Sentences Card List
+            // Sentences Card List
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -581,7 +658,7 @@ fun CoverDisplayLayout(
             ) {
                 items(sentences) { sentence ->
                     val isThisActive = activeSentence?.id == sentence.id
-                    val isThisPlaying = (currentPlayingId == sentence.id || isThisActive) && isPlaying
+                    val isThisPlaying = isThisActive && isPlaying
 
                     Card(
                         modifier = Modifier
@@ -598,7 +675,6 @@ fun CoverDisplayLayout(
                         shape = RoundedCornerShape(14.dp)
                     ) {
                         Column(modifier = Modifier.padding(14.dp)) {
-                            // Card Header
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -632,54 +708,24 @@ fun CoverDisplayLayout(
 
                             Spacer(modifier = Modifier.height(8.dp))
 
-                            // English Sentence
                             Text(
-                                text = sentence.en.replace(Regex("<.*?>"), ""),
+                                text = cleanSentenceText(sentence.en),
                                 color = Color.White,
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.Bold,
                                 lineHeight = 22.sp
                             )
 
-                            // Pronunciation Coaching Box (Matches Mockup)
-                            if (showCoaching && (sentence.guide.isNotEmpty() || sentence.tip.isNotEmpty())) {
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Surface(
-                                    color = Color(0xFF0B1120),
-                                    shape = RoundedCornerShape(8.dp),
-                                    border = BorderStroke(1.dp, Color(0xFF1E3A5F)),
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Column(modifier = Modifier.padding(10.dp)) {
-                                        if (sentence.guide.isNotEmpty()) {
-                                            val cleanGuide = sentence.guide
-                                                .replace(Regex("<.*?>"), " ")
-                                                .replace(Regex("\\s+"), " ")
-                                                .trim()
-                                            Text(
-                                                text = "🗣️ 낭독·강세: $cleanGuide",
-                                                color = Color(0xFF7DD3FC),
-                                                fontSize = 11.sp,
-                                                fontWeight = FontWeight.SemiBold,
-                                                lineHeight = 16.sp
-                                            )
-                                        }
-                                        if (sentence.tip.isNotEmpty()) {
-                                            Spacer(modifier = Modifier.height(4.dp))
-                                            Text(
-                                                text = "💡 팁: ${sentence.tip}",
-                                                color = Color(0xFF94A3B8),
-                                                fontSize = 11.sp,
-                                                lineHeight = 15.sp
-                                            )
-                                        }
-                                    }
-                                }
+                            if (showCoaching) {
+                                CoachingGuideCard(
+                                    guide = sentence.guide,
+                                    tip = sentence.tip,
+                                    modifier = Modifier.padding(top = 8.dp)
+                                )
                             }
 
                             Spacer(modifier = Modifier.height(6.dp))
 
-                            // Korean Translation
                             Text(
                                 text = sentence.ko,
                                 color = Color(0xFF94A3B8),
@@ -694,9 +740,10 @@ fun CoverDisplayLayout(
     }
 }
 
-// -------------------------------------------------------------
-// 2. MAIN DUAL-PANE STUDIO LAYOUT (2448 x 1848 Expanded)
-// -------------------------------------------------------------
+// =========================================================================
+// 2. MAIN DUAL-PANE STUDIO LAYOUT (2448 x 1848 Unfolded Studio)
+// =========================================================================
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainDualPaneLayout(
@@ -705,13 +752,14 @@ fun MainDualPaneLayout(
     sentences: List<Sentence>,
     activeSentence: Sentence?,
     isPlaying: Boolean,
-    currentPlayingId: String?,
     repeatCount: Int,
     speed: Float,
     onSelectSentence: (Sentence) -> Unit,
     onPlayAll: () -> Unit,
     onTogglePlay: () -> Unit,
     onStop: () -> Unit,
+    onPrev: () -> Unit,
+    onNext: () -> Unit,
     onCycleRepeat: () -> Unit,
     onCycleSpeed: () -> Unit,
     onToggleFlexMode: () -> Unit,
@@ -743,19 +791,13 @@ fun MainDualPaneLayout(
                     }
                 },
                 actions = {
-                    // Manual Flex Mode Switch Button
                     Button(
                         onClick = onToggleFlexMode,
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4F46E5)),
                         shape = RoundedCornerShape(10.dp),
                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.VerticalSplit,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp),
-                            tint = Color.White
-                        )
+                        Icon(Icons.Default.VerticalSplit, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.White)
                         Spacer(modifier = Modifier.width(4.dp))
                         Text("📐 플렉스 모드", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
                     }
@@ -786,61 +828,31 @@ fun MainDualPaneLayout(
                     }
                     Spacer(modifier = Modifier.width(6.dp))
                     IconButton(onClick = onSyncGitHub) {
-                        Icon(
-                            imageVector = Icons.Default.CloudSync,
-                            contentDescription = "Sync",
-                            tint = Color(0xFF34D399)
-                        )
+                        Icon(Icons.Default.CloudSync, contentDescription = "Sync", tint = Color(0xFF34D399))
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF0F172A),
-                    titleContentColor = Color.White
-                )
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF0F172A))
             )
         },
         containerColor = Color(0xFF0B1120)
     ) { innerPadding ->
-        // Safe Insets: innerPadding from Scaffold + navigationBarsPadding()
         Row(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .navigationBarsPadding()
         ) {
-            // LEFT PANE: Storyboard & Sentence Set (Weight: 1f)
+            // LEFT PANE: Sentence List & Day Selector (Weight 1f)
             Column(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
                     .padding(16.dp)
             ) {
-                // Day Selector Chips in Main Screen
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(APP_DAYS) { meta ->
-                        val isSelected = selectedDay == meta.key
-                        Surface(
-                            shape = CircleShape,
-                            color = if (isSelected) Color(0xFF6366F1) else Color(0xFF1E293B),
-                            modifier = Modifier.clickable { onSelectDay(meta.key) }
-                        ) {
-                            Text(
-                                text = "${meta.emoji} ${meta.tabLabel}",
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                                color = if (isSelected) Color.White else Color(0xFF94A3B8),
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
-                    }
-                }
+                DaySelectorTabs(selectedDay = selectedDay, onSelectDay = onSelectDay, horizontalPadding = 0)
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
-                // Storyboard Topic Banner
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     color = Color(0xFF1E1B4B),
@@ -880,7 +892,6 @@ fun MainDualPaneLayout(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Sentence Context List
                 Text(
                     text = "📜 전체 문단 목록 (클릭하여 이동)",
                     color = Color(0xFF94A3B8),
@@ -895,7 +906,7 @@ fun MainDualPaneLayout(
                 ) {
                     items(sentences) { s ->
                         val isSelected = s.id == activeSentence?.id
-                        val isThisPlaying = (currentPlayingId == s.id || isSelected) && isPlaying
+                        val isThisPlaying = isSelected && isPlaying
 
                         Surface(
                             color = if (isThisPlaying) Color(0xFF1E1B4B) else if (isSelected) Color(0xFF1E293B) else Color(0xFF0F172A),
@@ -925,7 +936,7 @@ fun MainDualPaneLayout(
                                 }
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = s.en.replace(Regex("<.*?>"), ""),
+                                    text = cleanSentenceText(s.en),
                                     color = if (isSelected) Color.White else Color(0xFFCBD5E1),
                                     fontSize = 13.sp,
                                     lineHeight = 18.sp
@@ -944,7 +955,7 @@ fun MainDualPaneLayout(
                     .background(Color(0xFF1E293B))
             )
 
-            // RIGHT PANE: Deep Shadowing & Waveform Studio (Weight: 1f)
+            // RIGHT PANE: Focused Shadowing Studio (Weight 1f)
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -954,7 +965,6 @@ fun MainDualPaneLayout(
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    // Studio Header
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -984,39 +994,16 @@ fun MainDualPaneLayout(
                             )
                         }
 
-                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Surface(
-                                color = Color(0xFF1E293B),
-                                shape = RoundedCornerShape(6.dp),
-                                modifier = Modifier.clickable { onCycleRepeat() }
-                            ) {
-                                Text(
-                                    text = "🔁 ${if (repeatCount >= 999) "무한" else "${repeatCount}회"}",
-                                    color = Color(0xFFFBBF24),
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                                )
-                            }
-                            Surface(
-                                color = Color(0xFF1E293B),
-                                shape = RoundedCornerShape(6.dp),
-                                modifier = Modifier.clickable { onCycleSpeed() }
-                            ) {
-                                Text(
-                                    text = "⚡ 배속 ${speed}x",
-                                    color = Color(0xFFA5B4FC),
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                                )
-                            }
-                        }
+                        RepeatSpeedBadges(
+                            repeatCount = repeatCount,
+                            speed = speed,
+                            onCycleRepeat = onCycleRepeat,
+                            onCycleSpeed = onCycleSpeed
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(14.dp))
 
-                    // Main English Sentence Box
                     Surface(
                         color = Color(0xFF131D33),
                         shape = RoundedCornerShape(16.dp),
@@ -1025,7 +1012,7 @@ fun MainDualPaneLayout(
                     ) {
                         Column(modifier = Modifier.padding(18.dp)) {
                             Text(
-                                text = activeSentence?.en?.replace(Regex("<.*?>"), "") ?: "문장을 선택해 주세요.",
+                                text = activeSentence?.let { cleanSentenceText(it.en) } ?: "문장을 선택해 주세요.",
                                 color = Color.White,
                                 fontSize = 19.sp,
                                 fontWeight = FontWeight.Bold,
@@ -1043,60 +1030,29 @@ fun MainDualPaneLayout(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Pronunciation Coaching Box
-                    Surface(
-                        color = Color(0xFF0B1120),
-                        shape = RoundedCornerShape(12.dp),
-                        border = BorderStroke(1.dp, Color(0xFF1E3A5F)),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(modifier = Modifier.padding(14.dp)) {
-                            Text(
-                                text = "🗣️ 발음 & 낭독 코칭 가이드",
-                                color = Color(0xFF38BDF8),
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 12.sp
-                            )
-                            Spacer(modifier = Modifier.height(6.dp))
-                            val guideClean = activeSentence?.guide?.replace(Regex("<.*?>"), " ")?.replace(Regex("\\s+"), " ")?.trim() ?: ""
-                            if (guideClean.isNotEmpty()) {
-                                Text(
-                                    text = "낭독 호흡: $guideClean",
-                                    color = Color(0xFFE2E8F0),
-                                    fontSize = 12.sp,
-                                    lineHeight = 17.sp
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
-                            }
-                            Text(
-                                text = "강세 팁: ${activeSentence?.tip ?: ""}",
-                                color = Color(0xFF94A3B8),
-                                fontSize = 11.sp,
-                                lineHeight = 16.sp
-                            )
-                        }
-                    }
+                    CoachingGuideCard(
+                        guide = activeSentence?.guide ?: "",
+                        tip = activeSentence?.tip ?: ""
+                    )
                 }
 
-                // Bottom Interactive Action Buttons (Play/Pause, Stop)
+                // Bottom Player Control Deck
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Play / Pause Button
+                    FilledIconButton(
+                        onClick = onPrev,
+                        modifier = Modifier.size(48.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color(0xFF1E293B))
+                    ) {
+                        Icon(Icons.Default.SkipPrevious, contentDescription = "Prev", tint = Color.White)
+                    }
+
                     Button(
-                        onClick = {
-                            if (isPlaying) {
-                                onTogglePlay()
-                            } else if (currentPlayingId != null && currentPlayingId == activeSentence?.id) {
-                                onTogglePlay()
-                            } else {
-                                val target = activeSentence ?: sentences.firstOrNull()
-                                if (target != null) {
-                                    onSelectSentence(target)
-                                }
-                            }
-                        },
+                        onClick = onTogglePlay,
                         modifier = Modifier.weight(1f).height(48.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (isPlaying) Color(0xFF4338CA) else Color(0xFF6366F1)
@@ -1116,28 +1072,22 @@ fun MainDualPaneLayout(
                         )
                     }
 
-                    // Stop Button
-                    Button(
+                    FilledIconButton(
                         onClick = onStop,
-                        modifier = Modifier.weight(0.6f).height(48.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF1E293B)
-                        ),
-                        shape = RoundedCornerShape(12.dp)
+                        modifier = Modifier.size(48.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color(0xFF1E293B))
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Stop,
-                            contentDescription = null,
-                            modifier = Modifier.size(20.dp),
-                            tint = Color(0xFFEF4444)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = "정지",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
+                        Icon(Icons.Default.Stop, contentDescription = "Stop", tint = Color(0xFFEF4444), modifier = Modifier.size(22.dp))
+                    }
+
+                    FilledIconButton(
+                        onClick = onNext,
+                        modifier = Modifier.size(48.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color(0xFF1E293B))
+                    ) {
+                        Icon(Icons.Default.SkipNext, contentDescription = "Next", tint = Color.White)
                     }
                 }
             }
@@ -1145,9 +1095,10 @@ fun MainDualPaneLayout(
     }
 }
 
-// -------------------------------------------------------------
-// 3. FLEX MODE LAYOUT (Tabletop 90° Hinge View)
-// -------------------------------------------------------------
+// =========================================================================
+// 3. FLEX MODE LAYOUT (Tabletop 90° Hinge View L-Stand)
+// =========================================================================
+
 @Composable
 fun FlexModeLayout(
     selectedDay: String,
@@ -1155,7 +1106,6 @@ fun FlexModeLayout(
     activeSentence: Sentence?,
     sentences: List<Sentence>,
     isPlaying: Boolean,
-    currentPlayingId: String?,
     repeatCount: Int,
     speed: Float,
     onTogglePlay: () -> Unit,
@@ -1177,7 +1127,7 @@ fun FlexModeLayout(
             .statusBarsPadding()
             .navigationBarsPadding()
     ) {
-        // Top Header Bar: Mode Status & Return to Main Dual Pane + Day Selector
+        // Mode Header & Day Selector
         Surface(
             modifier = Modifier.fillMaxWidth(),
             color = Color(0xFF0F172A),
@@ -1203,46 +1153,17 @@ fun FlexModeLayout(
                         shape = RoundedCornerShape(10.dp),
                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.VerticalSplit,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp),
-                            tint = Color.White
-                        )
+                        Icon(Icons.Default.VerticalSplit, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.White)
                         Spacer(modifier = Modifier.width(6.dp))
                         Text("📖 메인 대화면 전환", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
                     }
                 }
-
-                // Day Selector Chips Row in Flex Mode
-                LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(APP_DAYS) { meta ->
-                        val isSelected = selectedDay == meta.key
-                        Surface(
-                            shape = CircleShape,
-                            color = if (isSelected) Color(0xFF6366F1) else Color(0xFF1E293B),
-                            modifier = Modifier.clickable { onSelectDay(meta.key) }
-                        ) {
-                            Text(
-                                text = "${meta.emoji} ${meta.tabLabel}",
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                                color = if (isSelected) Color.White else Color(0xFF94A3B8),
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
-                    }
-                }
+                DaySelectorTabs(selectedDay = selectedDay, onSelectDay = onSelectDay, horizontalPadding = 16)
                 Spacer(modifier = Modifier.height(4.dp))
             }
         }
 
-        // TOP HALF SCREEN: Reading Stand (독서대)
+        // TOP HALF: Reading Stand (독서대)
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -1264,7 +1185,6 @@ fun FlexModeLayout(
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column {
-                        // Header inside stand: Stand Title + Status Badge
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -1281,9 +1201,7 @@ fun FlexModeLayout(
                                     modifier = Modifier
                                         .size(7.dp)
                                         .clip(CircleShape)
-                                        .background(
-                                            if (isPlaying) Color(0xFF10B981) else Color(0xFF64748B)
-                                        )
+                                        .background(if (isPlaying) Color(0xFF10B981) else Color(0xFF64748B))
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
@@ -1297,7 +1215,6 @@ fun FlexModeLayout(
 
                         Spacer(modifier = Modifier.height(10.dp))
 
-                        // Progress Indicator: Sentence 3 / 8
                         Text(
                             text = if (totalCount > 0) "Sentence ${currentIndex + 1} / $totalCount" else "Sentence",
                             color = Color(0xFF818CF8),
@@ -1307,8 +1224,7 @@ fun FlexModeLayout(
 
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        // English Sentence
-                        val cleanEn = activeSentence?.en?.replace(Regex("<.*?>"), "") ?: "선택된 문장이 없습니다."
+                        val cleanEn = activeSentence?.let { cleanSentenceText(it.en) } ?: "선택된 문장이 없습니다."
                         Text(
                             text = "\"$cleanEn\"",
                             color = Color.White,
@@ -1317,43 +1233,15 @@ fun FlexModeLayout(
                             lineHeight = 28.sp
                         )
 
-                        // Coaching Pronunciation & Stress box (guide & tip)
-                        if (!activeSentence?.guide.isNullOrEmpty() || !activeSentence?.tip.isNullOrEmpty()) {
-                            Spacer(modifier = Modifier.height(10.dp))
-                            Surface(
-                                modifier = Modifier.fillMaxWidth(),
-                                color = Color(0xFF082F49).copy(alpha = 0.55f),
-                                shape = RoundedCornerShape(12.dp),
-                                border = BorderStroke(1.dp, Color(0xFF0284C7).copy(alpha = 0.4f))
-                            ) {
-                                Column(modifier = Modifier.padding(10.dp)) {
-                                    if (!activeSentence?.guide.isNullOrEmpty()) {
-                                        val cleanGuide = activeSentence.guide
-                                            .replace(Regex("<span class=\"slash\">/</span>"), " / ")
-                                            .replace(Regex("<.*?>"), "")
-                                        Text(
-                                            text = "🗣️ $cleanGuide",
-                                            color = Color(0xFF7DD3FC),
-                                            fontSize = 12.sp,
-                                            fontWeight = FontWeight.SemiBold,
-                                            lineHeight = 18.sp
-                                        )
-                                    }
-                                    if (!activeSentence?.tip.isNullOrEmpty()) {
-                                        Spacer(modifier = Modifier.height(4.dp))
-                                        Text(
-                                            text = "💡 ${activeSentence.tip}",
-                                            color = Color(0xFFBAE6FD),
-                                            fontSize = 11.sp,
-                                            lineHeight = 16.sp
-                                        )
-                                    }
-                                }
-                            }
-                        }
+                        CoachingGuideCard(
+                            guide = activeSentence?.guide ?: "",
+                            tip = activeSentence?.tip ?: "",
+                            modifier = Modifier.padding(top = 10.dp),
+                            containerColor = Color(0xFF082F49).copy(alpha = 0.55f),
+                            borderColor = Color(0xFF0284C7).copy(alpha = 0.4f)
+                        )
                     }
 
-                    // Korean Translation
                     if (!activeSentence?.ko.isNullOrEmpty()) {
                         Spacer(modifier = Modifier.height(10.dp))
                         Text(
@@ -1385,7 +1273,7 @@ fun FlexModeLayout(
             }
         }
 
-        // BOTTOM HALF SCREEN: Tabletop Touch Controller Deck
+        // BOTTOM HALF: Touch Controller Deck
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -1406,7 +1294,6 @@ fun FlexModeLayout(
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Deck Header
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -1433,98 +1320,45 @@ fun FlexModeLayout(
                         }
                     }
 
-                    // Row 1: Speed Selector Pills (0.8x, 1.0x (보통), 1.2x)
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        val speeds = listOf(0.8f to "0.8x", 1.0f to "1.0x (보통)", 1.2f to "1.2x")
-                        speeds.forEach { (sp, label) ->
-                            val isSelected = (speed == sp)
-                            Surface(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(36.dp)
-                                    .clickable { onSelectSpeed(sp) },
-                                color = if (isSelected) Color(0xFF4F46E5) else Color(0xFF1E293B),
-                                shape = RoundedCornerShape(10.dp),
-                                border = if (isSelected) BorderStroke(1.dp, Color(0xFF818CF8)) else null
-                            ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Text(
-                                        text = label,
-                                        color = if (isSelected) Color.White else Color(0xFF94A3B8),
-                                        fontSize = 12.sp,
-                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
-                                    )
-                                }
-                            }
-                        }
-                    }
+                    // Speed Selector Pills
+                    SelectionPillsRow(
+                        items = listOf(0.8f to "0.8x", 1.0f to "1.0x (보통)", 1.2f to "1.2x"),
+                        selectedItem = speed,
+                        onSelect = onSelectSpeed,
+                        selectedColor = Color(0xFF4F46E5),
+                        selectedBorderColor = Color(0xFF818CF8),
+                        heightDp = 36
+                    )
 
-                    // Row 2: Repeat Count Selector Pills (1회, 3회, 5회, 무한)
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        val repeats = listOf(1 to "1회", 3 to "3회", 5 to "5회", 999 to "무한 🔁")
-                        repeats.forEach { (rep, label) ->
-                            val isSelected = (repeatCount == rep)
-                            Surface(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(34.dp)
-                                    .clickable { onSelectRepeat(rep) },
-                                color = if (isSelected) Color(0xFF047857) else Color(0xFF1E293B),
-                                shape = RoundedCornerShape(10.dp),
-                                border = if (isSelected) BorderStroke(1.dp, Color(0xFF34D399)) else null
-                            ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Text(
-                                        text = label,
-                                        color = if (isSelected) Color.White else Color(0xFF94A3B8),
-                                        fontSize = 12.sp,
-                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
-                                    )
-                                }
-                            }
-                        }
-                    }
+                    // Repeat Count Selector Pills
+                    SelectionPillsRow(
+                        items = listOf(1 to "1회", 3 to "3회", 5 to "5회", 999 to "무한 🔁"),
+                        selectedItem = repeatCount,
+                        onSelect = onSelectRepeat,
+                        selectedColor = Color(0xFF047857),
+                        selectedBorderColor = Color(0xFF34D399),
+                        heightDp = 34
+                    )
 
-                    // Row 3: Central Big Player Controls (Prev, Big Play/Pause, Stop, Next)
+                    // Central Big Player Controls
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Previous Button
                         FilledIconButton(
                             onClick = onPrev,
                             modifier = Modifier.size(48.dp),
                             shape = RoundedCornerShape(14.dp),
                             colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color(0xFF1E293B))
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.SkipPrevious,
-                                contentDescription = "Prev",
-                                modifier = Modifier.size(24.dp),
-                                tint = Color.White
-                            )
+                            Icon(Icons.Default.SkipPrevious, contentDescription = "Prev", modifier = Modifier.size(24.dp), tint = Color.White)
                         }
 
                         Spacer(modifier = Modifier.width(18.dp))
 
-                        // Large Center Play / Pause Button (64dp)
                         FilledIconButton(
-                            onClick = {
-                                if (isPlaying) {
-                                    onTogglePlay()
-                                } else if (currentPlayingId != null && currentPlayingId == activeSentence?.id) {
-                                    onTogglePlay()
-                                } else {
-                                    activeSentence?.let { onPlaySentence(it) }
-                                }
-                            },
+                            onClick = onTogglePlay,
                             modifier = Modifier.size(64.dp),
                             shape = RoundedCornerShape(22.dp),
                             colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color(0xFF6366F1))
@@ -1539,39 +1373,26 @@ fun FlexModeLayout(
 
                         Spacer(modifier = Modifier.width(14.dp))
 
-                        // Stop Button
                         FilledIconButton(
                             onClick = onStop,
                             modifier = Modifier.size(48.dp),
                             shape = RoundedCornerShape(14.dp),
                             colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color(0xFF1E293B))
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Stop,
-                                contentDescription = "Stop",
-                                modifier = Modifier.size(24.dp),
-                                tint = Color(0xFFEF4444)
-                            )
+                            Icon(Icons.Default.Stop, contentDescription = "Stop", modifier = Modifier.size(24.dp), tint = Color(0xFFEF4444))
                         }
 
                         Spacer(modifier = Modifier.width(18.dp))
 
-                        // Next Button
                         FilledIconButton(
                             onClick = onNext,
                             modifier = Modifier.size(48.dp),
                             shape = RoundedCornerShape(14.dp),
                             colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color(0xFF1E293B))
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.SkipNext,
-                                contentDescription = "Next",
-                                modifier = Modifier.size(24.dp),
-                                tint = Color.White
-                            )
+                            Icon(Icons.Default.SkipNext, contentDescription = "Next", modifier = Modifier.size(24.dp), tint = Color.White)
                         }
                     }
-
 
                     // Screen-Off Continuous Playback Status
                     Row(

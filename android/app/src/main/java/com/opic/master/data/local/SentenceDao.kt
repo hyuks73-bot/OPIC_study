@@ -24,6 +24,9 @@ interface SentenceDao {
     @Query("UPDATE sentences SET localAudioPath = :localPath, isDownloaded = 1 WHERE id = :id")
     suspend fun updateAudioDownloaded(id: String, localPath: String)
 
+    @Query("SELECT * FROM sentences")
+    suspend fun getAllSentencesList(): List<Sentence>
+
     @Query("SELECT COUNT(*) FROM sentences WHERE isDownloaded = 1")
     fun getDownloadedCount(): Flow<Int>
 }
@@ -56,23 +59,19 @@ abstract class AppDatabase : RoomDatabase() {
                     try {
                         val jsonString = context.assets.open("data_manifest.json").bufferedReader().use { it.readText() }
                         val manifest = com.google.gson.Gson().fromJson(jsonString, com.opic.master.data.model.ManifestResponse::class.java)
-                        val list = mutableListOf<Sentence>()
                         var orderIndexCounter = 0
-                        for ((dayKey, dayData) in manifest.days) {
-                            for (item in dayData.sentences) {
-                                list.add(
-                                    Sentence(
-                                        id = item.id,
-                                        dayKey = dayKey,
-                                        orderIndex = orderIndexCounter++,
-                                        en = item.en,
-                                        ko = item.ko,
-                                        guide = item.guide,
-                                        tip = item.tip,
-                                        audioUrl = item.audioUrl,
-                                        imageUrl = item.imageUrl,
-                                        isDownloaded = false
-                                    )
+                        val list = manifest.days.flatMap { (dayKey, dayData) ->
+                            dayData.sentences.map { item ->
+                                Sentence(
+                                    id = item.id,
+                                    dayKey = dayKey,
+                                    orderIndex = orderIndexCounter++,
+                                    en = item.en,
+                                    ko = item.ko,
+                                    guide = item.guide,
+                                    tip = item.tip,
+                                    audioUrl = item.audioUrl,
+                                    imageUrl = item.imageUrl
                                 )
                             }
                         }
