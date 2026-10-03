@@ -100,27 +100,29 @@ fun Fold8AdaptiveApp(
         ?: filteredSentences.firstOrNull()
 
     fun handlePrevSentence() {
+        if (filteredSentences.isEmpty()) return
         val currentIndex = filteredSentences.indexOfFirst { it.id == currentActiveSentence?.id }
-        if (currentIndex > 0) {
-            val prev = filteredSentences[currentIndex - 1]
-            activeSentence = prev
-            if (isPlaying) {
-                onPlaySentence(prev, repeatCount)
-            }
+        val prevIndex = if (currentIndex > 0) {
+            currentIndex - 1
+        } else {
+            filteredSentences.size - 1
         }
-        onPrev()
+        val prev = filteredSentences[prevIndex]
+        activeSentence = prev
+        onPlaySentence(prev, repeatCount)
     }
 
     fun handleNextSentence() {
+        if (filteredSentences.isEmpty()) return
         val currentIndex = filteredSentences.indexOfFirst { it.id == currentActiveSentence?.id }
-        if (currentIndex >= 0 && currentIndex + 1 < filteredSentences.size) {
-            val next = filteredSentences[currentIndex + 1]
-            activeSentence = next
-            if (isPlaying) {
-                onPlaySentence(next, repeatCount)
-            }
+        val nextIndex = if (currentIndex in filteredSentences.indices && currentIndex + 1 < filteredSentences.size) {
+            currentIndex + 1
+        } else {
+            0
         }
-        onNext()
+        val next = filteredSentences[nextIndex]
+        activeSentence = next
+        onPlaySentence(next, repeatCount)
     }
 
     fun handleRepeatCycle() {
@@ -203,7 +205,7 @@ fun Fold8AdaptiveApp(
                 onTogglePlay = {
                     if (isPlaying) {
                         onTogglePlay()
-                    } else if (currentPlayingId != null) {
+                    } else if (currentPlayingId != null && currentPlayingId == currentActiveSentence?.id) {
                         onTogglePlay()
                     } else {
                         currentActiveSentence?.let { onPlaySentence(it, repeatCount) }
@@ -374,7 +376,7 @@ fun CoverDisplayLayout(
                                 onClick = {
                                     if (isPlaying) {
                                         onTogglePlay()
-                                    } else if (currentPlayingId != null) {
+                                    } else if (currentPlayingId != null && currentPlayingId == activeSentence?.id) {
                                         onTogglePlay()
                                     } else {
                                         val target = activeSentence ?: sentences.firstOrNull()
@@ -1047,7 +1049,7 @@ fun MainDualPaneLayout(
                         onClick = {
                             if (isPlaying) {
                                 onTogglePlay()
-                            } else if (currentPlayingId != null) {
+                            } else if (currentPlayingId != null && currentPlayingId == activeSentence?.id) {
                                 onTogglePlay()
                             } else {
                                 val target = activeSentence ?: sentences.firstOrNull()
@@ -1484,7 +1486,7 @@ fun FlexModeLayout(
                             onClick = {
                                 if (isPlaying) {
                                     onTogglePlay()
-                                } else if (currentPlayingId != null) {
+                                } else if (currentPlayingId != null && currentPlayingId == activeSentence?.id) {
                                     onTogglePlay()
                                 } else {
                                     activeSentence?.let { onPlaySentence(it) }
