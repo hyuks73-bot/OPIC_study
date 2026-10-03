@@ -95,47 +95,19 @@ fun Fold8AdaptiveApp(
         }
     }
 
+    var isManualFlexActive by remember { mutableStateOf(false) }
+
+    LaunchedEffect(isFlexMode) {
+        if (isFlexMode) {
+            isManualFlexActive = true
+        }
+    }
+
+    val isDisplayingFlex = isUnfolded && isManualFlexActive
+
     when {
-        isFlexMode -> {
-            // 1. Flex Mode (Tabletop Posture 90° ~ 115°)
-            FlexModeLayout(
-                activeSentence = activeSentence,
-                isPlaying = isPlaying,
-                repeatCount = repeatCount,
-                isRecording = isRecording,
-                onTogglePlay = onTogglePlay,
-                onStop = onStop,
-                onPlayCurrent = { activeSentence?.let { onPlaySentence(it, repeatCount) } },
-                onToggleRecord = { isRecording = !isRecording },
-                onCycleRepeat = { handleRepeatCycle() }
-            )
-        }
-        isUnfolded -> {
-            // 2. Main Display (Unfolded Dual-Pane Studio 2448 x 1848)
-            MainDualPaneLayout(
-                selectedDay = selectedDay,
-                onSelectDay = { selectedDay = it },
-                sentences = filteredSentences,
-                activeSentence = activeSentence,
-                isPlaying = isPlaying,
-                currentPlayingId = currentPlayingId,
-                repeatCount = repeatCount,
-                speed = speed,
-                isRecording = isRecording,
-                onSelectSentence = {
-                    activeSentence = it
-                    onPlaySentence(it, repeatCount)
-                },
-                onPlayAll = { onPlayAll(filteredSentences, repeatCount) },
-                onTogglePlay = onTogglePlay,
-                onStop = onStop,
-                onToggleRecord = { isRecording = !isRecording },
-                onCycleRepeat = { handleRepeatCycle() },
-                onSyncGitHub = onSyncGitHub
-            )
-        }
-        else -> {
-            // 3. Cover Display (Folded Compact Thumb-Zone 1248 x 1972)
+        !isUnfolded -> {
+            // 1. Cover Display (Folded Compact Thumb-Zone 1248 x 1972)
             CoverDisplayLayout(
                 selectedDay = selectedDay,
                 onSelectDay = { selectedDay = it },
@@ -156,6 +128,46 @@ fun Fold8AdaptiveApp(
                 onCycleRepeat = { handleRepeatCycle() },
                 onPrevSentence = onPrev,
                 onNextSentence = onNext,
+                onSyncGitHub = onSyncGitHub
+            )
+        }
+        isDisplayingFlex -> {
+            // 2. Flex Mode (Tabletop Posture 90° ~ 115° or Manual Toggle)
+            FlexModeLayout(
+                activeSentence = activeSentence,
+                isPlaying = isPlaying,
+                repeatCount = repeatCount,
+                isRecording = isRecording,
+                onTogglePlay = onTogglePlay,
+                onStop = onStop,
+                onPlayCurrent = { activeSentence?.let { onPlaySentence(it, repeatCount) } },
+                onToggleRecord = { isRecording = !isRecording },
+                onCycleRepeat = { handleRepeatCycle() },
+                onToggleFlexMode = { isManualFlexActive = false }
+            )
+        }
+        else -> {
+            // 3. Main Display (Unfolded Dual-Pane Studio 2448 x 1848)
+            MainDualPaneLayout(
+                selectedDay = selectedDay,
+                onSelectDay = { selectedDay = it },
+                sentences = filteredSentences,
+                activeSentence = activeSentence,
+                isPlaying = isPlaying,
+                currentPlayingId = currentPlayingId,
+                repeatCount = repeatCount,
+                speed = speed,
+                isRecording = isRecording,
+                onSelectSentence = {
+                    activeSentence = it
+                    onPlaySentence(it, repeatCount)
+                },
+                onPlayAll = { onPlayAll(filteredSentences, repeatCount) },
+                onTogglePlay = onTogglePlay,
+                onStop = onStop,
+                onToggleRecord = { isRecording = !isRecording },
+                onCycleRepeat = { handleRepeatCycle() },
+                onToggleFlexMode = { isManualFlexActive = true },
                 onSyncGitHub = onSyncGitHub
             )
         }
@@ -569,6 +581,7 @@ fun MainDualPaneLayout(
     onStop: () -> Unit,
     onToggleRecord: () -> Unit,
     onCycleRepeat: () -> Unit,
+    onToggleFlexMode: () -> Unit,
     onSyncGitHub: () -> Unit
 ) {
     val currentDayMeta = APP_DAYS.find { it.key == selectedDay } ?: APP_DAYS.first()
@@ -597,6 +610,24 @@ fun MainDualPaneLayout(
                     }
                 },
                 actions = {
+                    // Manual Flex Mode Switch Button
+                    Button(
+                        onClick = onToggleFlexMode,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4F46E5)),
+                        shape = RoundedCornerShape(10.dp),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.VerticalSplit,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                            tint = Color.White
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("📐 플렉스 모드", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+
                     Surface(
                         color = Color(0xFF064E3B),
                         shape = RoundedCornerShape(12.dp)
@@ -613,7 +644,7 @@ fun MainDualPaneLayout(
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                text = "GitHub 오프라인 동기화 완료 (${sentences.size}개)",
+                                text = "GitHub 오프라인 완료 (${sentences.size}개)",
                                 color = Color(0xFF34D399),
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold
@@ -1009,7 +1040,8 @@ fun FlexModeLayout(
     onStop: () -> Unit,
     onPlayCurrent: () -> Unit,
     onToggleRecord: () -> Unit,
-    onCycleRepeat: () -> Unit
+    onCycleRepeat: () -> Unit,
+    onToggleFlexMode: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -1018,6 +1050,43 @@ fun FlexModeLayout(
             .statusBarsPadding()
             .navigationBarsPadding()
     ) {
+        // Top Header Bar: Mode Status & Return to Main Dual Pane
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = Color(0xFF0F172A),
+            tonalElevation = 4.dp
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "📐 플렉스 거치 모드 (L자 스탠드)",
+                    color = Color(0xFFA5B4FC),
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Button(
+                    onClick = onToggleFlexMode,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6366F1)),
+                    shape = RoundedCornerShape(10.dp),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.VerticalSplit,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = Color.White
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("📖 메인 대화면 전환", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                }
+            }
+        }
+
         // Top Screen: Reading Stand (Stand Posture)
         Box(
             modifier = Modifier
