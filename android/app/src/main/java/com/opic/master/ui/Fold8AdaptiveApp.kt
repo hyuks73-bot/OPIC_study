@@ -26,10 +26,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.opic.master.data.model.Sentence
@@ -635,34 +639,46 @@ fun CoachingGuideCard(
     tip: String,
     modifier: Modifier = Modifier,
     containerColor: Color = Color(0xFF0B1120),
-    borderColor: Color = Color(0xFF1E3A5F)
+    borderColor: Color = Color(0xFF1E3A5F),
+    fontSize: TextUnit = 13.5.sp
 ) {
     val cleanGuide = remember(guide) { cleanGuideText(guide) }
     if (cleanGuide.isEmpty() && tip.isEmpty()) return
 
     Surface(
         color = containerColor,
-        shape = RoundedCornerShape(10.dp),
+        shape = RoundedCornerShape(12.dp),
         border = BorderStroke(1.dp, borderColor),
         modifier = modifier.fillMaxWidth()
     ) {
-        Column(modifier = Modifier.padding(10.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
             if (cleanGuide.isNotEmpty()) {
                 Text(
-                    text = "🗣️ 낭독·강세: $cleanGuide",
-                    color = Color(0xFF7DD3FC),
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    lineHeight = 16.sp
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(color = Color(0xFF38BDF8), fontWeight = FontWeight.Bold)) {
+                            append("🗣️ 낭독·강세: ")
+                        }
+                        withStyle(SpanStyle(color = Color(0xFFE0F2FE), fontWeight = FontWeight.Normal)) {
+                            append(cleanGuide)
+                        }
+                    },
+                    fontSize = fontSize,
+                    lineHeight = (fontSize.value * 1.45f).sp
                 )
             }
             if (tip.isNotEmpty()) {
-                if (cleanGuide.isNotEmpty()) Spacer(modifier = Modifier.height(4.dp))
+                if (cleanGuide.isNotEmpty()) Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = "💡 팁: $tip",
-                    color = Color(0xFF94A3B8),
-                    fontSize = 11.sp,
-                    lineHeight = 15.sp
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(color = Color(0xFFFBBF24), fontWeight = FontWeight.Bold)) {
+                            append("💡 팁: ")
+                        }
+                        withStyle(SpanStyle(color = Color(0xFFCBD5E1), fontWeight = FontWeight.Normal)) {
+                            append(tip)
+                        }
+                    },
+                    fontSize = (fontSize.value - 0.5f).sp,
+                    lineHeight = ((fontSize.value - 0.5f) * 1.45f).sp
                 )
             }
         }
@@ -1600,7 +1616,8 @@ fun MainDualPaneLayout(
 
                     CoachingGuideCard(
                         guide = activeSentence?.guide ?: "",
-                        tip = activeSentence?.tip ?: ""
+                        tip = activeSentence?.tip ?: "",
+                        fontSize = 15.sp
                     )
                 }
 
@@ -1833,7 +1850,8 @@ fun FlexModeLayout(
                             tip = activeSentence?.tip ?: "",
                             modifier = Modifier.padding(top = 10.dp),
                             containerColor = Color(0xFF082F49).copy(alpha = 0.55f),
-                            borderColor = Color(0xFF0284C7).copy(alpha = 0.4f)
+                            borderColor = Color(0xFF0284C7).copy(alpha = 0.4f),
+                            fontSize = 15.sp
                         )
                     }
 
