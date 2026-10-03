@@ -204,6 +204,8 @@ fun Fold8AdaptiveApp(
         isDisplayingFlex -> {
             // 2. Flex Mode (Tabletop Posture 90° ~ 115° or Manual Toggle)
             FlexModeLayout(
+                selectedDay = selectedDay,
+                onSelectDay = { selectedDay = it },
                 activeSentence = currentActiveSentence,
                 sentences = filteredSentences,
                 isPlaying = isPlaying,
@@ -1117,6 +1119,8 @@ fun MainDualPaneLayout(
 // -------------------------------------------------------------
 @Composable
 fun FlexModeLayout(
+    selectedDay: String,
+    onSelectDay: (String) -> Unit,
     activeSentence: Sentence?,
     sentences: List<Sentence>,
     isPlaying: Boolean,
@@ -1142,40 +1146,68 @@ fun FlexModeLayout(
             .statusBarsPadding()
             .navigationBarsPadding()
     ) {
-        // Top Header Bar: Mode Status & Return to Main Dual Pane
+        // Top Header Bar: Mode Status & Return to Main Dual Pane + Day Selector
         Surface(
             modifier = Modifier.fillMaxWidth(),
             color = Color(0xFF0F172A),
             tonalElevation = 4.dp
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "📐 갤럭시 Z 폴드 8 플렉스 거치 모드 (L자 스탠드)",
-                    color = Color(0xFFA5B4FC),
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Button(
-                    onClick = onToggleFlexMode,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4F46E5)),
-                    shape = RoundedCornerShape(10.dp),
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.VerticalSplit,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp),
-                        tint = Color.White
+                    Text(
+                        text = "📐 갤럭시 Z 폴드 8 플렉스 거치 모드 (L자 스탠드)",
+                        color = Color(0xFFA5B4FC),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text("📖 메인 대화면 전환", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    Button(
+                        onClick = onToggleFlexMode,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4F46E5)),
+                        shape = RoundedCornerShape(10.dp),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.VerticalSplit,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                            tint = Color.White
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("📖 메인 대화면 전환", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    }
                 }
+
+                // Day Selector Chips Row in Flex Mode
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(APP_DAYS) { meta ->
+                        val isSelected = selectedDay == meta.key
+                        Surface(
+                            shape = CircleShape,
+                            color = if (isSelected) Color(0xFF6366F1) else Color(0xFF1E293B),
+                            modifier = Modifier.clickable { onSelectDay(meta.key) }
+                        ) {
+                            Text(
+                                text = "${meta.emoji} ${meta.tabLabel}",
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                color = if (isSelected) Color.White else Color(0xFF94A3B8),
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(4.dp))
             }
         }
 
