@@ -942,11 +942,6 @@ fun MainDualPaneLayout(
                             )
                         }
                     }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    // Animated Waveform Equalizer
-                    WaveformVisualizerCard(isPlaying = isPlaying)
                 }
 
                 // Bottom Interactive Action Buttons (Play/Pause, Stop, Record)
@@ -1150,8 +1145,6 @@ fun FlexModeLayout(
             verticalArrangement = Arrangement.SpaceEvenly,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            WaveformVisualizerCard(isPlaying = isPlaying)
-
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
                 // Play / Pause
                 FilledIconButton(
@@ -1208,83 +1201,6 @@ fun FlexModeLayout(
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                 )
-            }
-        }
-    }
-}
-
-// -------------------------------------------------------------
-// Animated Waveform Equalizer Component
-// -------------------------------------------------------------
-@Composable
-fun WaveformVisualizerCard(isPlaying: Boolean) {
-    Surface(
-        color = Color(0xFF0B1120),
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, Color(0xFF1E293B)),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "〰️ 원어민 음성 파형 비주얼라이저",
-                    color = Color(0xFFCBD5E1),
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = if (isPlaying) "● 음성 분석 중 (일치율 92%)" else "대기 중",
-                    color = if (isPlaying) Color(0xFF34D399) else Color(0xFF64748B),
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // 8 Animated Equalizer Bars
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(40.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                val infiniteTransition = rememberInfiniteTransition(label = "waveform")
-                val heights = (0 until 8).map { idx ->
-                    if (isPlaying) {
-                        infiniteTransition.animateFloat(
-                            initialValue = 8f,
-                            targetValue = (20 + (idx * 5) % 20).toFloat(),
-                            animationSpec = infiniteRepeatable(
-                                animation = tween(durationMillis = 350 + (idx * 90), easing = FastOutSlowInEasing),
-                                repeatMode = RepeatMode.Reverse
-                            ),
-                            label = "bar_$idx"
-                        ).value
-                    } else {
-                        10f
-                    }
-                }
-
-                heights.forEachIndexed { i, h ->
-                    val barColor = when (i % 3) {
-                        0 -> Color(0xFF6366F1)
-                        1 -> Color(0xFF38BDF8)
-                        else -> Color(0xFFEC4899)
-                    }
-                    Box(
-                        modifier = Modifier
-                            .width(6.dp)
-                            .height(h.dp)
-                            .clip(RoundedCornerShape(3.dp))
-                            .background(barColor)
-                    )
-                }
             }
         }
     }
