@@ -88,7 +88,6 @@ fun Fold8AdaptiveApp(
     var activeSentence by remember { mutableStateOf<Sentence?>(null) }
     var speed by remember { mutableFloatStateOf(1.0f) }
     var repeatCount by remember { mutableIntStateOf(3) }
-    var isRecording by remember { mutableStateOf(false) }
     var showCoaching by remember { mutableStateOf(true) }
 
     val filteredSentences = remember(sentences, selectedDay) {
@@ -201,7 +200,6 @@ fun Fold8AdaptiveApp(
                 currentPlayingId = currentPlayingId,
                 repeatCount = repeatCount,
                 speed = speed,
-                isRecording = isRecording,
                 onTogglePlay = {
                     if (isPlaying) {
                         onTogglePlay()
@@ -226,7 +224,6 @@ fun Fold8AdaptiveApp(
                     repeatCount = count
                     onUpdateRepeatCount(count)
                 },
-                onToggleRecord = { isRecording = !isRecording },
                 onToggleFlexMode = { isManualFlexActive = false }
             )
         }
@@ -241,7 +238,6 @@ fun Fold8AdaptiveApp(
                 currentPlayingId = currentPlayingId,
                 repeatCount = repeatCount,
                 speed = speed,
-                isRecording = isRecording,
                 onSelectSentence = {
                     activeSentence = it
                     onPlaySentence(it, repeatCount)
@@ -249,7 +245,6 @@ fun Fold8AdaptiveApp(
                 onPlayAll = { onPlayAll(filteredSentences, repeatCount) },
                 onTogglePlay = onTogglePlay,
                 onStop = onStop,
-                onToggleRecord = { isRecording = !isRecording },
                 onCycleRepeat = { handleRepeatCycle() },
                 onToggleFlexMode = { isManualFlexActive = true },
                 onSyncGitHub = onSyncGitHub
@@ -669,12 +664,10 @@ fun MainDualPaneLayout(
     currentPlayingId: String?,
     repeatCount: Int,
     speed: Float,
-    isRecording: Boolean,
     onSelectSentence: (Sentence) -> Unit,
     onPlayAll: () -> Unit,
     onTogglePlay: () -> Unit,
     onStop: () -> Unit,
-    onToggleRecord: () -> Unit,
     onCycleRepeat: () -> Unit,
     onToggleFlexMode: () -> Unit,
     onSyncGitHub: () -> Unit
@@ -1039,10 +1032,10 @@ fun MainDualPaneLayout(
                     }
                 }
 
-                // Bottom Interactive Action Buttons (Play/Pause, Stop, Record)
+                // Bottom Interactive Action Buttons (Play/Pause, Stop)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     // Play / Pause Button
                     Button(
@@ -1058,7 +1051,7 @@ fun MainDualPaneLayout(
                                 }
                             }
                         },
-                        modifier = Modifier.weight(1.2f).height(46.dp),
+                        modifier = Modifier.weight(1f).height(48.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (isPlaying) Color(0xFF4338CA) else Color(0xFF6366F1)
                         ),
@@ -1067,12 +1060,12 @@ fun MainDualPaneLayout(
                         Icon(
                             imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
                             contentDescription = null,
-                            modifier = Modifier.size(18.dp)
+                            modifier = Modifier.size(20.dp)
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = if (isPlaying) "일시 정지" else "🔊 원어민 재생",
-                            fontSize = 12.sp,
+                            fontSize = 13.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -1080,7 +1073,7 @@ fun MainDualPaneLayout(
                     // Stop Button
                     Button(
                         onClick = onStop,
-                        modifier = Modifier.weight(0.8f).height(46.dp),
+                        modifier = Modifier.weight(0.6f).height(48.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF1E293B)
                         ),
@@ -1089,37 +1082,15 @@ fun MainDualPaneLayout(
                         Icon(
                             imageVector = Icons.Default.Stop,
                             contentDescription = null,
-                            modifier = Modifier.size(18.dp),
+                            modifier = Modifier.size(20.dp),
                             tint = Color(0xFFEF4444)
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = "정지",
-                            fontSize = 12.sp,
+                            fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
-                        )
-                    }
-
-                    // Shadowing Record Button
-                    Button(
-                        onClick = onToggleRecord,
-                        modifier = Modifier.weight(1f).height(46.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (isRecording) Color(0xFFDC2626) else Color(0xFFEF4444)
-                        ),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Mic,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = if (isRecording) "녹음 중지" else "🎙️ 섀도잉",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold
                         )
                     }
                 }
@@ -1139,7 +1110,6 @@ fun FlexModeLayout(
     currentPlayingId: String?,
     repeatCount: Int,
     speed: Float,
-    isRecording: Boolean,
     onTogglePlay: () -> Unit,
     onStop: () -> Unit,
     onPlaySentence: (Sentence) -> Unit,
@@ -1147,7 +1117,6 @@ fun FlexModeLayout(
     onNext: () -> Unit,
     onSelectSpeed: (Float) -> Unit,
     onSelectRepeat: (Int) -> Unit,
-    onToggleRecord: () -> Unit,
     onToggleFlexMode: () -> Unit
 ) {
     val currentIndex = sentences.indexOfFirst { it.id == activeSentence?.id }.takeIf { it >= 0 } ?: 0
@@ -1237,27 +1206,15 @@ fun FlexModeLayout(
                                         .size(7.dp)
                                         .clip(CircleShape)
                                         .background(
-                                            when {
-                                                isRecording -> Color(0xFFEF4444)
-                                                isPlaying -> Color(0xFF10B981)
-                                                else -> Color(0xFF64748B)
-                                            }
+                                            if (isPlaying) Color(0xFF10B981) else Color(0xFF64748B)
                                         )
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = when {
-                                        isRecording -> "● 실시간 섀도잉 녹음 중"
-                                        isPlaying -> "● 섀도잉 모드 재생 중"
-                                        else -> "● 거치 대기 중"
-                                    },
+                                    text = if (isPlaying) "● 섀도잉 모드 재생 중" else "● 거치 대기 중",
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = when {
-                                        isRecording -> Color(0xFFEF4444)
-                                        isPlaying -> Color(0xFF34D399)
-                                        else -> Color(0xFF94A3B8)
-                                    }
+                                    color = if (isPlaying) Color(0xFF34D399) else Color(0xFF94A3B8)
                                 )
                             }
                         }
@@ -1539,32 +1496,6 @@ fun FlexModeLayout(
                         }
                     }
 
-                    // Row 4: Full-width One-touch Shadowing Record Action
-                    Button(
-                        onClick = onToggleRecord,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(48.dp),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (isRecording) Color(0xFFDC2626) else Color(0xFFE11D48)
-                        ),
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .clip(CircleShape)
-                                .background(Color.White)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = if (isRecording) "⏹ 녹음 완료 / 중지" else "🎙️ 원터치 실시간 섀도잉 녹음 시작",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                    }
 
                     // Screen-Off Continuous Playback Status
                     Row(

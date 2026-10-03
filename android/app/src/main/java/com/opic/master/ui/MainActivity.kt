@@ -11,11 +11,14 @@ import androidx.window.layout.FoldingFeature
 import androidx.window.layout.WindowInfoTracker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import androidx.lifecycle.lifecycleScope
 import com.opic.master.data.local.AppDatabase
 import com.opic.master.data.model.Sentence
 import com.opic.master.data.sync.GitHubSyncWorker
 import com.opic.master.service.PlaybackService
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -26,7 +29,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         // 1. Seed database from bundled assets if empty
-        androidx.lifecycle.lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+        lifecycleScope.launch(Dispatchers.IO) {
             AppDatabase.seedDatabaseIfEmpty(this@MainActivity, db.sentenceDao())
         }
 
