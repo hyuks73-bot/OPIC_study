@@ -135,6 +135,16 @@ fun Fold8AdaptiveApp(
         onUpdateRepeatCount(next)
     }
 
+    fun handleSpeedCycle() {
+        val next = when (speed) {
+            0.8f -> 1.0f
+            1.0f -> 1.2f
+            else -> 0.8f
+        }
+        speed = next
+        onUpdateSpeed(next)
+    }
+
     // Auto-update active sentence when playing or day changes
     LaunchedEffect(currentPlayingId, filteredSentences) {
         if (currentPlayingId != null) {
@@ -246,6 +256,7 @@ fun Fold8AdaptiveApp(
                 onTogglePlay = onTogglePlay,
                 onStop = onStop,
                 onCycleRepeat = { handleRepeatCycle() },
+                onCycleSpeed = { handleSpeedCycle() },
                 onToggleFlexMode = { isManualFlexActive = true },
                 onSyncGitHub = onSyncGitHub
             )
@@ -669,6 +680,7 @@ fun MainDualPaneLayout(
     onTogglePlay: () -> Unit,
     onStop: () -> Unit,
     onCycleRepeat: () -> Unit,
+    onCycleSpeed: () -> Unit,
     onToggleFlexMode: () -> Unit,
     onSyncGitHub: () -> Unit
 ) {
@@ -955,11 +967,12 @@ fun MainDualPaneLayout(
                             }
                             Surface(
                                 color = Color(0xFF1E293B),
-                                shape = RoundedCornerShape(6.dp)
+                                shape = RoundedCornerShape(6.dp),
+                                modifier = Modifier.clickable { onCycleSpeed() }
                             ) {
                                 Text(
-                                    text = "배속 ${speed}x",
-                                    color = Color(0xFF94A3B8),
+                                    text = "⚡ 배속 ${speed}x",
+                                    color = Color(0xFFA5B4FC),
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
