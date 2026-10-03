@@ -51,20 +51,17 @@ class PlaybackService : MediaSessionService() {
         const val ACTION_PLAY_ALL = "ACTION_PLAY_ALL"
         const val ACTION_TOGGLE_PLAY = "ACTION_TOGGLE_PLAY"
         const val ACTION_STOP = "ACTION_STOP"
-        const val ACTION_UPDATE_REPEAT_COUNT = "ACTION_UPDATE_REPEAT_COUNT"
         const val ACTION_UPDATE_SETTINGS = "ACTION_UPDATE_SETTINGS"
         const val ACTION_PAUSE = "ACTION_PAUSE"
         const val ACTION_RESUME = "ACTION_RESUME"
         const val ACTION_PREV = "ACTION_PREV"
         const val ACTION_NEXT = "ACTION_NEXT"
-        const val ACTION_SET_SPEED = "ACTION_SET_SPEED"
 
         const val EXTRA_AUDIO_PATH = "EXTRA_AUDIO_PATH"
         const val EXTRA_SENTENCE_TITLE = "EXTRA_SENTENCE_TITLE"
         const val EXTRA_SENTENCE_ID = "EXTRA_SENTENCE_ID"
         const val EXTRA_REPEAT_COUNT = "EXTRA_REPEAT_COUNT"
         const val EXTRA_REPEAT_SPEEDS = "EXTRA_REPEAT_SPEEDS"
-        const val EXTRA_SPEED = "EXTRA_SPEED"
 
         const val EXTRA_AUDIO_PATHS = "EXTRA_AUDIO_PATHS"
         const val EXTRA_SENTENCE_TITLES = "EXTRA_SENTENCE_TITLES"
@@ -178,9 +175,9 @@ class PlaybackService : MediaSessionService() {
 
         when (intent?.action) {
             ACTION_PLAY_SENTENCE -> {
+                val audioPath = intent.getStringExtra(EXTRA_AUDIO_PATH) ?: return rejectStartRequest()
                 cancelShadowingPause()
                 isPlaylistMode = false
-                val audioPath = intent.getStringExtra(EXTRA_AUDIO_PATH) ?: return START_STICKY
                 val title = intent.getStringExtra(EXTRA_SENTENCE_TITLE) ?: "OPIc Sentence"
                 val sentenceId = intent.getStringExtra(EXTRA_SENTENCE_ID)
                 repeatTargetCount = intent.getIntExtra(EXTRA_REPEAT_COUNT, 3)
@@ -203,15 +200,15 @@ class PlaybackService : MediaSessionService() {
                 player.setPlaybackSpeed(initialSpeed)
                 player.play()
 
-                startForeground(NOTIFICATION_ID, buildNotification(title, "반복: ${repeatTargetCount}회 · 화면 꺼짐 연속 재생"))
+                startForeground(NOTIFICATION_ID, buildNotification(title, currentSubtitle()))
             }
 
             ACTION_PLAY_ALL -> {
+                val paths = intent.getStringArrayListExtra(EXTRA_AUDIO_PATHS)
+                val titles = intent.getStringArrayListExtra(EXTRA_SENTENCE_TITLES)
+                val ids = intent.getStringArrayListExtra(EXTRA_SENTENCE_IDS)
+                if (paths.isNullOrEmpty() || titles == null || ids == null) return rejectStartRequest()
                 cancelShadowingPause()
-                val paths = intent.getStringArrayListExtra(EXTRA_AUDIO_PATHS) ?: return START_STICKY
-                val titles = intent.getStringArrayListExtra(EXTRA_SENTENCE_TITLES) ?: return START_STICKY
-                val ids = intent.getStringArrayListExtra(EXTRA_SENTENCE_IDS) ?: return START_STICKY
-                if (paths.isEmpty()) return START_STICKY
 
                 isPlaylistMode = true
                 playlistPaths = paths
@@ -257,16 +254,6 @@ class PlaybackService : MediaSessionService() {
                 stopForeground(STOP_FOREGROUND_REMOVE)
             }
 
-            ACTION_UPDATE_REPEAT_COUNT -> {
-                val newCount = intent.getIntExtra(EXTRA_REPEAT_COUNT, 3)
-                repeatTargetCount = newCount
-                if (player.isPlaying) {
-                    val sub = if (isPlaylistMode) "탭 전체 재생 [${currentPlaylistIndex + 1}/${playlistPaths.size}] · 반복 ${repeatTargetCount}회" else "반복: ${repeatTargetCount}회 · 화면 꺼짐 연속 재생"
-                    val manager = getSystemService(NotificationManager::class.java)
-                    manager?.notify(NOTIFICATION_ID, buildNotification(_currentPlayingTitle.value, sub))
-                }
-            }
-
             ACTION_UPDATE_SETTINGS -> {
                 val newCount = intent.getIntExtra(EXTRA_REPEAT_COUNT, repeatTargetCount)
                 val speedsExtra = intent.getFloatArrayExtra(EXTRA_REPEAT_SPEEDS)
@@ -277,9 +264,8 @@ class PlaybackService : MediaSessionService() {
                 val currentSpeed = repeatSpeeds.getOrElse(currentRepeat) { 1.0f }
                 player.setPlaybackSpeed(currentSpeed)
                 if (player.isPlaying) {
-                    val sub = if (isPlaylistMode) "탭 전체 재생 [${currentPlaylistIndex + 1}/${playlistPaths.size}] · 반복 ${repeatTargetCount}회" else "반복: ${repeatTargetCount}회 · 화면 꺼짐 연속 재생"
                     val manager = getSystemService(NotificationManager::class.java)
-                    manager?.notify(NOTIFICATION_ID, buildNotification(_currentPlayingTitle.value, sub))
+                    manager?.notify(NOTIFICATION_ID, buildNotification(_currentPlayingTitle.value, currentSubtitle()))
                 }
             }
 
@@ -312,11 +298,6 @@ class PlaybackService : MediaSessionService() {
                     playCurrentPlaylistItem()
                 }
             }
-
-            ACTION_SET_SPEED -> {
-                val speed = intent.getFloatExtra(EXTRA_SPEED, 1.0f)
-                player.setPlaybackSpeed(speed)
-            }
         }
 
         return START_STICKY
@@ -342,8 +323,26 @@ class PlaybackService : MediaSessionService() {
         player.setPlaybackSpeed(initialSpeed)
         player.play()
 
-        val progressInfo = "탭 전체 재생 [${currentPlaylistIndex + 1}/${playlistPaths.size}] · 반복 ${repeatTargetCount}회"
-        startForeground(NOTIFICATION_ID, buildNotification(title, progressInfo))
+        startForeground(NOTIFICATION_ID, buildNotification(title, currentSubtitle()))
+    }
+
+    private fun currentSubtitle(): String =
+        if (isPlaylistMode) "탭 전체 재생 [${currentPlaylistIndex + 1}/${playlistPaths.size}] · 반복 ${repeatTargetCount}회"
+        else "반복: ${repeatTargetCount}회 · 화면 꺼짐 연속 재생"
+
+    /**
+     * Play requests arrive via startForegroundService(), which obliges the service to call
+     * startForeground() within a few seconds even when the request is invalid — otherwise the
+     * system kills the app (ForegroundServiceDidNotStartInTimeException). Satisfy that contract,
+     * and leave the foreground state only if nothing is actually playing.
+     */
+    private fun rejectStartRequest(): Int {
+        val playing = player.isPlaying
+        val title = _currentPlayingTitle.value.ifEmpty { "OPIc Sentence" }
+        val subtitle = if (playing) currentSubtitle() else "재생할 음원을 찾을 수 없습니다"
+        startForeground(NOTIFICATION_ID, buildNotification(title, subtitle))
+        if (!playing) stopForeground(STOP_FOREGROUND_REMOVE)
+        return START_STICKY
     }
 
     private fun buildNotification(title: String, subtitle: String) =

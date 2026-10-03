@@ -580,63 +580,6 @@ fun PlaybackSettingsDialog(
 }
 
 @Composable
-fun RepeatSpeedBadges(
-    repeatCount: Int,
-    speed: Float,
-    onCycleRepeat: () -> Unit,
-    onCycleSpeed: () -> Unit,
-    modifier: Modifier = Modifier,
-    isVertical: Boolean = false
-) {
-    val items = @Composable {
-        Surface(
-            color = Color(0xFF1E293B),
-            shape = RoundedCornerShape(6.dp),
-            modifier = Modifier.clickable { onCycleRepeat() }
-        ) {
-            Text(
-                text = "🔁 ${if (repeatCount >= 999) "무한" else "${repeatCount}회"}",
-                fontSize = 11.sp,
-                color = Color(0xFFFBBF24),
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
-            )
-        }
-        Surface(
-            color = Color(0xFF1E293B),
-            shape = RoundedCornerShape(6.dp),
-            modifier = Modifier.clickable { onCycleSpeed() }
-        ) {
-            Text(
-                text = "⚡ ${speed}x",
-                fontSize = 11.sp,
-                color = Color(0xFFA5B4FC),
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
-            )
-        }
-    }
-
-    if (isVertical) {
-        Column(
-            modifier = modifier,
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            horizontalAlignment = Alignment.End
-        ) {
-            items()
-        }
-    } else {
-        Row(
-            modifier = modifier,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            items()
-        }
-    }
-}
-
-@Composable
 fun CoachingGuideCard(
     guide: String,
     tip: String,
@@ -683,44 +626,6 @@ fun CoachingGuideCard(
                     fontSize = (fontSize.value - 0.5f).sp,
                     lineHeight = ((fontSize.value - 0.5f) * 1.45f).sp
                 )
-            }
-        }
-    }
-}
-
-@Composable
-fun <T> SelectionPillsRow(
-    items: List<Pair<T, String>>,
-    selectedItem: T,
-    onSelect: (T) -> Unit,
-    selectedColor: Color,
-    selectedBorderColor: Color,
-    modifier: Modifier = Modifier,
-    heightDp: Int = 36
-) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items.forEach { (value, label) ->
-            val isSelected = selectedItem == value
-            Surface(
-                modifier = Modifier
-                    .weight(1f)
-                    .height(heightDp.dp)
-                    .clickable { onSelect(value) },
-                color = if (isSelected) selectedColor else Color(0xFF1E293B),
-                shape = RoundedCornerShape(10.dp),
-                border = if (isSelected) BorderStroke(1.dp, selectedBorderColor) else null
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Text(
-                        text = label,
-                        color = if (isSelected) Color.White else Color(0xFF94A3B8),
-                        fontSize = 12.sp,
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
-                    )
-                }
             }
         }
     }
@@ -813,7 +718,10 @@ fun Fold8AdaptiveApp(
             .putInt("repeat_count", newCount)
             .putString("repeat_speeds", newSpeeds.joinToString(","))
             .apply()
-        onUpdateSettings(newCount, newSpeeds)
+        // Idle: the next play request carries the new settings, so don't start the service just for this.
+        if (isPlaying || currentPlayingId != null) {
+            onUpdateSettings(newCount, newSpeeds)
+        }
     }
 
     if (showSettingsDialog) {
