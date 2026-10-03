@@ -6,10 +6,10 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SentenceDao {
-    @Query("SELECT * FROM sentences ORDER BY id ASC")
+    @Query("SELECT * FROM sentences ORDER BY orderIndex ASC, id ASC")
     fun getAllSentences(): Flow<List<Sentence>>
 
-    @Query("SELECT * FROM sentences WHERE dayKey = :dayKey ORDER BY id ASC")
+    @Query("SELECT * FROM sentences WHERE dayKey = :dayKey ORDER BY orderIndex ASC, id ASC")
     fun getSentencesByDay(dayKey: String): Flow<List<Sentence>>
 
     @Query("SELECT * FROM sentences WHERE id = :id LIMIT 1")
@@ -28,7 +28,7 @@ interface SentenceDao {
     fun getDownloadedCount(): Flow<Int>
 }
 
-@Database(entities = [Sentence::class], version = 1, exportSchema = false)
+@Database(entities = [Sentence::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun sentenceDao(): SentenceDao
 
@@ -42,7 +42,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "opic_master_database"
-                ).build()
+                )
+                .fallbackToDestructiveMigration()
+                .build()
                 INSTANCE = instance
                 instance
             }
@@ -55,12 +57,14 @@ abstract class AppDatabase : RoomDatabase() {
                         val jsonString = context.assets.open("data_manifest.json").bufferedReader().use { it.readText() }
                         val manifest = com.google.gson.Gson().fromJson(jsonString, com.opic.master.data.model.ManifestResponse::class.java)
                         val list = mutableListOf<Sentence>()
+                        var orderIndexCounter = 0
                         for ((dayKey, dayData) in manifest.days) {
                             for (item in dayData.sentences) {
                                 list.add(
                                     Sentence(
                                         id = item.id,
                                         dayKey = dayKey,
+                                        orderIndex = orderIndexCounter++,
                                         en = item.en,
                                         ko = item.ko,
                                         guide = item.guide,

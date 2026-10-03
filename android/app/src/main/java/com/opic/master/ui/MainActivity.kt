@@ -56,11 +56,10 @@ class MainActivity : ComponentActivity() {
 
             // Reliable posture evaluation:
             // - If screen width is narrow (< 600dp), it is ALWAYS the Cover Screen (Folded)
-            // - If screen width is wide (>= 600dp) and half-opened, it is Flex Mode
-            // - If screen width is wide (>= 600dp) and flat, it is Unfolded Dual Pane
+            // - If screen width is wide (>= 600dp), it is Unfolded (Dual Pane Studio or Flex Mode)
             val isCoverScreen = screenWidthDp < 600
             val isFlexMode = !isCoverScreen && (foldingFeatureState == FoldingFeature.State.HALF_OPENED)
-            val isUnfolded = !isCoverScreen && !isFlexMode
+            val isUnfolded = !isCoverScreen
 
             Fold8AdaptiveApp(
                 sentences = sentences,
@@ -82,6 +81,9 @@ class MainActivity : ComponentActivity() {
                 },
                 onUpdateRepeatCount = { newRepeat ->
                     updateRepeatCount(newRepeat)
+                },
+                onUpdateSpeed = { speed ->
+                    updatePlaybackSpeed(speed)
                 },
                 onPrev = {
                     val intent = Intent(this, PlaybackService::class.java).apply {
@@ -153,6 +155,14 @@ class MainActivity : ComponentActivity() {
         val intent = Intent(this, PlaybackService::class.java).apply {
             action = PlaybackService.ACTION_UPDATE_REPEAT_COUNT
             putExtra(PlaybackService.EXTRA_REPEAT_COUNT, repeatCount)
+        }
+        startService(intent)
+    }
+
+    private fun updatePlaybackSpeed(speed: Float) {
+        val intent = Intent(this, PlaybackService::class.java).apply {
+            action = PlaybackService.ACTION_SET_SPEED
+            putExtra(PlaybackService.EXTRA_SPEED, speed)
         }
         startService(intent)
     }

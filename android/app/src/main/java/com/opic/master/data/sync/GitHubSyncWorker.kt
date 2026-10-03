@@ -47,6 +47,7 @@ class GitHubSyncWorker(
             }
 
             val sentenceEntities = mutableListOf<Sentence>()
+            var syncOrderCounter = 0
 
             for ((dayKey, dayData) in manifest.days) {
                 for (item in dayData.sentences) {
@@ -74,6 +75,7 @@ class GitHubSyncWorker(
                         Sentence(
                             id = item.id,
                             dayKey = dayKey,
+                            orderIndex = syncOrderCounter++,
                             en = item.en,
                             ko = item.ko,
                             guide = item.guide,

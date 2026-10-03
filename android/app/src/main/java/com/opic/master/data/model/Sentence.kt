@@ -9,6 +9,7 @@ data class Sentence(
     @PrimaryKey
     val id: String,
     val dayKey: String,
+    val orderIndex: Int = 0,
     val en: String,
     val ko: String,
     val guide: String,

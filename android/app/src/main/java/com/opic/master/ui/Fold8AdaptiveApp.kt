@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -20,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -42,6 +45,27 @@ val APP_DAYS = listOf(
     DayMeta("day6", "Day 6", "휴일 루틴 & 홈캉스", "🏖️")
 )
 
+private val naturalOrderRegex = Regex("^(.*?)(?:_|-|)(\\d+)$")
+
+fun naturalSentenceComparator(): Comparator<Sentence> = Comparator { a, b ->
+    if (a.orderIndex != b.orderIndex) {
+        return@Comparator a.orderIndex.compareTo(b.orderIndex)
+    }
+    val matchA = naturalOrderRegex.find(a.id)
+    val matchB = naturalOrderRegex.find(b.id)
+    if (matchA != null && matchB != null) {
+        val prefixA = matchA.groupValues[1]
+        val prefixB = matchB.groupValues[1]
+        val prefixComp = prefixA.compareTo(prefixB)
+        if (prefixComp != 0) return@Comparator prefixComp
+        val numA = matchA.groupValues[2].toIntOrNull() ?: 0
+        val numB = matchB.groupValues[2].toIntOrNull() ?: 0
+        val numComp = numA.compareTo(numB)
+        if (numComp != 0) return@Comparator numComp
+    }
+    a.id.compareTo(b.id)
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Fold8AdaptiveApp(
@@ -55,6 +79,7 @@ fun Fold8AdaptiveApp(
     onTogglePlay: () -> Unit,
     onStop: () -> Unit,
     onUpdateRepeatCount: (Int) -> Unit,
+    onUpdateSpeed: (Float) -> Unit = {},
     onPrev: () -> Unit,
     onNext: () -> Unit,
     onSyncGitHub: () -> Unit
@@ -68,6 +93,34 @@ fun Fold8AdaptiveApp(
 
     val filteredSentences = remember(sentences, selectedDay) {
         sentences.filter { it.dayKey == selectedDay }
+            .sortedWith(naturalSentenceComparator())
+    }
+
+    val currentActiveSentence = activeSentence?.takeIf { s -> filteredSentences.any { it.id == s.id } }
+        ?: filteredSentences.firstOrNull()
+
+    fun handlePrevSentence() {
+        val currentIndex = filteredSentences.indexOfFirst { it.id == currentActiveSentence?.id }
+        if (currentIndex > 0) {
+            val prev = filteredSentences[currentIndex - 1]
+            activeSentence = prev
+            if (isPlaying) {
+                onPlaySentence(prev, repeatCount)
+            }
+        }
+        onPrev()
+    }
+
+    fun handleNextSentence() {
+        val currentIndex = filteredSentences.indexOfFirst { it.id == currentActiveSentence?.id }
+        if (currentIndex >= 0 && currentIndex + 1 < filteredSentences.size) {
+            val next = filteredSentences[currentIndex + 1]
+            activeSentence = next
+            if (isPlaying) {
+                onPlaySentence(next, repeatCount)
+            }
+        }
+        onNext()
     }
 
     fun handleRepeatCycle() {
@@ -103,9 +156,13 @@ fun Fold8AdaptiveApp(
         }
     }
 
-    val isDisplayingFlex = isUnfolded && isManualFlexActive
-    val currentActiveSentence = activeSentence?.takeIf { s -> filteredSentences.any { it.id == s.id } }
-        ?: filteredSentences.firstOrNull()
+    LaunchedEffect(isUnfolded) {
+        if (!isUnfolded) {
+            isManualFlexActive = false
+        }
+    }
+
+    val isDisplayingFlex = isUnfolded && (isFlexMode || isManualFlexActive)
 
     when {
         !isUnfolded -> {
@@ -128,8 +185,8 @@ fun Fold8AdaptiveApp(
                 onTogglePlay = onTogglePlay,
                 onStop = onStop,
                 onCycleRepeat = { handleRepeatCycle() },
-                onPrevSentence = onPrev,
-                onNextSentence = onNext,
+                onPrevSentence = { handlePrevSentence() },
+                onNextSentence = { handleNextSentence() },
                 onSyncGitHub = onSyncGitHub
             )
         }
@@ -137,14 +194,37 @@ fun Fold8AdaptiveApp(
             // 2. Flex Mode (Tabletop Posture 90° ~ 115° or Manual Toggle)
             FlexModeLayout(
                 activeSentence = currentActiveSentence,
+                sentences = filteredSentences,
                 isPlaying = isPlaying,
+                currentPlayingId = currentPlayingId,
                 repeatCount = repeatCount,
+                speed = speed,
                 isRecording = isRecording,
-                onTogglePlay = onTogglePlay,
+                onTogglePlay = {
+                    if (isPlaying) {
+                        onTogglePlay()
+                    } else if (currentPlayingId != null) {
+                        onTogglePlay()
+                    } else {
+                        currentActiveSentence?.let { onPlaySentence(it, repeatCount) }
+                    }
+                },
                 onStop = onStop,
-                onPlayCurrent = { currentActiveSentence?.let { onPlaySentence(it, repeatCount) } },
+                onPlaySentence = { s ->
+                    activeSentence = s
+                    onPlaySentence(s, repeatCount)
+                },
+                onPrev = { handlePrevSentence() },
+                onNext = { handleNextSentence() },
+                onSelectSpeed = { newSpeed ->
+                    speed = newSpeed
+                    onUpdateSpeed(newSpeed)
+                },
+                onSelectRepeat = { count ->
+                    repeatCount = count
+                    onUpdateRepeatCount(count)
+                },
                 onToggleRecord = { isRecording = !isRecording },
-                onCycleRepeat = { handleRepeatCycle() },
                 onToggleFlexMode = { isManualFlexActive = false }
             )
         }
@@ -1052,16 +1132,25 @@ fun MainDualPaneLayout(
 @Composable
 fun FlexModeLayout(
     activeSentence: Sentence?,
+    sentences: List<Sentence>,
     isPlaying: Boolean,
+    currentPlayingId: String?,
     repeatCount: Int,
+    speed: Float,
     isRecording: Boolean,
     onTogglePlay: () -> Unit,
     onStop: () -> Unit,
-    onPlayCurrent: () -> Unit,
+    onPlaySentence: (Sentence) -> Unit,
+    onPrev: () -> Unit,
+    onNext: () -> Unit,
+    onSelectSpeed: (Float) -> Unit,
+    onSelectRepeat: (Int) -> Unit,
     onToggleRecord: () -> Unit,
-    onCycleRepeat: () -> Unit,
     onToggleFlexMode: () -> Unit
 ) {
+    val currentIndex = sentences.indexOfFirst { it.id == activeSentence?.id }.takeIf { it >= 0 } ?: 0
+    val totalCount = sentences.size
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -1083,14 +1172,14 @@ fun FlexModeLayout(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "📐 플렉스 거치 모드 (L자 스탠드)",
+                    text = "📐 갤럭시 Z 폴드 8 플렉스 거치 모드 (L자 스탠드)",
                     color = Color(0xFFA5B4FC),
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Button(
                     onClick = onToggleFlexMode,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6366F1)),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4F46E5)),
                     shape = RoundedCornerShape(10.dp),
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
                 ) {
@@ -1100,139 +1189,401 @@ fun FlexModeLayout(
                         modifier = Modifier.size(16.dp),
                         tint = Color.White
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
                     Text("📖 메인 대화면 전환", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
                 }
             }
         }
 
-        // Top Screen: Reading Stand (Stand Posture)
+        // TOP HALF SCREEN: Reading Stand (독서대)
         Box(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .padding(18.dp),
-            contentAlignment = Alignment.Center
+                .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Surface(
-                    color = Color(0xFF6366F1),
-                    shape = RoundedCornerShape(8.dp)
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = Color(0xFF020617),
+                shape = RoundedCornerShape(20.dp),
+                border = BorderStroke(1.dp, Color(0xFF1E293B)),
+                shadowElevation = 8.dp
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(
-                        text = activeSentence?.id?.uppercase() ?: "SENTENCE",
-                        color = Color.White,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
-                    )
+                    Column {
+                        // Header inside stand: Stand Title + Status Badge
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "[상단 디스플레이: 낭독 독서대]",
+                                fontSize = 11.sp,
+                                color = Color(0xFF94A3B8),
+                                fontWeight = FontWeight.Medium
+                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(7.dp)
+                                        .clip(CircleShape)
+                                        .background(
+                                            when {
+                                                isRecording -> Color(0xFFEF4444)
+                                                isPlaying -> Color(0xFF10B981)
+                                                else -> Color(0xFF64748B)
+                                            }
+                                        )
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = when {
+                                        isRecording -> "● 실시간 섀도잉 녹음 중"
+                                        isPlaying -> "● 섀도잉 모드 재생 중"
+                                        else -> "● 거치 대기 중"
+                                    },
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = when {
+                                        isRecording -> Color(0xFFEF4444)
+                                        isPlaying -> Color(0xFF34D399)
+                                        else -> Color(0xFF94A3B8)
+                                    }
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        // Progress Indicator: Sentence 3 / 8
+                        Text(
+                            text = if (totalCount > 0) "Sentence ${currentIndex + 1} / $totalCount" else "Sentence",
+                            color = Color(0xFF818CF8),
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // English Sentence
+                        val cleanEn = activeSentence?.en?.replace(Regex("<.*?>"), "") ?: "선택된 문장이 없습니다."
+                        Text(
+                            text = "\"$cleanEn\"",
+                            color = Color.White,
+                            fontSize = 19.sp,
+                            fontWeight = FontWeight.Bold,
+                            lineHeight = 28.sp
+                        )
+
+                        // Coaching Pronunciation & Stress box (guide & tip)
+                        if (!activeSentence?.guide.isNullOrEmpty() || !activeSentence?.tip.isNullOrEmpty()) {
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Surface(
+                                modifier = Modifier.fillMaxWidth(),
+                                color = Color(0xFF082F49).copy(alpha = 0.55f),
+                                shape = RoundedCornerShape(12.dp),
+                                border = BorderStroke(1.dp, Color(0xFF0284C7).copy(alpha = 0.4f))
+                            ) {
+                                Column(modifier = Modifier.padding(10.dp)) {
+                                    if (!activeSentence?.guide.isNullOrEmpty()) {
+                                        val cleanGuide = activeSentence.guide
+                                            .replace(Regex("<span class=\"slash\">/</span>"), " / ")
+                                            .replace(Regex("<.*?>"), "")
+                                        Text(
+                                            text = "🗣️ $cleanGuide",
+                                            color = Color(0xFF7DD3FC),
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            lineHeight = 18.sp
+                                        )
+                                    }
+                                    if (!activeSentence?.tip.isNullOrEmpty()) {
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = "💡 ${activeSentence.tip}",
+                                            color = Color(0xFFBAE6FD),
+                                            fontSize = 11.sp,
+                                            lineHeight = 16.sp
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Korean Translation
+                    if (!activeSentence?.ko.isNullOrEmpty()) {
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Text(
+                            text = activeSentence.ko,
+                            color = Color(0xFF94A3B8),
+                            fontSize = 13.sp,
+                            lineHeight = 19.sp
+                        )
+                    }
                 }
-                Spacer(modifier = Modifier.height(14.dp))
-                Text(
-                    text = activeSentence?.en?.replace(Regex("<.*?>"), "") ?: "",
-                    color = Color.White,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    lineHeight = 32.sp
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Text(
-                    text = activeSentence?.ko ?: "",
-                    color = Color(0xFF94A3B8),
-                    fontSize = 14.sp
-                )
             }
         }
 
-        // Hinge Divider
+        // PHYSICAL HINGE DIVIDER
         Surface(
-            modifier = Modifier.fillMaxWidth().height(24.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(22.dp),
             color = Color(0xFF1E293B)
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Text(
-                    text = "═══ 힌지 접힘선 (HINGE FOLD 90°) ═══",
+                    text = "═══ 힌지 접힘선 (HINGE FOLD 90° ~ 115°) ═══",
                     color = Color(0xFF64748B),
                     fontSize = 10.sp,
+                    fontFamily = FontFamily.Monospace,
                     fontWeight = FontWeight.Bold
                 )
             }
         }
 
-        // Bottom Screen: Tabletop Touchpad Controller
-        Column(
+        // BOTTOM HALF SCREEN: Tabletop Touch Controller Deck
+        Box(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .background(Color(0xFF0F172A))
-                .padding(18.dp),
-            verticalArrangement = Arrangement.SpaceEvenly,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                // Play / Pause
-                FilledIconButton(
-                    onClick = {
-                        if (isPlaying) {
-                            onTogglePlay()
-                        } else if (currentPlayingId != null) {
-                            onTogglePlay()
-                        } else {
-                            onPlayCurrent()
-                        }
-                    },
-                    modifier = Modifier.size(60.dp),
-                    colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color(0xFF6366F1))
-                ) {
-                    Icon(
-                        imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                        contentDescription = "Play/Pause",
-                        modifier = Modifier.size(32.dp),
-                        tint = Color.White
-                    )
-                }
-                // Stop
-                FilledIconButton(
-                    onClick = onStop,
-                    modifier = Modifier.size(60.dp),
-                    colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color(0xFF1E293B))
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Stop,
-                        contentDescription = "Stop",
-                        modifier = Modifier.size(32.dp),
-                        tint = Color(0xFFEF4444)
-                    )
-                }
-                // Mic Record
-                FilledIconButton(
-                    onClick = onToggleRecord,
-                    modifier = Modifier.size(60.dp),
-                    colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = if (isRecording) Color(0xFFDC2626) else Color(0xFFEF4444)
-                    )
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Mic,
-                        contentDescription = "Record",
-                        modifier = Modifier.size(32.dp),
-                        tint = Color.White
-                    )
-                }
-            }
-
             Surface(
-                color = Color(0xFF1E293B),
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier.clickable { onCycleRepeat() }
+                modifier = Modifier.fillMaxSize(),
+                color = Color(0xFF020617),
+                shape = RoundedCornerShape(20.dp),
+                border = BorderStroke(1.dp, Color(0xFF1E293B)),
+                shadowElevation = 8.dp
             ) {
-                Text(
-                    text = "🔁 반복 ${if (repeatCount >= 999) "무한" else "${repeatCount}회"} · 화면 꺼짐 무중단 연속 재생",
-                    color = Color(0xFF10B981),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(14.dp),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Deck Header
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "[하단 디스플레이: 평면 터치 컨트롤 패드]",
+                            fontSize = 11.sp,
+                            color = Color(0xFF94A3B8),
+                            fontWeight = FontWeight.Medium
+                        )
+                        Surface(
+                            color = Color(0xFF451A03),
+                            shape = RoundedCornerShape(6.dp),
+                            border = BorderStroke(1.dp, Color(0xFFF59E0B).copy(alpha = 0.5f))
+                        ) {
+                            Text(
+                                text = "반복 ${if (repeatCount >= 999) "무한" else "${repeatCount}회"} 선택됨",
+                                color = Color(0xFFFBBF24),
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                            )
+                        }
+                    }
+
+                    // Row 1: Speed Selector Pills (0.8x, 1.0x (보통), 1.2x)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        val speeds = listOf(0.8f to "0.8x", 1.0f to "1.0x (보통)", 1.2f to "1.2x")
+                        speeds.forEach { (sp, label) ->
+                            val isSelected = (speed == sp)
+                            Surface(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(36.dp)
+                                    .clickable { onSelectSpeed(sp) },
+                                color = if (isSelected) Color(0xFF4F46E5) else Color(0xFF1E293B),
+                                shape = RoundedCornerShape(10.dp),
+                                border = if (isSelected) BorderStroke(1.dp, Color(0xFF818CF8)) else null
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Text(
+                                        text = label,
+                                        color = if (isSelected) Color.White else Color(0xFF94A3B8),
+                                        fontSize = 12.sp,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    // Row 2: Repeat Count Selector Pills (1회, 3회, 5회, 무한)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        val repeats = listOf(1 to "1회", 3 to "3회", 5 to "5회", 999 to "무한 🔁")
+                        repeats.forEach { (rep, label) ->
+                            val isSelected = (repeatCount == rep)
+                            Surface(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(34.dp)
+                                    .clickable { onSelectRepeat(rep) },
+                                color = if (isSelected) Color(0xFF047857) else Color(0xFF1E293B),
+                                shape = RoundedCornerShape(10.dp),
+                                border = if (isSelected) BorderStroke(1.dp, Color(0xFF34D399)) else null
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Text(
+                                        text = label,
+                                        color = if (isSelected) Color.White else Color(0xFF94A3B8),
+                                        fontSize = 12.sp,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    // Row 3: Central Big Player Controls (Prev, Big Play/Pause, Stop, Next)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Previous Button
+                        FilledIconButton(
+                            onClick = onPrev,
+                            modifier = Modifier.size(48.dp),
+                            shape = RoundedCornerShape(14.dp),
+                            colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color(0xFF1E293B))
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.SkipPrevious,
+                                contentDescription = "Prev",
+                                modifier = Modifier.size(24.dp),
+                                tint = Color.White
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(18.dp))
+
+                        // Large Center Play / Pause Button (64dp)
+                        FilledIconButton(
+                            onClick = {
+                                if (isPlaying) {
+                                    onTogglePlay()
+                                } else if (currentPlayingId != null) {
+                                    onTogglePlay()
+                                } else {
+                                    activeSentence?.let { onPlaySentence(it) }
+                                }
+                            },
+                            modifier = Modifier.size(64.dp),
+                            shape = RoundedCornerShape(22.dp),
+                            colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color(0xFF6366F1))
+                        ) {
+                            Icon(
+                                imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                                contentDescription = if (isPlaying) "Pause" else "Play",
+                                modifier = Modifier.size(34.dp),
+                                tint = Color.White
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(14.dp))
+
+                        // Stop Button
+                        FilledIconButton(
+                            onClick = onStop,
+                            modifier = Modifier.size(48.dp),
+                            shape = RoundedCornerShape(14.dp),
+                            colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color(0xFF1E293B))
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Stop,
+                                contentDescription = "Stop",
+                                modifier = Modifier.size(24.dp),
+                                tint = Color(0xFFEF4444)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(18.dp))
+
+                        // Next Button
+                        FilledIconButton(
+                            onClick = onNext,
+                            modifier = Modifier.size(48.dp),
+                            shape = RoundedCornerShape(14.dp),
+                            colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color(0xFF1E293B))
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.SkipNext,
+                                contentDescription = "Next",
+                                modifier = Modifier.size(24.dp),
+                                tint = Color.White
+                            )
+                        }
+                    }
+
+                    // Row 4: Full-width One-touch Shadowing Record Action
+                    Button(
+                        onClick = onToggleRecord,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (isRecording) Color(0xFFDC2626) else Color(0xFFE11D48)
+                        ),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .clip(CircleShape)
+                                .background(Color.White)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = if (isRecording) "⏹ 녹음 완료 / 중지" else "🎙️ 원터치 실시간 섀도잉 녹음 시작",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    }
+
+                    // Screen-Off Continuous Playback Status
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(6.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFF10B981))
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "화면 꺼짐(AOD) 무중단 백그라운드 연속 재생 활성화",
+                            color = Color(0xFF10B981),
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
             }
         }
     }
