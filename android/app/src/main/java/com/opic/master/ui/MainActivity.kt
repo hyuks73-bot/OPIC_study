@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
-import androidx.lifecycle.lifecycleScope
 import androidx.window.layout.FoldingFeature
 import androidx.window.layout.WindowInfoTracker
 import androidx.work.OneTimeWorkRequestBuilder
@@ -15,7 +14,6 @@ import com.opic.master.data.model.Sentence
 import com.opic.master.data.sync.GitHubSyncWorker
 import com.opic.master.service.PlaybackService
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 

@@ -123,6 +123,7 @@ fun Fold8AdaptiveApp(
 // -------------------------------------------------------------
 // 1. COVER DISPLAY LAYOUT (1248 x 1972 Thumb-Zone Optimized)
 // -------------------------------------------------------------
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoverDisplayLayout(
     selectedDay: String,

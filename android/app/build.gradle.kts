@@ -5,6 +5,8 @@ plugins {
     id("org.jetbrains.kotlin.kapt")
 }
 
+layout.buildDirectory.set(file("C:/tmp/OPICMasterIH_build/app"))
+
 android {
     namespace = "com.opic.master"
     compileSdk = 35
