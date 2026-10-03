@@ -26,6 +26,7 @@ class PlaybackService : MediaSessionService() {
 
     private var repeatTargetCount = 3
     private var currentRepeat = 0
+    private var repeatSpeeds = listOf(1.0f, 1.0f, 1.0f)
     private var isShadowingPauseActive = false
     private var shadowingJob: Job? = null
 
@@ -51,6 +52,7 @@ class PlaybackService : MediaSessionService() {
         const val ACTION_TOGGLE_PLAY = "ACTION_TOGGLE_PLAY"
         const val ACTION_STOP = "ACTION_STOP"
         const val ACTION_UPDATE_REPEAT_COUNT = "ACTION_UPDATE_REPEAT_COUNT"
+        const val ACTION_UPDATE_SETTINGS = "ACTION_UPDATE_SETTINGS"
         const val ACTION_PAUSE = "ACTION_PAUSE"
         const val ACTION_RESUME = "ACTION_RESUME"
         const val ACTION_PREV = "ACTION_PREV"
@@ -61,6 +63,7 @@ class PlaybackService : MediaSessionService() {
         const val EXTRA_SENTENCE_TITLE = "EXTRA_SENTENCE_TITLE"
         const val EXTRA_SENTENCE_ID = "EXTRA_SENTENCE_ID"
         const val EXTRA_REPEAT_COUNT = "EXTRA_REPEAT_COUNT"
+        const val EXTRA_REPEAT_SPEEDS = "EXTRA_REPEAT_SPEEDS"
         const val EXTRA_SPEED = "EXTRA_SPEED"
 
         const val EXTRA_AUDIO_PATHS = "EXTRA_AUDIO_PATHS"
@@ -123,6 +126,8 @@ class PlaybackService : MediaSessionService() {
                         // 1.2-second smart pause for learner's vocal shadowing
                         cancelShadowingPause()
                         isShadowingPauseActive = true
+                        val nextSpeed = repeatSpeeds.getOrElse(currentRepeat) { 1.0f }
+                        player.setPlaybackSpeed(nextSpeed)
                         shadowingJob = serviceScope.launch {
                             delay(1200)
                             if (isShadowingPauseActive && player.playbackState == Player.STATE_ENDED) {
@@ -179,6 +184,12 @@ class PlaybackService : MediaSessionService() {
                 val title = intent.getStringExtra(EXTRA_SENTENCE_TITLE) ?: "OPIc Sentence"
                 val sentenceId = intent.getStringExtra(EXTRA_SENTENCE_ID)
                 repeatTargetCount = intent.getIntExtra(EXTRA_REPEAT_COUNT, 3)
+                val speedsExtra = intent.getFloatArrayExtra(EXTRA_REPEAT_SPEEDS)
+                if (speedsExtra != null && speedsExtra.isNotEmpty()) {
+                    repeatSpeeds = speedsExtra.toList()
+                } else if (repeatSpeeds.size != repeatTargetCount) {
+                    repeatSpeeds = List(repeatTargetCount) { 1.0f }
+                }
                 currentRepeat = 0
                 _currentRepeatFlow.value = 1
 
@@ -188,6 +199,8 @@ class PlaybackService : MediaSessionService() {
                 val mediaItem = MediaItem.fromUri(audioPath)
                 player.setMediaItem(mediaItem)
                 player.prepare()
+                val initialSpeed = repeatSpeeds.getOrElse(0) { 1.0f }
+                player.setPlaybackSpeed(initialSpeed)
                 player.play()
 
                 startForeground(NOTIFICATION_ID, buildNotification(title, "반복: ${repeatTargetCount}회 · 화면 꺼짐 연속 재생"))
@@ -206,6 +219,12 @@ class PlaybackService : MediaSessionService() {
                 playlistIds = ids
                 currentPlaylistIndex = 0
                 repeatTargetCount = intent.getIntExtra(EXTRA_REPEAT_COUNT, 3)
+                val speedsExtra = intent.getFloatArrayExtra(EXTRA_REPEAT_SPEEDS)
+                if (speedsExtra != null && speedsExtra.isNotEmpty()) {
+                    repeatSpeeds = speedsExtra.toList()
+                } else if (repeatSpeeds.size != repeatTargetCount) {
+                    repeatSpeeds = List(repeatTargetCount) { 1.0f }
+                }
                 currentRepeat = 0
                 _currentRepeatFlow.value = 1
 
@@ -243,7 +262,23 @@ class PlaybackService : MediaSessionService() {
                 if (player.isPlaying) {
                     val sub = if (isPlaylistMode) "탭 전체 재생 [${currentPlaylistIndex + 1}/${playlistPaths.size}] · 반복 ${repeatTargetCount}회" else "반복: ${repeatTargetCount}회 · 화면 꺼짐 연속 재생"
                     val manager = getSystemService(NotificationManager::class.java)
-                    manager.notify(NOTIFICATION_ID, buildNotification(_currentPlayingTitle.value, sub))
+                    manager?.notify(NOTIFICATION_ID, buildNotification(_currentPlayingTitle.value, sub))
+                }
+            }
+
+            ACTION_UPDATE_SETTINGS -> {
+                val newCount = intent.getIntExtra(EXTRA_REPEAT_COUNT, repeatTargetCount)
+                val speedsExtra = intent.getFloatArrayExtra(EXTRA_REPEAT_SPEEDS)
+                repeatTargetCount = newCount
+                if (speedsExtra != null && speedsExtra.isNotEmpty()) {
+                    repeatSpeeds = speedsExtra.toList()
+                }
+                val currentSpeed = repeatSpeeds.getOrElse(currentRepeat) { 1.0f }
+                player.setPlaybackSpeed(currentSpeed)
+                if (player.isPlaying) {
+                    val sub = if (isPlaylistMode) "탭 전체 재생 [${currentPlaylistIndex + 1}/${playlistPaths.size}] · 반복 ${repeatTargetCount}회" else "반복: ${repeatTargetCount}회 · 화면 꺼짐 연속 재생"
+                    val manager = getSystemService(NotificationManager::class.java)
+                    manager?.notify(NOTIFICATION_ID, buildNotification(_currentPlayingTitle.value, sub))
                 }
             }
 
@@ -301,6 +336,8 @@ class PlaybackService : MediaSessionService() {
         val mediaItem = MediaItem.fromUri(audioPath)
         player.setMediaItem(mediaItem)
         player.prepare()
+        val initialSpeed = repeatSpeeds.getOrElse(0) { 1.0f }
+        player.setPlaybackSpeed(initialSpeed)
         player.play()
 
         val progressInfo = "탭 전체 재생 [${currentPlaylistIndex + 1}/${playlistPaths.size}] · 반복 ${repeatTargetCount}회"

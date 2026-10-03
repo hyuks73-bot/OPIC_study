@@ -79,11 +79,11 @@ class MainActivity : ComponentActivity() {
                 isPlaying = isPlaying,
                 currentPlayingId = currentPlayingId,
                 isSyncing = isSyncing,
-                onPlaySentence = { sentence, repeatCount ->
-                    playSentenceViaService(sentence, repeatCount)
+                onPlaySentence = { sentence, repeatCount, speeds ->
+                    playSentenceViaService(sentence, repeatCount, speeds)
                 },
-                onPlayAll = { daySentences, repeatCount ->
-                    playAllViaService(daySentences, repeatCount)
+                onPlayAll = { daySentences, repeatCount, speeds ->
+                    playAllViaService(daySentences, repeatCount, speeds)
                 },
                 onTogglePlay = {
                     togglePlayback()
@@ -91,11 +91,8 @@ class MainActivity : ComponentActivity() {
                 onStop = {
                     stopPlayback()
                 },
-                onUpdateRepeatCount = { newRepeat ->
-                    updateRepeatCount(newRepeat)
-                },
-                onUpdateSpeed = { speed ->
-                    updatePlaybackSpeed(speed)
+                onUpdateSettings = { newRepeat, speeds ->
+                    updatePlaybackSettings(newRepeat, speeds)
                 },
                 onSyncGitHub = {
                     triggerGitHubSync()
@@ -122,7 +119,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun playSentenceViaService(sentence: Sentence, repeatCount: Int) {
+    private fun playSentenceViaService(sentence: Sentence, repeatCount: Int, speeds: List<Float> = emptyList()) {
         val path = sentence.localAudioPath ?: "https://raw.githubusercontent.com/hyuks73-bot/OPIC_study/main/${sentence.audioUrl}"
         val intent = Intent(this, PlaybackService::class.java).apply {
             action = PlaybackService.ACTION_PLAY_SENTENCE
@@ -130,11 +127,14 @@ class MainActivity : ComponentActivity() {
             putExtra(PlaybackService.EXTRA_SENTENCE_TITLE, sentence.en.replace(HTML_TAG_REGEX, ""))
             putExtra(PlaybackService.EXTRA_SENTENCE_ID, sentence.id)
             putExtra(PlaybackService.EXTRA_REPEAT_COUNT, repeatCount)
+            if (speeds.isNotEmpty()) {
+                putExtra(PlaybackService.EXTRA_REPEAT_SPEEDS, speeds.toFloatArray())
+            }
         }
         startForegroundService(intent)
     }
 
-    private fun playAllViaService(sentences: List<Sentence>, repeatCount: Int) {
+    private fun playAllViaService(sentences: List<Sentence>, repeatCount: Int, speeds: List<Float> = emptyList()) {
         if (sentences.isEmpty()) return
         val paths = ArrayList(sentences.map { it.localAudioPath ?: "https://raw.githubusercontent.com/hyuks73-bot/OPIC_study/main/${it.audioUrl}" })
         val titles = ArrayList(sentences.map { it.en.replace(HTML_TAG_REGEX, "") })
@@ -146,6 +146,9 @@ class MainActivity : ComponentActivity() {
             putStringArrayListExtra(PlaybackService.EXTRA_SENTENCE_TITLES, titles)
             putStringArrayListExtra(PlaybackService.EXTRA_SENTENCE_IDS, ids)
             putExtra(PlaybackService.EXTRA_REPEAT_COUNT, repeatCount)
+            if (speeds.isNotEmpty()) {
+                putExtra(PlaybackService.EXTRA_REPEAT_SPEEDS, speeds.toFloatArray())
+            }
         }
         startForegroundService(intent)
     }
@@ -164,18 +167,11 @@ class MainActivity : ComponentActivity() {
         startService(intent)
     }
 
-    private fun updateRepeatCount(repeatCount: Int) {
+    private fun updatePlaybackSettings(repeatCount: Int, speeds: List<Float>) {
         val intent = Intent(this, PlaybackService::class.java).apply {
-            action = PlaybackService.ACTION_UPDATE_REPEAT_COUNT
+            action = PlaybackService.ACTION_UPDATE_SETTINGS
             putExtra(PlaybackService.EXTRA_REPEAT_COUNT, repeatCount)
-        }
-        startService(intent)
-    }
-
-    private fun updatePlaybackSpeed(speed: Float) {
-        val intent = Intent(this, PlaybackService::class.java).apply {
-            action = PlaybackService.ACTION_SET_SPEED
-            putExtra(PlaybackService.EXTRA_SPEED, speed)
+            putExtra(PlaybackService.EXTRA_REPEAT_SPEEDS, speeds.toFloatArray())
         }
         startService(intent)
     }

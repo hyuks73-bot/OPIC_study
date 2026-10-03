@@ -7,9 +7,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import android.content.Context
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,8 +25,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -122,6 +126,450 @@ fun DaySelectorTabs(
             }
         }
     }
+}
+
+@Composable
+fun RepeatSpeedSettingButton(
+    repeatCount: Int,
+    repeatSpeeds: List<Float>,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    isVertical: Boolean = false
+) {
+    val speedSummary = remember(repeatSpeeds) {
+        if (repeatSpeeds.isEmpty()) "1.0x"
+        else {
+            val min = repeatSpeeds.minOrNull() ?: 1.0f
+            val max = repeatSpeeds.maxOrNull() ?: 1.0f
+            if (min == max) "${min}x" else "${min}~${max}x"
+        }
+    }
+
+    Surface(
+        color = Color(0xFF1E293B),
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, Color(0xFF475569)),
+        modifier = modifier.clickable { onClick() }
+    ) {
+        if (isVertical) {
+            Column(
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "설정",
+                        tint = Color(0xFF818CF8),
+                        modifier = Modifier.size(13.dp)
+                    )
+                    Text(
+                        text = "반복 ${repeatCount}회",
+                        fontSize = 11.sp,
+                        color = Color(0xFFFBBF24),
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Text(
+                    text = "⚡ $speedSummary",
+                    fontSize = 10.sp,
+                    color = Color(0xFFA5B4FC),
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        } else {
+            Row(
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "설정",
+                    tint = Color(0xFF818CF8),
+                    modifier = Modifier.size(15.dp)
+                )
+                Text(
+                    text = "반복 ${repeatCount}회",
+                    fontSize = 11.sp,
+                    color = Color(0xFFFBBF24),
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "·",
+                    fontSize = 11.sp,
+                    color = Color(0xFF64748B)
+                )
+                Text(
+                    text = "⚡ $speedSummary",
+                    fontSize = 11.sp,
+                    color = Color(0xFFA5B4FC),
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun PlaybackSettingsDialog(
+    initialRepeatCount: Int,
+    initialRepeatSpeeds: List<Float>,
+    onDismiss: () -> Unit,
+    onSave: (Int, List<Float>) -> Unit
+) {
+    var repeatCount by remember { mutableIntStateOf(initialRepeatCount.coerceIn(1, 10)) }
+    var speeds by remember {
+        mutableStateOf(
+            if (initialRepeatSpeeds.size == initialRepeatCount) {
+                initialRepeatSpeeds
+            } else {
+                List(initialRepeatCount) { idx ->
+                    initialRepeatSpeeds.getOrElse(idx) { 1.0f }
+                }
+            }
+        )
+    }
+
+    fun updateCount(newCount: Int) {
+        val clamped = newCount.coerceIn(1, 10)
+        repeatCount = clamped
+        val lastSpeed = speeds.lastOrNull() ?: 1.0f
+        speeds = if (clamped <= speeds.size) {
+            speeds.take(clamped)
+        } else {
+            speeds + List(clamped - speeds.size) { lastSpeed }
+        }
+    }
+
+    val availableSpeeds = listOf(0.7f, 0.8f, 0.9f, 1.0f, 1.1f, 1.2f, 1.3f, 1.5f)
+    var isRepeatDropdownExpanded by remember { mutableStateOf(false) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Color(0xFF0F172A),
+        shape = RoundedCornerShape(20.dp),
+        title = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Surface(
+                    color = Color(0xFF312E81),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Default.Tune,
+                            contentDescription = null,
+                            tint = Color(0xFFA5B4FC),
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.width(10.dp))
+                Column {
+                    Text(
+                        text = "반복 및 배속 상세 설정",
+                        color = Color.White,
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "회차별 맞춤 섀도잉 속도 조절",
+                        color = Color(0xFF94A3B8),
+                        fontSize = 11.sp
+                    )
+                }
+            }
+        },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                // 1. 반복 횟수 선택 (1~10 드롭다운)
+                Text(
+                    text = "🔁 반복 횟수 선택 (1 ~ 10회)",
+                    color = Color(0xFFFBBF24),
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { isRepeatDropdownExpanded = true },
+                        color = Color(0xFF1E293B),
+                        shape = RoundedCornerShape(10.dp),
+                        border = BorderStroke(1.dp, Color(0xFF475569))
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 14.dp, vertical = 12.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "문장당 ${repeatCount}회 반복",
+                                color = Color.White,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Icon(
+                                imageVector = Icons.Default.ArrowDropDown,
+                                contentDescription = null,
+                                tint = Color(0xFFA5B4FC)
+                            )
+                        }
+                    }
+
+                    DropdownMenu(
+                        expanded = isRepeatDropdownExpanded,
+                        onDismissRequest = { isRepeatDropdownExpanded = false },
+                        modifier = Modifier.background(Color(0xFF1E293B))
+                    ) {
+                        for (count in 1..10) {
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        text = "${count}회 반복${if (count == repeatCount) "  ✓" else ""}",
+                                        color = if (count == repeatCount) Color(0xFFFBBF24) else Color.White,
+                                        fontWeight = if (count == repeatCount) FontWeight.Bold else FontWeight.Normal
+                                    )
+                                },
+                                onClick = {
+                                    updateCount(count)
+                                    isRepeatDropdownExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(18.dp))
+
+                // 2. 회차별 배속 설정 헤더 & 프리셋
+                Text(
+                    text = "⚡ 회차별 배속 지정",
+                    color = Color(0xFF7DD3FC),
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                // Quick Presets
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    // 점진적 가속 프리셋
+                    Surface(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable {
+                                val stepSpeeds = listOf(0.8f, 0.9f, 1.0f, 1.1f, 1.2f, 1.3f, 1.5f, 1.5f, 1.5f, 1.5f)
+                                speeds = List(repeatCount) { idx ->
+                                    stepSpeeds.getOrElse(idx) { 1.2f }
+                                }
+                            },
+                        color = Color(0xFF1E1B4B),
+                        shape = RoundedCornerShape(8.dp),
+                        border = BorderStroke(1.dp, Color(0xFF4338CA))
+                    ) {
+                        Text(
+                            text = "📈 점진 가속",
+                            color = Color(0xFFA5B4FC),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 6.dp),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
+                    // 1.0x 표준 통일
+                    Surface(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable {
+                                speeds = List(repeatCount) { 1.0f }
+                            },
+                        color = Color(0xFF064E3B),
+                        shape = RoundedCornerShape(8.dp),
+                        border = BorderStroke(1.dp, Color(0xFF059669))
+                    ) {
+                        Text(
+                            text = "▶ 1.0x 통일",
+                            color = Color(0xFF34D399),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 6.dp),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
+                    // 0.8x 정밀 청취 통일
+                    Surface(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable {
+                                speeds = List(repeatCount) { 0.8f }
+                            },
+                        color = Color(0xFF451A03),
+                        shape = RoundedCornerShape(8.dp),
+                        border = BorderStroke(1.dp, Color(0xFFD97706))
+                    ) {
+                        Text(
+                            text = "🐢 0.8x 통일",
+                            color = Color(0xFFFBBF24),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 6.dp),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // List of iterations
+                Surface(
+                    color = Color(0xFF0B1120),
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, Color(0xFF1E293B)),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(10.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        for (i in 0 until repeatCount) {
+                            val currentSpeed = speeds.getOrElse(i) { 1.0f }
+                            var isSpeedMenuOpen by remember { mutableStateOf(false) }
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Color(0xFF1E293B), RoundedCornerShape(8.dp))
+                                    .padding(horizontal = 10.dp, vertical = 8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Surface(
+                                        color = when (i) {
+                                            0 -> Color(0xFF0369A1)
+                                            1 -> Color(0xFF4338CA)
+                                            2 -> Color(0xFF7C3AED)
+                                            else -> Color(0xFF334155)
+                                        },
+                                        shape = RoundedCornerShape(6.dp)
+                                    ) {
+                                        Text(
+                                            text = "${i + 1}회차",
+                                            color = Color.White,
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp)
+                                        )
+                                    }
+                                    val desc = when (i) {
+                                        0 -> "첫 청취"
+                                        1 -> "섀도잉"
+                                        2 -> "발화 완성"
+                                        else -> "심화 반복"
+                                    }
+                                    Text(
+                                        text = desc,
+                                        color = Color(0xFF94A3B8),
+                                        fontSize = 11.sp
+                                    )
+                                }
+
+                                Box {
+                                    Surface(
+                                        color = Color(0xFF0F172A),
+                                        shape = RoundedCornerShape(6.dp),
+                                        border = BorderStroke(1.dp, Color(0xFF4F46E5)),
+                                        modifier = Modifier.clickable { isSpeedMenuOpen = true }
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                        ) {
+                                            Text(
+                                                text = "${currentSpeed}x",
+                                                color = Color(0xFFA5B4FC),
+                                                fontSize = 12.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                            Icon(
+                                                imageVector = Icons.Default.ArrowDropDown,
+                                                contentDescription = null,
+                                                tint = Color(0xFFA5B4FC),
+                                                modifier = Modifier.size(16.dp)
+                                            )
+                                        }
+                                    }
+
+                                    DropdownMenu(
+                                        expanded = isSpeedMenuOpen,
+                                        onDismissRequest = { isSpeedMenuOpen = false },
+                                        modifier = Modifier.background(Color(0xFF1E293B))
+                                    ) {
+                                        availableSpeeds.forEach { sp ->
+                                            DropdownMenuItem(
+                                                text = {
+                                                    Text(
+                                                        text = "${sp}x${if (sp == 1.0f) " (표준)" else ""}${if (sp == currentSpeed) "  ✓" else ""}",
+                                                        color = if (sp == currentSpeed) Color(0xFF7DD3FC) else Color.White,
+                                                        fontWeight = if (sp == currentSpeed) FontWeight.Bold else FontWeight.Normal
+                                                    )
+                                                },
+                                                onClick = {
+                                                    val newSpeeds = speeds.toMutableList()
+                                                    if (i in newSpeeds.indices) {
+                                                        newSpeeds[i] = sp
+                                                    }
+                                                    speeds = newSpeeds
+                                                    isSpeedMenuOpen = false
+                                                }
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = { onSave(repeatCount, speeds) },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6366F1)),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Text("설정 적용", fontWeight = FontWeight.Bold, color = Color.White)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("취소", color = Color(0xFF94A3B8))
+            }
+        }
+    )
 }
 
 @Composable
@@ -272,12 +720,11 @@ fun Fold8AdaptiveApp(
     isFlexMode: Boolean,
     isPlaying: Boolean,
     currentPlayingId: String?,
-    onPlaySentence: (Sentence, Int) -> Unit,
-    onPlayAll: (List<Sentence>, Int) -> Unit,
+    onPlaySentence: (Sentence, Int, List<Float>) -> Unit,
+    onPlayAll: (List<Sentence>, Int, List<Float>) -> Unit,
     onTogglePlay: () -> Unit,
     onStop: () -> Unit,
-    onUpdateRepeatCount: (Int) -> Unit,
-    onUpdateSpeed: (Float) -> Unit = {},
+    onUpdateSettings: (Int, List<Float>) -> Unit = { _, _ -> },
     isSyncing: Boolean = false,
     onSyncGitHub: () -> Unit
 ) {
@@ -298,11 +745,48 @@ fun Fold8AdaptiveApp(
         }
     }
 
+    val context = LocalContext.current
+    val prefs = remember(context) { context.getSharedPreferences("opic_playback_prefs", Context.MODE_PRIVATE) }
+
+    val savedRepeatCount = remember(prefs) { prefs.getInt("repeat_count", 3).coerceIn(1, 10) }
+    val savedSpeeds = remember(prefs, savedRepeatCount) {
+        val str = prefs.getString("repeat_speeds", null)
+        if (!str.isNullOrEmpty()) {
+            val list = str.split(",").mapNotNull { it.toFloatOrNull() }
+            if (list.size == savedRepeatCount) list else List(savedRepeatCount) { 1.0f }
+        } else {
+            List(savedRepeatCount) { 1.0f }
+        }
+    }
+
     var selectedDay by remember { mutableStateOf(availableDays.firstOrNull()?.key ?: "day1") }
     var activeSentence by remember { mutableStateOf<Sentence?>(null) }
-    var speed by remember { mutableFloatStateOf(1.0f) }
-    var repeatCount by remember { mutableIntStateOf(3) }
+    var repeatCount by remember { mutableIntStateOf(savedRepeatCount) }
+    var repeatSpeeds by remember { mutableStateOf(savedSpeeds) }
     var showCoaching by remember { mutableStateOf(true) }
+    var showSettingsDialog by remember { mutableStateOf(false) }
+
+    fun handleSaveSettings(newCount: Int, newSpeeds: List<Float>) {
+        repeatCount = newCount
+        repeatSpeeds = newSpeeds
+        prefs.edit()
+            .putInt("repeat_count", newCount)
+            .putString("repeat_speeds", newSpeeds.joinToString(","))
+            .apply()
+        onUpdateSettings(newCount, newSpeeds)
+    }
+
+    if (showSettingsDialog) {
+        PlaybackSettingsDialog(
+            initialRepeatCount = repeatCount,
+            initialRepeatSpeeds = repeatSpeeds,
+            onDismiss = { showSettingsDialog = false },
+            onSave = { count, speeds ->
+                handleSaveSettings(count, speeds)
+                showSettingsDialog = false
+            }
+        )
+    }
 
     LaunchedEffect(availableDays) {
         if (availableDays.isNotEmpty() && availableDays.none { it.key == selectedDay }) {
@@ -324,7 +808,7 @@ fun Fold8AdaptiveApp(
         val prevIndex = if (currentIndex > 0) currentIndex - 1 else filteredSentences.size - 1
         val prev = filteredSentences[prevIndex]
         activeSentence = prev
-        onPlaySentence(prev, repeatCount)
+        onPlaySentence(prev, repeatCount, repeatSpeeds)
     }
 
     fun handleNextSentence() {
@@ -333,28 +817,7 @@ fun Fold8AdaptiveApp(
         val nextIndex = if (currentIndex in filteredSentences.indices && currentIndex + 1 < filteredSentences.size) currentIndex + 1 else 0
         val next = filteredSentences[nextIndex]
         activeSentence = next
-        onPlaySentence(next, repeatCount)
-    }
-
-    fun handleRepeatCycle() {
-        val next = when (repeatCount) {
-            1 -> 3
-            3 -> 5
-            5 -> 999
-            else -> 1
-        }
-        repeatCount = next
-        onUpdateRepeatCount(next)
-    }
-
-    fun handleSpeedCycle() {
-        val next = when (speed) {
-            0.8f -> 1.0f
-            1.0f -> 1.2f
-            else -> 0.8f
-        }
-        speed = next
-        onUpdateSpeed(next)
+        onPlaySentence(next, repeatCount, repeatSpeeds)
     }
 
     fun handleSelectDay(newDay: String) {
@@ -372,7 +835,7 @@ fun Fold8AdaptiveApp(
         } else if (currentPlayingId != null && currentPlayingId == currentActiveSentence?.id) {
             onTogglePlay()
         } else {
-            currentActiveSentence?.let { onPlaySentence(it, repeatCount) }
+            currentActiveSentence?.let { onPlaySentence(it, repeatCount, repeatSpeeds) }
         }
     }
 
@@ -410,18 +873,17 @@ fun Fold8AdaptiveApp(
                 activeSentence = currentActiveSentence,
                 isPlaying = isPlaying,
                 repeatCount = repeatCount,
-                speed = speed,
+                repeatSpeeds = repeatSpeeds,
+                onOpenSettings = { showSettingsDialog = true },
                 showCoaching = showCoaching,
                 onToggleCoaching = { showCoaching = !showCoaching },
                 onSelectSentence = {
                     activeSentence = it
-                    onPlaySentence(it, repeatCount)
+                    onPlaySentence(it, repeatCount, repeatSpeeds)
                 },
-                onPlayAll = { onPlayAll(filteredSentences, repeatCount) },
+                onPlayAll = { onPlayAll(filteredSentences, repeatCount, repeatSpeeds) },
                 onTogglePlay = handleToggleOrPlayActive,
                 onStop = onStop,
-                onCycleRepeat = { handleRepeatCycle() },
-                onCycleSpeed = { handleSpeedCycle() },
                 onPrevSentence = { handlePrevSentence() },
                 onNextSentence = { handleNextSentence() },
                 onSyncGitHub = onSyncGitHub,
@@ -437,23 +899,16 @@ fun Fold8AdaptiveApp(
                 sentences = filteredSentences,
                 isPlaying = isPlaying,
                 repeatCount = repeatCount,
-                speed = speed,
+                repeatSpeeds = repeatSpeeds,
+                onOpenSettings = { showSettingsDialog = true },
                 onTogglePlay = handleToggleOrPlayActive,
                 onStop = onStop,
                 onPlaySentence = { s ->
                     activeSentence = s
-                    onPlaySentence(s, repeatCount)
+                    onPlaySentence(s, repeatCount, repeatSpeeds)
                 },
                 onPrev = { handlePrevSentence() },
                 onNext = { handleNextSentence() },
-                onSelectSpeed = { newSpeed ->
-                    speed = newSpeed
-                    onUpdateSpeed(newSpeed)
-                },
-                onSelectRepeat = { count ->
-                    repeatCount = count
-                    onUpdateRepeatCount(count)
-                },
                 onToggleFlexMode = { isManualFlexActive = false },
                 onSyncGitHub = onSyncGitHub,
                 isSyncing = isSyncing
@@ -468,18 +923,17 @@ fun Fold8AdaptiveApp(
                 activeSentence = currentActiveSentence,
                 isPlaying = isPlaying,
                 repeatCount = repeatCount,
-                speed = speed,
+                repeatSpeeds = repeatSpeeds,
+                onOpenSettings = { showSettingsDialog = true },
                 onSelectSentence = {
                     activeSentence = it
-                    onPlaySentence(it, repeatCount)
+                    onPlaySentence(it, repeatCount, repeatSpeeds)
                 },
-                onPlayAll = { onPlayAll(filteredSentences, repeatCount) },
+                onPlayAll = { onPlayAll(filteredSentences, repeatCount, repeatSpeeds) },
                 onTogglePlay = handleToggleOrPlayActive,
                 onStop = onStop,
                 onPrev = { handlePrevSentence() },
                 onNext = { handleNextSentence() },
-                onCycleRepeat = { handleRepeatCycle() },
-                onCycleSpeed = { handleSpeedCycle() },
                 onToggleFlexMode = { isManualFlexActive = true },
                 onSyncGitHub = onSyncGitHub,
                 isSyncing = isSyncing
@@ -502,15 +956,14 @@ fun CoverDisplayLayout(
     activeSentence: Sentence?,
     isPlaying: Boolean,
     repeatCount: Int,
-    speed: Float,
+    repeatSpeeds: List<Float>,
+    onOpenSettings: () -> Unit,
     showCoaching: Boolean,
     onToggleCoaching: () -> Unit,
     onSelectSentence: (Sentence) -> Unit,
     onPlayAll: () -> Unit,
     onTogglePlay: () -> Unit,
     onStop: () -> Unit,
-    onCycleRepeat: () -> Unit,
-    onCycleSpeed: () -> Unit,
     onPrevSentence: () -> Unit,
     onNextSentence: () -> Unit,
     isSyncing: Boolean = false,
@@ -635,11 +1088,10 @@ fun CoverDisplayLayout(
                             }
                         }
 
-                        RepeatSpeedBadges(
+                        RepeatSpeedSettingButton(
                             repeatCount = repeatCount,
-                            speed = speed,
-                            onCycleRepeat = onCycleRepeat,
-                            onCycleSpeed = onCycleSpeed,
+                            repeatSpeeds = repeatSpeeds,
+                            onClick = onOpenSettings,
                             isVertical = true
                         )
                     }
@@ -704,8 +1156,29 @@ fun CoverDisplayLayout(
                 }
             }
 
-            // Sentences Card List
+            // Sentences Card List with Auto-Centering on Playback
+            val listState = rememberLazyListState()
+
+            LaunchedEffect(activeSentence?.id, isPlaying) {
+                if (activeSentence != null && isPlaying) {
+                    val index = sentences.indexOfFirst { it.id == activeSentence.id }
+                    if (index >= 0) {
+                        val layoutInfo = listState.layoutInfo
+                        val viewportHeight = layoutInfo.viewportSize.height
+                        val itemInfo = layoutInfo.visibleItemsInfo.firstOrNull { it.index == index }
+                        val itemHeight = itemInfo?.size ?: 200
+                        val offset = if (viewportHeight > 0) -(viewportHeight / 2 - itemHeight / 2) else 0
+                        try {
+                            listState.animateScrollToItem(index, offset)
+                        } catch (_: Exception) {
+                            listState.scrollToItem(index, offset)
+                        }
+                    }
+                }
+            }
+
             LazyColumn(
+                state = listState,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 12.dp, vertical = 4.dp),
@@ -810,15 +1283,14 @@ fun MainDualPaneLayout(
     activeSentence: Sentence?,
     isPlaying: Boolean,
     repeatCount: Int,
-    speed: Float,
+    repeatSpeeds: List<Float>,
+    onOpenSettings: () -> Unit,
     onSelectSentence: (Sentence) -> Unit,
     onPlayAll: () -> Unit,
     onTogglePlay: () -> Unit,
     onStop: () -> Unit,
     onPrev: () -> Unit,
     onNext: () -> Unit,
-    onCycleRepeat: () -> Unit,
-    onCycleSpeed: () -> Unit,
     onToggleFlexMode: () -> Unit,
     isSyncing: Boolean = false,
     onSyncGitHub: () -> Unit
@@ -976,7 +1448,28 @@ fun MainDualPaneLayout(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
+                val listState = rememberLazyListState()
+
+                LaunchedEffect(activeSentence?.id, isPlaying) {
+                    if (activeSentence != null && isPlaying) {
+                        val index = sentences.indexOfFirst { it.id == activeSentence.id }
+                        if (index >= 0) {
+                            val layoutInfo = listState.layoutInfo
+                            val viewportHeight = layoutInfo.viewportSize.height
+                            val itemInfo = layoutInfo.visibleItemsInfo.firstOrNull { it.index == index }
+                            val itemHeight = itemInfo?.size ?: 100
+                            val offset = if (viewportHeight > 0) -(viewportHeight / 2 - itemHeight / 2) else 0
+                            try {
+                                listState.animateScrollToItem(index, offset)
+                            } catch (_: Exception) {
+                                listState.scrollToItem(index, offset)
+                            }
+                        }
+                    }
+                }
+
                 LazyColumn(
+                    state = listState,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.weight(1f)
                 ) {
@@ -1070,11 +1563,10 @@ fun MainDualPaneLayout(
                             )
                         }
 
-                        RepeatSpeedBadges(
+                        RepeatSpeedSettingButton(
                             repeatCount = repeatCount,
-                            speed = speed,
-                            onCycleRepeat = onCycleRepeat,
-                            onCycleSpeed = onCycleSpeed
+                            repeatSpeeds = repeatSpeeds,
+                            onClick = onOpenSettings
                         )
                     }
 
@@ -1184,14 +1676,13 @@ fun FlexModeLayout(
     sentences: List<Sentence>,
     isPlaying: Boolean,
     repeatCount: Int,
-    speed: Float,
+    repeatSpeeds: List<Float> = emptyList(),
+    onOpenSettings: () -> Unit = {},
     onTogglePlay: () -> Unit,
     onStop: () -> Unit,
     onPlaySentence: (Sentence) -> Unit,
     onPrev: () -> Unit,
     onNext: () -> Unit,
-    onSelectSpeed: (Float) -> Unit,
-    onSelectRepeat: (Int) -> Unit,
     onToggleFlexMode: () -> Unit,
     isSyncing: Boolean = false,
     onSyncGitHub: () -> Unit = {}
@@ -1409,40 +1900,70 @@ fun FlexModeLayout(
                             color = Color(0xFF94A3B8),
                             fontWeight = FontWeight.Medium
                         )
-                        Surface(
-                            color = Color(0xFF451A03),
-                            shape = RoundedCornerShape(6.dp),
-                            border = BorderStroke(1.dp, Color(0xFFF59E0B).copy(alpha = 0.5f))
-                        ) {
-                            Text(
-                                text = "반복 ${if (repeatCount >= 999) "무한" else "${repeatCount}회"} 선택됨",
-                                color = Color(0xFFFBBF24),
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-                            )
-                        }
+                        RepeatSpeedSettingButton(
+                            repeatCount = repeatCount,
+                            repeatSpeeds = repeatSpeeds,
+                            onClick = onOpenSettings
+                        )
                     }
 
-                    // Speed Selector Pills
-                    SelectionPillsRow(
-                        items = listOf(0.8f to "0.8x", 1.0f to "1.0x (보통)", 1.2f to "1.2x"),
-                        selectedItem = speed,
-                        onSelect = onSelectSpeed,
-                        selectedColor = Color(0xFF4F46E5),
-                        selectedBorderColor = Color(0xFF818CF8),
-                        heightDp = 36
-                    )
-
-                    // Repeat Count Selector Pills
-                    SelectionPillsRow(
-                        items = listOf(1 to "1회", 3 to "3회", 5 to "5회", 999 to "무한 🔁"),
-                        selectedItem = repeatCount,
-                        onSelect = onSelectRepeat,
-                        selectedColor = Color(0xFF047857),
-                        selectedBorderColor = Color(0xFF34D399),
-                        heightDp = 34
-                    )
+                    // Full-width prominent Repeat & Speed settings button in the center
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onOpenSettings() },
+                        color = Color(0xFF1E1B4B).copy(alpha = 0.6f),
+                        shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(1.dp, Color(0xFF4F46E5).copy(alpha = 0.5f))
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 14.dp, vertical = 10.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Default.Tune,
+                                    contentDescription = null,
+                                    tint = Color(0xFFA5B4FC),
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Column {
+                                    Text(
+                                        text = "반복 및 배속 상세 설정",
+                                        color = Color.White,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    val summary = if (repeatSpeeds.isNotEmpty()) {
+                                        val min = repeatSpeeds.minOrNull() ?: 1.0f
+                                        val max = repeatSpeeds.maxOrNull() ?: 1.0f
+                                        if (min == max) "${min}x 동일 속도" else "${min}x ~ ${max}x 점진 가속"
+                                    } else "1.0x 표준"
+                                    Text(
+                                        text = "회차별 맞춤 속도 ($summary)",
+                                        color = Color(0xFF94A3B8),
+                                        fontSize = 10.sp
+                                    )
+                                }
+                            }
+                            Surface(
+                                color = Color(0xFF312E81),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Text(
+                                    text = "설정 변경 ⚙️",
+                                    color = Color(0xFFC7D2FE),
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                )
+                            }
+                        }
+                    }
 
                     // Central Big Player Controls
                     Row(
