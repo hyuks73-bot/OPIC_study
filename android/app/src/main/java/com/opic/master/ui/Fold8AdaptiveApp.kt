@@ -145,6 +145,15 @@ fun Fold8AdaptiveApp(
         onUpdateSpeed(next)
     }
 
+    fun handleSelectDay(newDay: String) {
+        if (newDay != selectedDay) {
+            if (isPlaying || currentPlayingId != null) {
+                onStop()
+            }
+            selectedDay = newDay
+        }
+    }
+
     // Auto-update active sentence when playing or day changes
     LaunchedEffect(currentPlayingId, filteredSentences) {
         if (currentPlayingId != null) {
@@ -180,7 +189,7 @@ fun Fold8AdaptiveApp(
             // 1. Cover Display (Folded Compact Thumb-Zone 1248 x 1972)
             CoverDisplayLayout(
                 selectedDay = selectedDay,
-                onSelectDay = { selectedDay = it },
+                onSelectDay = { handleSelectDay(it) },
                 sentences = filteredSentences,
                 activeSentence = currentActiveSentence,
                 isPlaying = isPlaying,
@@ -207,7 +216,7 @@ fun Fold8AdaptiveApp(
             // 2. Flex Mode (Tabletop Posture 90° ~ 115° or Manual Toggle)
             FlexModeLayout(
                 selectedDay = selectedDay,
-                onSelectDay = { selectedDay = it },
+                onSelectDay = { handleSelectDay(it) },
                 activeSentence = currentActiveSentence,
                 sentences = filteredSentences,
                 isPlaying = isPlaying,
@@ -245,7 +254,7 @@ fun Fold8AdaptiveApp(
             // 3. Main Display (Unfolded Dual-Pane Studio 2448 x 1848)
             MainDualPaneLayout(
                 selectedDay = selectedDay,
-                onSelectDay = { selectedDay = it },
+                onSelectDay = { handleSelectDay(it) },
                 sentences = filteredSentences,
                 activeSentence = currentActiveSentence,
                 isPlaying = isPlaying,
