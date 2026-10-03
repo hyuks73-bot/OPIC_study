@@ -25,6 +25,16 @@ data class Sentence(
     val repeatCount: Int = 3
 )
 
+@Entity(tableName = "days")
+data class DayEntity(
+    @PrimaryKey
+    val dayKey: String,
+    val tabLabel: String,
+    val title: String,
+    val emoji: String = "📖",
+    val orderIndex: Int = 0
+)
+
 data class ManifestResponse(
     val version: String,
     val lastUpdated: String,

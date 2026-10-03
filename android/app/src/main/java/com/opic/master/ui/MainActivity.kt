@@ -40,6 +40,10 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val sentences by db.sentenceDao().getAllSentences().collectAsState(initial = emptyList())
+            val daysEntities by db.sentenceDao().getAllDays().collectAsState(initial = emptyList())
+            val days = remember(daysEntities) {
+                daysEntities.map { DayMeta(it.dayKey, it.tabLabel, it.title, it.emoji) }
+            }
             val isPlaying by PlaybackService.isPlayingFlow.collectAsState()
             val currentPlayingId by PlaybackService.currentPlayingSentenceId.collectAsState()
 
@@ -68,6 +72,7 @@ class MainActivity : ComponentActivity() {
 
             Fold8AdaptiveApp(
                 sentences = sentences,
+                days = days,
                 isUnfolded = isUnfolded,
                 isFlexMode = isFlexMode,
                 isPlaying = isPlaying,

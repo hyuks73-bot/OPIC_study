@@ -24,6 +24,12 @@ interface SentenceDao {
     @Query("UPDATE sentences SET localAudioPath = :localPath, isDownloaded = 1 WHERE id = :id")
     suspend fun updateAudioDownloaded(id: String, localPath: String)
 
+    @Query("SELECT * FROM days ORDER BY orderIndex ASC")
+    fun getAllDays(): Flow<List<DayEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertDays(days: List<DayEntity>)
+
     @Query("SELECT * FROM sentences")
     suspend fun getAllSentencesList(): List<Sentence>
 
@@ -31,7 +37,7 @@ interface SentenceDao {
     fun getDownloadedCount(): Flow<Int>
 }
 
-@Database(entities = [Sentence::class], version = 2, exportSchema = false)
+@Database(entities = [Sentence::class, DayEntity::class], version = 3, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun sentenceDao(): SentenceDao
 
@@ -53,12 +59,44 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        fun createDayEntity(dayKey: String, title: String, orderIndex: Int): DayEntity {
+            val num = dayKey.filter { it.isDigit() }
+            val tabLabel = if (num.isNotEmpty()) "Day $num" else dayKey.uppercase()
+            val emoji = when (dayKey) {
+                "day1" -> "📋"
+                "day2" -> "🌊"
+                "day3" -> "🏃"
+                "day4" -> "🎸"
+                "day5" -> "🚗"
+                "day6" -> "🏖️"
+                "day7" -> "💼"
+                "day8" -> "🍽️"
+                "day9" -> "🏥"
+                "day10" -> "✈️"
+                else -> "📖"
+            }
+            return DayEntity(
+                dayKey = dayKey,
+                tabLabel = tabLabel,
+                title = title,
+                emoji = emoji,
+                orderIndex = orderIndex
+            )
+        }
+
         suspend fun seedDatabaseIfEmpty(context: android.content.Context, dao: SentenceDao) {
             kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
                 if (dao.getSentenceById("day1_1") == null) {
                     try {
                         val jsonString = context.assets.open("data_manifest.json").bufferedReader().use { it.readText() }
                         val manifest = com.google.gson.Gson().fromJson(jsonString, com.opic.master.data.model.ManifestResponse::class.java)
+                        
+                        var dayOrderCounter = 0
+                        val dayEntities = manifest.days.map { (dayKey, dayData) ->
+                            createDayEntity(dayKey, dayData.title, dayOrderCounter++)
+                        }
+                        dao.insertDays(dayEntities)
+
                         var orderIndexCounter = 0
                         val list = manifest.days.flatMap { (dayKey, dayData) ->
                             dayData.sentences.map { item ->

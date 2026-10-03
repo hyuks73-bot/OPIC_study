@@ -40,7 +40,7 @@ data class DayMeta(
     val emoji: String
 )
 
-val APP_DAYS = listOf(
+val DEFAULT_DAYS = listOf(
     DayMeta("day1", "Day 1", "서베이 & 2룸 아파트", "📋"),
     DayMeta("day2", "Day 2", "수변 공원 & 침실 묘사", "🌊"),
     DayMeta("day3", "Day 3", "주말 루틴 & 자전거", "🏃"),
@@ -48,6 +48,12 @@ val APP_DAYS = listOf(
     DayMeta("day5", "Day 5", "렌터카 & 가족 여행", "🚗"),
     DayMeta("day6", "Day 6", "휴일 루틴 & 홈캉스", "🏖️")
 )
+
+fun naturalDayComparator(): Comparator<String> = Comparator { a, b ->
+    val numA = a.filter { it.isDigit() }.toIntOrNull() ?: 0
+    val numB = b.filter { it.isDigit() }.toIntOrNull() ?: 0
+    if (numA != numB) numA.compareTo(numB) else a.compareTo(b)
+}
 
 private val HTML_TAG_REGEX = Regex("<.*?>")
 private val SLASH_TAG_REGEX = Regex("<span class=\"slash\">/</span>")
@@ -86,6 +92,7 @@ fun naturalSentenceComparator(): Comparator<Sentence> = Comparator { a, b ->
 
 @Composable
 fun DaySelectorTabs(
+    days: List<DayMeta>,
     selectedDay: String,
     onSelectDay: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -97,7 +104,7 @@ fun DaySelectorTabs(
             .padding(horizontal = horizontalPadding.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(APP_DAYS) { meta ->
+        items(days) { meta ->
             val isSelected = selectedDay == meta.key
             Surface(
                 shape = CircleShape,
@@ -259,6 +266,7 @@ fun <T> SelectionPillsRow(
 @Composable
 fun Fold8AdaptiveApp(
     sentences: List<Sentence>,
+    days: List<DayMeta> = emptyList(),
     isUnfolded: Boolean,
     isFlexMode: Boolean,
     isPlaying: Boolean,
@@ -271,11 +279,34 @@ fun Fold8AdaptiveApp(
     onUpdateSpeed: (Float) -> Unit = {},
     onSyncGitHub: () -> Unit
 ) {
-    var selectedDay by remember { mutableStateOf("day1") }
+    val availableDays = remember(days, sentences) {
+        if (days.isNotEmpty()) {
+            days
+        } else if (sentences.isNotEmpty()) {
+            val distinctKeys = sentences.map { it.dayKey }.distinct().sortedWith(naturalDayComparator())
+            distinctKeys.map { key ->
+                DEFAULT_DAYS.find { it.key == key } ?: run {
+                    val num = key.filter { it.isDigit() }
+                    val label = if (num.isNotEmpty()) "Day $num" else key.uppercase()
+                    DayMeta(key, label, "$label 학습 세트", "📖")
+                }
+            }
+        } else {
+            DEFAULT_DAYS
+        }
+    }
+
+    var selectedDay by remember { mutableStateOf(availableDays.firstOrNull()?.key ?: "day1") }
     var activeSentence by remember { mutableStateOf<Sentence?>(null) }
     var speed by remember { mutableFloatStateOf(1.0f) }
     var repeatCount by remember { mutableIntStateOf(3) }
     var showCoaching by remember { mutableStateOf(true) }
+
+    LaunchedEffect(availableDays) {
+        if (availableDays.isNotEmpty() && availableDays.none { it.key == selectedDay }) {
+            selectedDay = availableDays.first().key
+        }
+    }
 
     val filteredSentences = remember(sentences, selectedDay) {
         sentences.filter { it.dayKey == selectedDay }
@@ -370,6 +401,7 @@ fun Fold8AdaptiveApp(
     when {
         !isUnfolded -> {
             CoverDisplayLayout(
+                availableDays = availableDays,
                 selectedDay = selectedDay,
                 onSelectDay = { handleSelectDay(it) },
                 sentences = filteredSentences,
@@ -395,6 +427,7 @@ fun Fold8AdaptiveApp(
         }
         isDisplayingFlex -> {
             FlexModeLayout(
+                availableDays = availableDays,
                 selectedDay = selectedDay,
                 onSelectDay = { handleSelectDay(it) },
                 activeSentence = currentActiveSentence,
@@ -423,6 +456,7 @@ fun Fold8AdaptiveApp(
         }
         else -> {
             MainDualPaneLayout(
+                availableDays = availableDays,
                 selectedDay = selectedDay,
                 onSelectDay = { handleSelectDay(it) },
                 sentences = filteredSentences,
@@ -455,6 +489,7 @@ fun Fold8AdaptiveApp(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoverDisplayLayout(
+    availableDays: List<DayMeta>,
     selectedDay: String,
     onSelectDay: (String) -> Unit,
     sentences: List<Sentence>,
@@ -474,7 +509,7 @@ fun CoverDisplayLayout(
     onNextSentence: () -> Unit,
     onSyncGitHub: () -> Unit
 ) {
-    val currentDayMeta = APP_DAYS.find { it.key == selectedDay } ?: APP_DAYS.first()
+    val currentDayMeta = availableDays.find { it.key == selectedDay } ?: availableDays.firstOrNull() ?: DEFAULT_DAYS.first()
 
     Scaffold(
         topBar = {
@@ -597,7 +632,7 @@ fun CoverDisplayLayout(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            DaySelectorTabs(selectedDay = selectedDay, onSelectDay = onSelectDay)
+            DaySelectorTabs(days = availableDays, selectedDay = selectedDay, onSelectDay = onSelectDay)
 
             // Play-All Bar & Coaching Toggle
             Surface(
@@ -747,6 +782,7 @@ fun CoverDisplayLayout(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainDualPaneLayout(
+    availableDays: List<DayMeta>,
     selectedDay: String,
     onSelectDay: (String) -> Unit,
     sentences: List<Sentence>,
@@ -765,7 +801,7 @@ fun MainDualPaneLayout(
     onToggleFlexMode: () -> Unit,
     onSyncGitHub: () -> Unit
 ) {
-    val currentDayMeta = APP_DAYS.find { it.key == selectedDay } ?: APP_DAYS.first()
+    val currentDayMeta = availableDays.find { it.key == selectedDay } ?: availableDays.firstOrNull() ?: DEFAULT_DAYS.first()
 
     Scaffold(
         topBar = {
@@ -849,7 +885,7 @@ fun MainDualPaneLayout(
                     .fillMaxHeight()
                     .padding(16.dp)
             ) {
-                DaySelectorTabs(selectedDay = selectedDay, onSelectDay = onSelectDay, horizontalPadding = 0)
+                DaySelectorTabs(days = availableDays, selectedDay = selectedDay, onSelectDay = onSelectDay, horizontalPadding = 0)
 
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -1101,6 +1137,7 @@ fun MainDualPaneLayout(
 
 @Composable
 fun FlexModeLayout(
+    availableDays: List<DayMeta>,
     selectedDay: String,
     onSelectDay: (String) -> Unit,
     activeSentence: Sentence?,
@@ -1158,7 +1195,7 @@ fun FlexModeLayout(
                         Text("📖 메인 대화면 전환", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
                     }
                 }
-                DaySelectorTabs(selectedDay = selectedDay, onSelectDay = onSelectDay, horizontalPadding = 16)
+                DaySelectorTabs(days = availableDays, selectedDay = selectedDay, onSelectDay = onSelectDay, horizontalPadding = 16)
                 Spacer(modifier = Modifier.height(4.dp))
             }
         }

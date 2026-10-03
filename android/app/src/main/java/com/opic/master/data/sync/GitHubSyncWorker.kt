@@ -94,7 +94,12 @@ class GitHubSyncWorker(
                 }
             }
 
-            // 4. Save to Room Database
+            // 4. Save Days and Sentences to Room Database
+            var dayOrderCounter = 0
+            val dayEntities = manifest.days.map { (dayKey, dayData) ->
+                AppDatabase.createDayEntity(dayKey, dayData.title, dayOrderCounter++)
+            }
+            dao.insertDays(dayEntities)
             dao.insertAll(sentenceEntities)
 
             Result.success()
