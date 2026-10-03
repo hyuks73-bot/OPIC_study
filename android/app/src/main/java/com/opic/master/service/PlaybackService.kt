@@ -237,6 +237,7 @@ class PlaybackService : MediaSessionService() {
                     player.pause()
                 } else if (player.playbackState == Player.STATE_ENDED) {
                     cancelShadowingPause()
+                    player.setPlaybackSpeed(repeatSpeeds.getOrElse(currentRepeat) { 1.0f })
                     player.seekTo(0)
                     player.play()
                 } else {
@@ -298,6 +299,7 @@ class PlaybackService : MediaSessionService() {
                     currentRepeat = 0
                     playCurrentPlaylistItem()
                 } else {
+                    player.setPlaybackSpeed(repeatSpeeds.getOrElse(currentRepeat) { 1.0f })
                     player.seekTo(0)
                 }
             }

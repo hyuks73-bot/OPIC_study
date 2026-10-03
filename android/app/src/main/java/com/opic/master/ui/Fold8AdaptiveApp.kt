@@ -8,7 +8,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import android.content.Context
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -37,6 +39,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.opic.master.data.model.Sentence
+import kotlinx.coroutines.flow.first
 
 // =========================================================================
 // DATA MODELS & PRECOMPILED REGEX UTILITIES (Optimized for Zero-GC in UI)
@@ -724,6 +727,27 @@ fun <T> SelectionPillsRow(
 }
 
 // =========================================================================
+// AUTO-SCROLL HELPER
+// =========================================================================
+
+/**
+ * Smoothly scrolls so the item at [index] sits in the vertical center of the viewport.
+ * If the item is off-screen it is first brought into view, then its actual measured
+ * size is used for the centering step (card heights vary with the coaching box).
+ */
+suspend fun LazyListState.centerOnItem(index: Int) {
+    if (layoutInfo.visibleItemsInfo.none { it.index == index }) {
+        animateScrollToItem(index)
+    }
+    val info = layoutInfo
+    val item = info.visibleItemsInfo.firstOrNull { it.index == index } ?: return
+    val viewportCenter = (info.viewportStartOffset + info.viewportEndOffset) / 2
+    val itemCenter = item.offset + item.size / 2
+    val delta = (itemCenter - viewportCenter).toFloat()
+    if (delta != 0f) animateScrollBy(delta)
+}
+
+// =========================================================================
 // MAIN ADAPTIVE APP CONTAINER (Galaxy Fold 8 Screen Posture Handler)
 // =========================================================================
 
@@ -1174,23 +1198,15 @@ fun CoverDisplayLayout(
 
             // Sentences Card List with Auto-Centering on Playback
             val listState = rememberLazyListState()
+            val latestIsPlaying by rememberUpdatedState(isPlaying)
 
-            LaunchedEffect(activeSentence?.id, isPlaying) {
-                if (activeSentence != null && isPlaying) {
-                    val index = sentences.indexOfFirst { it.id == activeSentence.id }
-                    if (index >= 0) {
-                        val layoutInfo = listState.layoutInfo
-                        val viewportHeight = layoutInfo.viewportSize.height
-                        val itemInfo = layoutInfo.visibleItemsInfo.firstOrNull { it.index == index }
-                        val itemHeight = itemInfo?.size ?: 200
-                        val offset = if (viewportHeight > 0) -(viewportHeight / 2 - itemHeight / 2) else 0
-                        try {
-                            listState.animateScrollToItem(index, offset)
-                        } catch (_: Exception) {
-                            listState.scrollToItem(index, offset)
-                        }
-                    }
-                }
+            // Keyed only on the sentence id: the 1.2s shadowing pause toggles isPlaying
+            // between repeats, which must not re-trigger the scroll.
+            LaunchedEffect(activeSentence?.id) {
+                val targetId = activeSentence?.id ?: return@LaunchedEffect
+                snapshotFlow { latestIsPlaying }.first { it }
+                val index = sentences.indexOfFirst { it.id == targetId }
+                if (index >= 0) listState.centerOnItem(index)
             }
 
             LazyColumn(
@@ -1465,23 +1481,15 @@ fun MainDualPaneLayout(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 val listState = rememberLazyListState()
+                val latestIsPlaying by rememberUpdatedState(isPlaying)
 
-                LaunchedEffect(activeSentence?.id, isPlaying) {
-                    if (activeSentence != null && isPlaying) {
-                        val index = sentences.indexOfFirst { it.id == activeSentence.id }
-                        if (index >= 0) {
-                            val layoutInfo = listState.layoutInfo
-                            val viewportHeight = layoutInfo.viewportSize.height
-                            val itemInfo = layoutInfo.visibleItemsInfo.firstOrNull { it.index == index }
-                            val itemHeight = itemInfo?.size ?: 100
-                            val offset = if (viewportHeight > 0) -(viewportHeight / 2 - itemHeight / 2) else 0
-                            try {
-                                listState.animateScrollToItem(index, offset)
-                            } catch (_: Exception) {
-                                listState.scrollToItem(index, offset)
-                            }
-                        }
-                    }
+                // Keyed only on the sentence id: the 1.2s shadowing pause toggles isPlaying
+                // between repeats, which must not re-trigger the scroll.
+                LaunchedEffect(activeSentence?.id) {
+                    val targetId = activeSentence?.id ?: return@LaunchedEffect
+                    snapshotFlow { latestIsPlaying }.first { it }
+                    val index = sentences.indexOfFirst { it.id == targetId }
+                    if (index >= 0) listState.centerOnItem(index)
                 }
 
                 LazyColumn(
@@ -1918,11 +1926,6 @@ fun FlexModeLayout(
                             color = Color(0xFF94A3B8),
                             fontWeight = FontWeight.Medium
                         )
-                        RepeatSpeedSettingButton(
-                            repeatCount = repeatCount,
-                            repeatSpeeds = repeatSpeeds,
-                            onClick = onOpenSettings
-                        )
                     }
 
                     // Full-width prominent Repeat & Speed settings button in the center
@@ -1962,7 +1965,7 @@ fun FlexModeLayout(
                                         if (min == max) "${min}x 동일 속도" else "${min}x ~ ${max}x 점진 가속"
                                     } else "1.0x 표준"
                                     Text(
-                                        text = "회차별 맞춤 속도 ($summary)",
+                                        text = "반복 ${repeatCount}회 · $summary",
                                         color = Color(0xFF94A3B8),
                                         fontSize = 10.sp
                                     )
