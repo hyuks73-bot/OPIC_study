@@ -2,6 +2,7 @@ package com.opic.master.ui
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -18,7 +19,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -53,6 +53,8 @@ fun Fold8AdaptiveApp(
     onPlaySentence: (Sentence, Int) -> Unit,
     onPlayAll: (List<Sentence>, Int) -> Unit,
     onTogglePlay: () -> Unit,
+    onStop: () -> Unit,
+    onUpdateRepeatCount: (Int) -> Unit,
     onPrev: () -> Unit,
     onNext: () -> Unit,
     onSyncGitHub: () -> Unit
@@ -66,6 +68,17 @@ fun Fold8AdaptiveApp(
 
     val filteredSentences = remember(sentences, selectedDay) {
         sentences.filter { it.dayKey == selectedDay }
+    }
+
+    fun handleRepeatCycle() {
+        val next = when (repeatCount) {
+            1 -> 3
+            3 -> 5
+            5 -> 999
+            else -> 1
+        }
+        repeatCount = next
+        onUpdateRepeatCount(next)
     }
 
     // Auto-update active sentence when playing or day changes
@@ -91,16 +104,10 @@ fun Fold8AdaptiveApp(
                 repeatCount = repeatCount,
                 isRecording = isRecording,
                 onTogglePlay = onTogglePlay,
+                onStop = onStop,
                 onPlayCurrent = { activeSentence?.let { onPlaySentence(it, repeatCount) } },
                 onToggleRecord = { isRecording = !isRecording },
-                onCycleRepeat = {
-                    repeatCount = when (repeatCount) {
-                        1 -> 3
-                        3 -> 5
-                        5 -> 999
-                        else -> 1
-                    }
-                }
+                onCycleRepeat = { handleRepeatCycle() }
             )
         }
         isUnfolded -> {
@@ -121,15 +128,9 @@ fun Fold8AdaptiveApp(
                 },
                 onPlayAll = { onPlayAll(filteredSentences, repeatCount) },
                 onTogglePlay = onTogglePlay,
+                onStop = onStop,
                 onToggleRecord = { isRecording = !isRecording },
-                onCycleRepeat = {
-                    repeatCount = when (repeatCount) {
-                        1 -> 3
-                        3 -> 5
-                        5 -> 999
-                        else -> 1
-                    }
-                },
+                onCycleRepeat = { handleRepeatCycle() },
                 onSyncGitHub = onSyncGitHub
             )
         }
@@ -151,14 +152,8 @@ fun Fold8AdaptiveApp(
                 },
                 onPlayAll = { onPlayAll(filteredSentences, repeatCount) },
                 onTogglePlay = onTogglePlay,
-                onCycleRepeat = {
-                    repeatCount = when (repeatCount) {
-                        1 -> 3
-                        3 -> 5
-                        5 -> 999
-                        else -> 1
-                    }
-                },
+                onStop = onStop,
+                onCycleRepeat = { handleRepeatCycle() },
                 onPrevSentence = onPrev,
                 onNextSentence = onNext,
                 onSyncGitHub = onSyncGitHub
@@ -185,6 +180,7 @@ fun CoverDisplayLayout(
     onSelectSentence: (Sentence) -> Unit,
     onPlayAll: () -> Unit,
     onTogglePlay: () -> Unit,
+    onStop: () -> Unit,
     onCycleRepeat: () -> Unit,
     onPrevSentence: () -> Unit,
     onNextSentence: () -> Unit,
@@ -243,11 +239,11 @@ fun CoverDisplayLayout(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 14.dp, vertical = 8.dp),
+                            .padding(horizontal = 10.dp, vertical = 8.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column(modifier = Modifier.width(100.dp)) {
+                        Column(modifier = Modifier.width(90.dp)) {
                             Text(
                                 text = activeSentence?.id?.uppercase() ?: "SENTENCE",
                                 color = Color(0xFFA5B4FC),
@@ -272,16 +268,17 @@ fun CoverDisplayLayout(
                             }
                         }
 
+                        // Central Player Controls: Prev, Play/Pause, Stop, Next
                         Row(
-                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            IconButton(onClick = onPrevSentence, modifier = Modifier.size(40.dp)) {
+                            IconButton(onClick = onPrevSentence, modifier = Modifier.size(36.dp)) {
                                 Icon(Icons.Default.SkipPrevious, contentDescription = "Prev", tint = Color.White)
                             }
                             FilledIconButton(
                                 onClick = onTogglePlay,
-                                modifier = Modifier.size(48.dp),
+                                modifier = Modifier.size(44.dp),
                                 colors = IconButtonDefaults.filledIconButtonColors(
                                     containerColor = Color(0xFF6366F1)
                                 )
@@ -290,10 +287,22 @@ fun CoverDisplayLayout(
                                     imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
                                     contentDescription = if (isPlaying) "Pause" else "Play",
                                     tint = Color.White,
-                                    modifier = Modifier.size(28.dp)
+                                    modifier = Modifier.size(24.dp)
                                 )
                             }
-                            IconButton(onClick = onNextSentence, modifier = Modifier.size(40.dp)) {
+                            // Stop Button
+                            IconButton(
+                                onClick = onStop,
+                                modifier = Modifier.size(36.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Stop,
+                                    contentDescription = "Stop",
+                                    tint = Color(0xFFEF4444),
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+                            IconButton(onClick = onNextSentence, modifier = Modifier.size(36.dp)) {
                                 Icon(Icons.Default.SkipNext, contentDescription = "Next", tint = Color.White)
                             }
                         }
@@ -349,14 +358,14 @@ fun CoverDisplayLayout(
                 }
             }
 
-            // 2. Tab Action & Play-All Bar (User Requested Feature)
+            // 2. Tab Action & Play-All Bar
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp, vertical = 4.dp),
                 color = Color(0xFF131D33),
                 shape = RoundedCornerShape(14.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF1E293B))
+                border = BorderStroke(1.dp, Color(0xFF1E293B))
             ) {
                 Row(
                     modifier = Modifier
@@ -492,7 +501,7 @@ fun CoverDisplayLayout(
                                 Surface(
                                     color = Color(0xFF0B1120),
                                     shape = RoundedCornerShape(8.dp),
-                                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF1E3A5F)),
+                                    border = BorderStroke(1.dp, Color(0xFF1E3A5F)),
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     Column(modifier = Modifier.padding(10.dp)) {
@@ -557,6 +566,7 @@ fun MainDualPaneLayout(
     onSelectSentence: (Sentence) -> Unit,
     onPlayAll: () -> Unit,
     onTogglePlay: () -> Unit,
+    onStop: () -> Unit,
     onToggleRecord: () -> Unit,
     onCycleRepeat: () -> Unit,
     onSyncGitHub: () -> Unit
@@ -627,7 +637,7 @@ fun MainDualPaneLayout(
         },
         containerColor = Color(0xFF0B1120)
     ) { innerPadding ->
-        // Use padding from Scaffold and navigationBarsPadding so bottom action buttons are NEVER cut off!
+        // Safe Insets: innerPadding from Scaffold + navigationBarsPadding()
         Row(
             modifier = Modifier
                 .fillMaxSize()
@@ -671,7 +681,7 @@ fun MainDualPaneLayout(
                     modifier = Modifier.fillMaxWidth(),
                     color = Color(0xFF1E1B4B),
                     shape = RoundedCornerShape(14.dp),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF3730A3))
+                    border = BorderStroke(1.dp, Color(0xFF3730A3))
                 ) {
                     Row(
                         modifier = Modifier.padding(14.dp),
@@ -726,7 +736,7 @@ fun MainDualPaneLayout(
                         Surface(
                             color = if (isThisPlaying) Color(0xFF1E1B4B) else if (isSelected) Color(0xFF1E293B) else Color(0xFF0F172A),
                             shape = RoundedCornerShape(10.dp),
-                            border = androidx.compose.foundation.BorderStroke(
+                            border = BorderStroke(
                                 width = if (isThisPlaying) 2.dp else if (isSelected) 1.dp else 0.dp,
                                 color = if (isThisPlaying) Color(0xFF6366F1) else if (isSelected) Color(0xFF475569) else Color.Transparent
                             ),
@@ -845,7 +855,7 @@ fun MainDualPaneLayout(
                     Surface(
                         color = Color(0xFF131D33),
                         shape = RoundedCornerShape(16.dp),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF1E293B)),
+                        border = BorderStroke(1.dp, Color(0xFF1E293B)),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Column(modifier = Modifier.padding(18.dp)) {
@@ -872,7 +882,7 @@ fun MainDualPaneLayout(
                     Surface(
                         color = Color(0xFF0B1120),
                         shape = RoundedCornerShape(12.dp),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF1E3A5F)),
+                        border = BorderStroke(1.dp, Color(0xFF1E3A5F)),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Column(modifier = Modifier.padding(14.dp)) {
@@ -904,18 +914,19 @@ fun MainDualPaneLayout(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Animated Waveform Equalizer (Matches Mockup)
+                    // Animated Waveform Equalizer
                     WaveformVisualizerCard(isPlaying = isPlaying)
                 }
 
-                // Bottom Interactive Action Buttons (Fully padded against system navigation bar)
+                // Bottom Interactive Action Buttons (Play/Pause, Stop, Record)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    // Play / Pause Button
                     Button(
                         onClick = onTogglePlay,
-                        modifier = Modifier.weight(1f).height(46.dp),
+                        modifier = Modifier.weight(1.2f).height(46.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (isPlaying) Color(0xFF4338CA) else Color(0xFF6366F1)
                         ),
@@ -924,16 +935,41 @@ fun MainDualPaneLayout(
                         Icon(
                             imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
                             contentDescription = null,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(18.dp)
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = if (isPlaying) "일시 정지" else "🔊 원어민 재생",
-                            fontSize = 13.sp,
+                            fontSize = 12.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
 
+                    // Stop Button
+                    Button(
+                        onClick = onStop,
+                        modifier = Modifier.weight(0.8f).height(46.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF1E293B)
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Stop,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                            tint = Color(0xFFEF4444)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "정지",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    }
+
+                    // Shadowing Record Button
                     Button(
                         onClick = onToggleRecord,
                         modifier = Modifier.weight(1f).height(46.dp),
@@ -945,12 +981,12 @@ fun MainDualPaneLayout(
                         Icon(
                             imageVector = Icons.Default.Mic,
                             contentDescription = null,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(18.dp)
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = if (isRecording) "녹음 중지" else "🎙️ 섀도잉 녹음",
-                            fontSize = 13.sp,
+                            text = if (isRecording) "녹음 중지" else "🎙️ 섀도잉",
+                            fontSize = 12.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -970,6 +1006,7 @@ fun FlexModeLayout(
     repeatCount: Int,
     isRecording: Boolean,
     onTogglePlay: () -> Unit,
+    onStop: () -> Unit,
     onPlayCurrent: () -> Unit,
     onToggleRecord: () -> Unit,
     onCycleRepeat: () -> Unit
@@ -1046,22 +1083,37 @@ fun FlexModeLayout(
         ) {
             WaveformVisualizerCard(isPlaying = isPlaying)
 
-            Row(horizontalArrangement = Arrangement.spacedBy(20.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                // Play / Pause
                 FilledIconButton(
                     onClick = onTogglePlay,
-                    modifier = Modifier.size(64.dp),
+                    modifier = Modifier.size(60.dp),
                     colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color(0xFF6366F1))
                 ) {
                     Icon(
                         imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
                         contentDescription = "Play/Pause",
-                        modifier = Modifier.size(34.dp),
+                        modifier = Modifier.size(32.dp),
                         tint = Color.White
                     )
                 }
+                // Stop
+                FilledIconButton(
+                    onClick = onStop,
+                    modifier = Modifier.size(60.dp),
+                    colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color(0xFF1E293B))
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Stop,
+                        contentDescription = "Stop",
+                        modifier = Modifier.size(32.dp),
+                        tint = Color(0xFFEF4444)
+                    )
+                }
+                // Mic Record
                 FilledIconButton(
                     onClick = onToggleRecord,
-                    modifier = Modifier.size(64.dp),
+                    modifier = Modifier.size(60.dp),
                     colors = IconButtonDefaults.filledIconButtonColors(
                         containerColor = if (isRecording) Color(0xFFDC2626) else Color(0xFFEF4444)
                     )
@@ -1069,7 +1121,7 @@ fun FlexModeLayout(
                     Icon(
                         imageVector = Icons.Default.Mic,
                         contentDescription = "Record",
-                        modifier = Modifier.size(34.dp),
+                        modifier = Modifier.size(32.dp),
                         tint = Color.White
                     )
                 }
@@ -1100,7 +1152,7 @@ fun WaveformVisualizerCard(isPlaying: Boolean) {
     Surface(
         color = Color(0xFF0B1120),
         shape = RoundedCornerShape(12.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF1E293B)),
+        border = BorderStroke(1.dp, Color(0xFF1E293B)),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(12.dp)) {

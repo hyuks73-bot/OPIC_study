@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.window.layout.FoldingFeature
 import androidx.window.layout.WindowInfoTracker
 import androidx.work.OneTimeWorkRequestBuilder
@@ -32,26 +33,29 @@ class MainActivity : ComponentActivity() {
             val isPlaying by PlaybackService.isPlayingFlow.collectAsState()
             val currentPlayingId by PlaybackService.currentPlayingSentenceId.collectAsState()
 
-            var isUnfolded by remember { mutableStateOf(false) }
-            var isFlexMode by remember { mutableStateOf(false) }
+            // Real-time Galaxy Fold 8 screen configuration & hinge tracking
+            val configuration = LocalConfiguration.current
+            val screenWidthDp = configuration.screenWidthDp
 
-            // 2. Track Fold 8 Fold/Unfold & Hinge Posture via Jetpack WindowInfoTracker
+            var foldingFeatureState by remember { mutableStateOf<FoldingFeature.State?>(null) }
+
+            // 2. Track Fold 8 Hinge Posture via Jetpack WindowInfoTracker
             LaunchedEffect(Unit) {
                 WindowInfoTracker.getOrCreate(this@MainActivity)
                     .windowLayoutInfo(this@MainActivity)
                     .collectLatest { layoutInfo ->
                         val foldFeature = layoutInfo.displayFeatures.filterIsInstance<FoldingFeature>().firstOrNull()
-                        if (foldFeature != null) {
-                            isUnfolded = true
-                            isFlexMode = foldFeature.state == FoldingFeature.State.HALF_OPENED
-                        } else {
-                            // If width is wide (> 600dp), it is the unfolded main screen
-                            val widthDp = resources.configuration.screenWidthDp
-                            isUnfolded = widthDp > 600
-                            isFlexMode = false
-                        }
+                        foldingFeatureState = foldFeature?.state
                     }
             }
+
+            // Reliable posture evaluation:
+            // - If screen width is narrow (< 600dp), it is ALWAYS the Cover Screen (Folded)
+            // - If screen width is wide (>= 600dp) and half-opened, it is Flex Mode
+            // - If screen width is wide (>= 600dp) and flat, it is Unfolded Dual Pane
+            val isCoverScreen = screenWidthDp < 600
+            val isFlexMode = !isCoverScreen && (foldingFeatureState == FoldingFeature.State.HALF_OPENED)
+            val isUnfolded = !isCoverScreen && !isFlexMode
 
             Fold8AdaptiveApp(
                 sentences = sentences,
@@ -67,6 +71,12 @@ class MainActivity : ComponentActivity() {
                 },
                 onTogglePlay = {
                     togglePlayback()
+                },
+                onStop = {
+                    stopPlayback()
+                },
+                onUpdateRepeatCount = { newRepeat ->
+                    updateRepeatCount(newRepeat)
                 },
                 onPrev = {
                     val intent = Intent(this, PlaybackService::class.java).apply {
@@ -123,6 +133,21 @@ class MainActivity : ComponentActivity() {
     private fun togglePlayback() {
         val intent = Intent(this, PlaybackService::class.java).apply {
             action = PlaybackService.ACTION_TOGGLE_PLAY
+        }
+        startService(intent)
+    }
+
+    private fun stopPlayback() {
+        val intent = Intent(this, PlaybackService::class.java).apply {
+            action = PlaybackService.ACTION_STOP
+        }
+        startService(intent)
+    }
+
+    private fun updateRepeatCount(repeatCount: Int) {
+        val intent = Intent(this, PlaybackService::class.java).apply {
+            action = PlaybackService.ACTION_UPDATE_REPEAT_COUNT
+            putExtra(PlaybackService.EXTRA_REPEAT_COUNT, repeatCount)
         }
         startService(intent)
     }

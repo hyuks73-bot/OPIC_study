@@ -42,6 +42,8 @@ class PlaybackService : MediaSessionService() {
         const val ACTION_PLAY_SENTENCE = "ACTION_PLAY_SENTENCE"
         const val ACTION_PLAY_ALL = "ACTION_PLAY_ALL"
         const val ACTION_TOGGLE_PLAY = "ACTION_TOGGLE_PLAY"
+        const val ACTION_STOP = "ACTION_STOP"
+        const val ACTION_UPDATE_REPEAT_COUNT = "ACTION_UPDATE_REPEAT_COUNT"
         const val ACTION_PAUSE = "ACTION_PAUSE"
         const val ACTION_RESUME = "ACTION_RESUME"
         const val ACTION_PREV = "ACTION_PREV"
@@ -198,6 +200,29 @@ class PlaybackService : MediaSessionService() {
                 } else {
                     player.play()
                     _isPlayingFlow.value = true
+                }
+            }
+
+            ACTION_STOP -> {
+                isShadowingPauseActive = false
+                isPlaylistMode = false
+                currentRepeat = 0
+                player.stop()
+                player.clearMediaItems()
+                _isPlayingFlow.value = false
+                _currentPlayingSentenceId.value = null
+                _currentPlayingTitle.value = ""
+                _currentRepeatFlow.value = 1
+                stopForeground(STOP_FOREGROUND_REMOVE)
+            }
+
+            ACTION_UPDATE_REPEAT_COUNT -> {
+                val newCount = intent.getIntExtra(EXTRA_REPEAT_COUNT, 3)
+                repeatTargetCount = newCount
+                if (player.isPlaying) {
+                    val sub = if (isPlaylistMode) "탭 전체 재생 [${currentPlaylistIndex + 1}/${playlistPaths.size}] · 반복 ${repeatTargetCount}회" else "반복: ${repeatTargetCount}회 · 화면 꺼짐 연속 재생"
+                    val manager = getSystemService(NotificationManager::class.java)
+                    manager.notify(NOTIFICATION_ID, buildNotification(_currentPlayingTitle.value, sub))
                 }
             }
 
