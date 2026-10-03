@@ -1,6 +1,7 @@
 package com.opic.master.data.local
 
 import androidx.room.*
+import com.opic.master.data.model.DayEntity
 import com.opic.master.data.model.Sentence
 import kotlinx.coroutines.flow.Flow
 

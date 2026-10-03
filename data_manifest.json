@@ -1,7 +1,7 @@
 {
   "version": "1.7.0",
   "last_updated": "2026-10-03",
-  "total_sentences": 65,
+  "total_sentences": 75,
   "days": {
     "day1": {
       "title": "Day 1: 서베이 전략 & 기초 입트기",
@@ -615,6 +615,101 @@
           "tip": "[마무리 표현] to wrap it up ➔ [투 래-피-덥] | [숙어] recharge my batteries ➔ [리-차-ㄹ지 마이 배-터-리즈]",
           "audio_url": "audio/day6_holiday_6.mp3",
           "image_url": "images/day6_holiday_6.jpg"
+        }
+      ]
+    },
+    "day7": {
+      "title": "🎭 Day 7 롤플레이",
+      "sentences": [
+        {
+          "id": "day7_rp1_1",
+          "en": "Hey Min-su, it's Hyuk! <mark>Do you have a minute to talk?</mark> I was wondering if you're <mark>free this Saturday morning</mark>.",
+          "ko": "민수야 안녕, 나 혁이야! 잠깐 통화할 시간 돼? 이번 주 토요일 아침에 시간 괜찮은지 궁금해서 전화했어.",
+          "guide": "Hey Min-su, <span class=\"slash\">/</span> it's Hyuk! <span class=\"slash\">/</span> <strong>Do you have a MINute to talk?</strong> <span class=\"slash\">/</span> I was <strong>WONdering</strong> <span class=\"slash\">/</span> if you're <strong>FREE this Saturday morning</strong>.",
+          "tip": "[전화 오프닝] Do you have a minute to talk? [두유해버-미닛투-톡] | I was wondering if ~ [아이워즈-원더링-이프: ~인지 궁금해서]",
+          "audio_url": "audio/day7_rp1_1.mp3",
+          "image_url": "images/day7_rp1_1.jpg"
+        },
+        {
+          "id": "day7_rp1_2",
+          "en": "You know the <mark>waterfront park near my place</mark>? The weather is supposed to be amazing, so I was thinking of going there for a <mark>light jog and a walk</mark>.",
+          "ko": "우리 집 근처 수변 공원 알지? 날씨가 정말 좋을 거라고 해서, 가볍게 조깅도 하고 산책이나 하러 갈까 생각 중이었거든.",
+          "guide": "You know the <strong>WAterfront park</strong> near my place? <span class=\"slash\">/</span> The <strong>WEATHer is supposed to be aMAZing</strong>, <span class=\"slash\">/</span> so I was thinking of going there <span class=\"slash\">/</span> for a <strong>LIGHT JOG and a walk</strong>.",
+          "tip": "[제안 표현] I was thinking of ~ing [아이워즈-띵킹-오브: ~할까 생각 중이었어] | supposed to be [서포우스-투비: ~하기로 되어 있다]",
+          "audio_url": "audio/day7_rp1_2.mp3",
+          "image_url": "images/day7_rp1_2.jpg"
+        },
+        {
+          "id": "day7_rp1_3",
+          "en": "<mark>What time works best for you?</mark> Would <mark>around 9 or 10 in the morning</mark> be okay?",
+          "ko": "몇 시에 만나는 게 제일 편해? 아침 9시나 10시쯤 괜찮을까?",
+          "guide": "<strong>WHAT TIME works best for you?</strong> <span class=\"slash\">/</span> Would <strong>around NINE or TEN in the morning</strong> be okay?",
+          "tip": "[시간 묻기] What time works best for you? [왓타임 웍스 베스-포유: 언제가 제일 편해?] | Would ~ be okay? [우쥬~ 비 오케이?]",
+          "audio_url": "audio/day7_rp1_3.mp3",
+          "image_url": "images/day7_rp1_3.jpg"
+        },
+        {
+          "id": "day7_rp1_4",
+          "en": "Also, after running, <mark>how about grabbing some brunch</mark> or a <mark>cup of coffee nearby</mark>?",
+          "ko": "그리고 달리기 끝나고 나서, 근처에서 브런치 먹거나 커피 한잔하는 건 어때?",
+          "guide": "Also, <strong>AFter running</strong>, <span class=\"slash\">/</span> <strong>HOW aBOUT grabbing some brunch</strong> <span class=\"slash\">/</span> or a <strong>CUP of COFfee nearby</strong>?",
+          "tip": "[캐주얼 제안] grab brunch/coffee [그랩 브런치 / 컵 오브 커피: 간단히 먹다/마시다] | How about ~ing [하우 어바웃 ~잉]",
+          "audio_url": "audio/day7_rp1_4.mp3",
+          "image_url": "images/day7_rp1_4.jpg"
+        },
+        {
+          "id": "day7_rp1_5",
+          "en": "Oh, and <mark>should I pick you up in my car</mark>, or do you want to <mark>meet directly at the park entrance</mark>? Give me a call back, bye!",
+          "ko": "아, 그리고 내가 차로 너 데리러 갈까, 아니면 공원 입구에서 바로 만날래? 확인하면 전화 줘, 안녕!",
+          "guide": "Oh, and <strong>SHOULD I PICK you up in my car</strong>, <span class=\"slash\">/</span> or do you want to <strong>MEET diRECTly at the park ENtrance</strong>? <span class=\"slash\">/</span> <strong>Give me a call back</strong>, bye!",
+          "tip": "[교통/픽업] pick you up [피큐업: 차로 태우러 가다] | meet directly [밋 디렉틀리: 바로 만나다] | Give me a call back [기브미 어 콜백]",
+          "audio_url": "audio/day7_rp1_5.mp3",
+          "image_url": "images/day7_rp1_5.jpg"
+        },
+        {
+          "id": "day7_rp2_1",
+          "en": "Hey Min-su, it's Hyuk again. <mark>I'm really sorry, but something unexpected just came up</mark> and <mark>I don't think I can make it</mark> to the park tomorrow morning.",
+          "ko": "민수야, 나 혁이야. 정말 미안한데 갑자기 예기치 못한 일이 생겨서 내일 아침에 공원에 못 갈 것 같아.",
+          "guide": "Hey Min-su, it's Hyuk again. <span class=\"slash\">/</span> <strong>I'm REALly SORry</strong>, <span class=\"slash\">/</span> but <strong>something unexPECTed just came up</strong> <span class=\"slash\">/</span> and <strong>I DON'T think I can make it</strong> <span class=\"slash\">/</span> to the park tomorrow morning.",
+          "tip": "[문제 발생 필수 표현] something unexpected just came up [썸띵 언익스펙티드 저스트 케임업] | I don't think I can make it [메이킷: 가다/참석하다]",
+          "audio_url": "audio/day7_rp2_1.mp3",
+          "image_url": "images/day7_rp2_1.jpg"
+        },
+        {
+          "id": "day7_rp2_2",
+          "en": "My mother just called and <mark>asked me to help her with an urgent family errand</mark>, so I have to go over there.",
+          "ko": "방금 어머니한테 전화가 왔는데, 급한 집안일을 좀 도와달라고 하셔서 거기에 다녀와야 할 것 같아.",
+          "guide": "My mother just called <span class=\"slash\">/</span> and <strong>ASKED me to help her</strong> <span class=\"slash\">/</span> with an <strong>URgent FAMily errand</strong>, <span class=\"slash\">/</span> so <strong>I have to GO OVER there</strong>.",
+          "tip": "[사유 설명] urgent family errand [얼전트 패밀리 에런드: 급한 집안 심부름/볼일] | have to go over there [거기로 가봐야 해]",
+          "audio_url": "audio/day7_rp2_2.mp3",
+          "image_url": "images/day7_rp2_2.jpg"
+        },
+        {
+          "id": "day7_rp2_3",
+          "en": "I feel so bad about this! First of all, <mark>would you be available on Sunday morning instead</mark>? The weather looks great on Sunday as well.",
+          "ko": "정말 미안해! 우선 혹시 내일 대신 일요일 아침에 시간 괜찮을까? 일요일도 날씨가 아주 좋다고 해.",
+          "guide": "<strong>I feel so BAD about this!</strong> <span class=\"slash\">/</span> First of all, <span class=\"slash\">/</span> <strong>would you be aVAILable on Sunday morning inSTEAD?</strong> <span class=\"slash\">/</span> The weather looks great on Sunday as well.",
+          "tip": "[대안 1 질문] Would you be available on ~ instead? [우쥬비 어베일러블 온 ~ 인스테드?] | feel bad [미안하게 생각하다]",
+          "audio_url": "audio/day7_rp2_3.mp3",
+          "image_url": "images/day7_rp2_3.jpg"
+        },
+        {
+          "id": "day7_rp2_4",
+          "en": "If Sunday doesn't work for you, <mark>how about meeting up late tomorrow afternoon</mark> around 5 PM after I finish my errand?",
+          "ko": "만약 일요일이 안 된다면, 내일 볼일을 다 마친 후 늦은 오후 5시쯤 만나는 건 어때?",
+          "guide": "If Sunday doesn't work for you, <span class=\"slash\">/</span> <strong>HOW aBOUT meeting up</strong> <span class=\"slash\">/</span> <strong>LATE tomorrow AFternoon around 5 p.m.</strong> <span class=\"slash\">/</span> after I finish my errand?",
+          "tip": "[대안 2 제안] If ~ doesn't work for you [이프 ~ 더즌 웍 포유: ~가 안 된다면] | late afternoon [늦은 오후]",
+          "audio_url": "audio/day7_rp2_4.mp3",
+          "image_url": "images/day7_rp2_4.jpg"
+        },
+        {
+          "id": "day7_rp2_5",
+          "en": "Whichever time works for you, <mark>I'll definitely treat you to a delicious lunch and coffee</mark> to <mark>make it up to you</mark>. Let me know!",
+          "ko": "둘 중 언제든 너 편한 시간에 맞출게, 미안한 마음을 갚을 수 있게 맛있는 점심이랑 커피는 내가 꼭 살게. 어떻게 생각하는지 알려줘!",
+          "guide": "<strong>WHICHever time works for you</strong>, <span class=\"slash\">/</span> <strong>I'll DEFinitely TREAT you</strong> <span class=\"slash\">/</span> to a <strong>deLIcious LUNCH and coffee</strong> <span class=\"slash\">/</span> to <strong>MAKE IT UP to you</strong>. <span class=\"slash\">/</span> Let me know!",
+          "tip": "[고급 보상 표현] treat you to [트릿 유 투: 밥/커피를 사다] | make it up to you [메이킷 업투유: 만회하다/보상하다]",
+          "audio_url": "audio/day7_rp2_5.mp3",
+          "image_url": "images/day7_rp2_5.jpg"
         }
       ]
     }
