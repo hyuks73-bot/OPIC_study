@@ -59,11 +59,53 @@
       position: sticky;
       top: 0;
       z-index: 1000;
-      background: rgba(11, 17, 32, 0.94);
+      background: rgba(11, 17, 32, 0.95);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
-      padding: 8px 0;
+      padding: 6px 0;
+    }
+
+    .nav-tabs-inner {
+      display: flex;
+      align-items: center;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 0 6px;
+      box-sizing: border-box;
+      gap: 6px;
+    }
+
+    .nav-scroll-btn {
+      flex: 0 0 32px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(30, 41, 59, 0.9);
+      border: 1px solid var(--border);
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      padding: 0;
+      touch-action: manipulation;
+    }
+
+    .nav-scroll-btn:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .nav-scroll-btn:active {
+      transform: scale(0.92);
     }
 
     .nav-tabs {
@@ -71,15 +113,36 @@
       gap: 8px;
       overflow-x: auto;
       white-space: nowrap;
-      padding: 4px 14px;
+      padding: 4px 6px 8px;
       -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-      max-width: 900px;
-      margin: 0 auto;
+      touch-action: pan-x;
+      overscroll-behavior-x: contain;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(99, 102, 241, 0.7) rgba(15, 23, 42, 0.6);
+      flex: 1 1 auto;
+      scroll-behavior: smooth;
+      box-sizing: border-box;
     }
 
+    /* Modern visible scrollbar indicator */
     .nav-tabs::-webkit-scrollbar {
-      display: none;
+      height: 6px;
+      display: block;
+    }
+
+    .nav-tabs::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 9999px;
+      margin: 0 10px;
+    }
+
+    .nav-tabs::-webkit-scrollbar-thumb {
+      background: rgba(99, 102, 241, 0.7);
+      border-radius: 9999px;
+    }
+
+    .nav-tabs::-webkit-scrollbar-thumb:hover {
+      background: var(--primary);
     }
 
     .tab-btn {
@@ -513,14 +576,18 @@
 
   <!-- Mobile Sticky Horizontal Scrollable Tabs -->
   <div class="nav-tabs-wrapper">
-    <div class="nav-tabs">
-      <button class="tab-btn active" onclick="switchTab('day1')">📋 Day 1 서베이 전략</button>
-      <button class="tab-btn" onclick="switchTab('day2')">🗣️ Day 2 묘사 패턴</button>
-      <button class="tab-btn" onclick="switchTab('day3')">⏱️ Day 3 루틴 패턴</button>
-      <button class="tab-btn" onclick="switchTab('day4')">💬 Day 4 과거 경험</button>
-      <button class="tab-btn" onclick="switchTab('day5')">✈️ Day 5 해외 여행</button>
-      <button class="tab-btn" onclick="switchTab('day6')">🏖️ Day 6 휴일 루틴</button>
-      <button class="tab-btn" onclick="switchTab('day7')">🎭 Day 7 롤플레이</button>
+    <div class="nav-tabs-inner">
+      <button class="nav-scroll-btn" onclick="scrollTabs(-220)" title="이전 Day 보기" aria-label="이전 Day">◀</button>
+      <div class="nav-tabs" id="navTabsContainer">
+        <button class="tab-btn active" onclick="switchTab('day1')">📋 Day 1 서베이 전략</button>
+        <button class="tab-btn" onclick="switchTab('day2')">🗣️ Day 2 묘사 패턴</button>
+        <button class="tab-btn" onclick="switchTab('day3')">⏱️ Day 3 루틴 패턴</button>
+        <button class="tab-btn" onclick="switchTab('day4')">💬 Day 4 과거 경험</button>
+        <button class="tab-btn" onclick="switchTab('day5')">✈️ Day 5 해외 여행</button>
+        <button class="tab-btn" onclick="switchTab('day6')">🏖️ Day 6 휴일 루틴</button>
+        <button class="tab-btn" onclick="switchTab('day7')">🎭 Day 7 롤플레이</button>
+      </div>
+      <button class="nav-scroll-btn" onclick="scrollTabs(220)" title="다음 Day 보기" aria-label="다음 Day">▶</button>
     </div>
   </div>
 
@@ -1662,15 +1729,35 @@
       } catch (e) {}
     }
 
+    // Smooth Horizontal Scroll helper for Nav Tabs
+    function scrollTabs(offset) {
+      const navContainer = document.getElementById('navTabsContainer');
+      if (navContainer) {
+        navContainer.scrollBy({ left: offset, behavior: 'smooth' });
+      }
+    }
+
     // Tab Navigation
     function switchTab(tabId) {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
       
-      const targetBtn = (window.event && window.event.target) ? window.event.target : document.querySelector(`[onclick="switchTab('${tabId}')"]`);
+      const targetBtn = (window.event && window.event.target && window.event.target.classList.contains('tab-btn')) 
+        ? window.event.target 
+        : document.querySelector(`[onclick="switchTab('${tabId}')"]`);
+      
       if (targetBtn) {
         targetBtn.classList.add('active');
-        targetBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        const navContainer = document.getElementById('navTabsContainer');
+        if (navContainer) {
+          const btnLeft = targetBtn.offsetLeft;
+          const btnWidth = targetBtn.offsetWidth;
+          const containerWidth = navContainer.clientWidth;
+          navContainer.scrollTo({
+            left: btnLeft - (containerWidth / 2) + (btnWidth / 2),
+            behavior: 'smooth'
+          });
+        }
       }
       const targetContent = document.getElementById(tabId);
       if (targetContent) targetContent.classList.add('active');
@@ -1962,6 +2049,17 @@
 
     // Initial page load: Only initialize active tab (Day 1) to conserve mobile data
     initTab('day1');
+
+    // Horizontal wheel scroll listener for desktop / touchpad users
+    const navTabsEl = document.getElementById('navTabsContainer');
+    if (navTabsEl) {
+      navTabsEl.addEventListener('wheel', (e) => {
+        if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+          e.preventDefault();
+          navTabsEl.scrollLeft += e.deltaY;
+        }
+      }, { passive: false });
+    }
   </script>
 </body>
 </html>
