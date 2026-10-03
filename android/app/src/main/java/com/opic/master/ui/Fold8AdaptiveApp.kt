@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -277,6 +278,7 @@ fun Fold8AdaptiveApp(
     onStop: () -> Unit,
     onUpdateRepeatCount: (Int) -> Unit,
     onUpdateSpeed: (Float) -> Unit = {},
+    isSyncing: Boolean = false,
     onSyncGitHub: () -> Unit
 ) {
     val availableDays = remember(days, sentences) {
@@ -422,7 +424,8 @@ fun Fold8AdaptiveApp(
                 onCycleSpeed = { handleSpeedCycle() },
                 onPrevSentence = { handlePrevSentence() },
                 onNextSentence = { handleNextSentence() },
-                onSyncGitHub = onSyncGitHub
+                onSyncGitHub = onSyncGitHub,
+                isSyncing = isSyncing
             )
         }
         isDisplayingFlex -> {
@@ -451,7 +454,9 @@ fun Fold8AdaptiveApp(
                     repeatCount = count
                     onUpdateRepeatCount(count)
                 },
-                onToggleFlexMode = { isManualFlexActive = false }
+                onToggleFlexMode = { isManualFlexActive = false },
+                onSyncGitHub = onSyncGitHub,
+                isSyncing = isSyncing
             )
         }
         else -> {
@@ -476,7 +481,8 @@ fun Fold8AdaptiveApp(
                 onCycleRepeat = { handleRepeatCycle() },
                 onCycleSpeed = { handleSpeedCycle() },
                 onToggleFlexMode = { isManualFlexActive = true },
-                onSyncGitHub = onSyncGitHub
+                onSyncGitHub = onSyncGitHub,
+                isSyncing = isSyncing
             )
         }
     }
@@ -507,6 +513,7 @@ fun CoverDisplayLayout(
     onCycleSpeed: () -> Unit,
     onPrevSentence: () -> Unit,
     onNextSentence: () -> Unit,
+    isSyncing: Boolean = false,
     onSyncGitHub: () -> Unit
 ) {
     val currentDayMeta = availableDays.find { it.key == selectedDay } ?: availableDays.firstOrNull() ?: DEFAULT_DAYS.first()
@@ -530,11 +537,25 @@ fun CoverDisplayLayout(
                     }
                 },
                 actions = {
-                    IconButton(onClick = onSyncGitHub) {
+                    val infiniteTransition = rememberInfiniteTransition(label = "coverSyncTransition")
+                    val syncRotation by infiniteTransition.animateFloat(
+                        initialValue = 0f,
+                        targetValue = 360f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(1000, easing = LinearEasing),
+                            repeatMode = RepeatMode.Restart
+                        ),
+                        label = "coverSyncRotation"
+                    )
+                    IconButton(
+                        onClick = onSyncGitHub,
+                        enabled = !isSyncing
+                    ) {
                         Icon(
                             imageVector = Icons.Default.CloudSync,
                             contentDescription = "GitHub Sync",
-                            tint = Color(0xFF34D399)
+                            tint = if (isSyncing) Color(0xFFFBBF24) else Color(0xFF34D399),
+                            modifier = if (isSyncing) Modifier.graphicsLayer { rotationZ = syncRotation } else Modifier
                         )
                     }
                 },
@@ -799,6 +820,7 @@ fun MainDualPaneLayout(
     onCycleRepeat: () -> Unit,
     onCycleSpeed: () -> Unit,
     onToggleFlexMode: () -> Unit,
+    isSyncing: Boolean = false,
     onSyncGitHub: () -> Unit
 ) {
     val currentDayMeta = availableDays.find { it.key == selectedDay } ?: availableDays.firstOrNull() ?: DEFAULT_DAYS.first()
@@ -840,7 +862,7 @@ fun MainDualPaneLayout(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     Surface(
-                        color = Color(0xFF064E3B),
+                        color = if (isSyncing) Color(0xFF78350F) else Color(0xFF064E3B),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Row(
@@ -851,20 +873,38 @@ fun MainDualPaneLayout(
                                 modifier = Modifier
                                     .size(7.dp)
                                     .clip(CircleShape)
-                                    .background(Color(0xFF34D399))
+                                    .background(if (isSyncing) Color(0xFFFBBF24) else Color(0xFF34D399))
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                text = "GitHub 오프라인 완료 (${sentences.size}개)",
-                                color = Color(0xFF34D399),
+                                text = if (isSyncing) "GitHub 동기화 중..." else "GitHub 오프라인 완료 (${sentences.size}개)",
+                                color = if (isSyncing) Color(0xFFFBBF24) else Color(0xFF34D399),
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
                         }
                     }
                     Spacer(modifier = Modifier.width(6.dp))
-                    IconButton(onClick = onSyncGitHub) {
-                        Icon(Icons.Default.CloudSync, contentDescription = "Sync", tint = Color(0xFF34D399))
+                    val infiniteTransition = rememberInfiniteTransition(label = "mainSyncTransition")
+                    val syncRotation by infiniteTransition.animateFloat(
+                        initialValue = 0f,
+                        targetValue = 360f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(1000, easing = LinearEasing),
+                            repeatMode = RepeatMode.Restart
+                        ),
+                        label = "mainSyncRotation"
+                    )
+                    IconButton(
+                        onClick = onSyncGitHub,
+                        enabled = !isSyncing
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CloudSync,
+                            contentDescription = "Sync",
+                            tint = if (isSyncing) Color(0xFFFBBF24) else Color(0xFF34D399),
+                            modifier = if (isSyncing) Modifier.graphicsLayer { rotationZ = syncRotation } else Modifier
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF0F172A))
@@ -1152,7 +1192,9 @@ fun FlexModeLayout(
     onNext: () -> Unit,
     onSelectSpeed: (Float) -> Unit,
     onSelectRepeat: (Int) -> Unit,
-    onToggleFlexMode: () -> Unit
+    onToggleFlexMode: () -> Unit,
+    isSyncing: Boolean = false,
+    onSyncGitHub: () -> Unit = {}
 ) {
     val currentIndex = sentences.indexOfFirst { it.id == activeSentence?.id }.takeIf { it >= 0 } ?: 0
     val totalCount = sentences.size
@@ -1184,15 +1226,40 @@ fun FlexModeLayout(
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold
                     )
-                    Button(
-                        onClick = onToggleFlexMode,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4F46E5)),
-                        shape = RoundedCornerShape(10.dp),
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
-                    ) {
-                        Icon(Icons.Default.VerticalSplit, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.White)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        val infiniteTransition = rememberInfiniteTransition(label = "flexSyncTransition")
+                        val syncRotation by infiniteTransition.animateFloat(
+                            initialValue = 0f,
+                            targetValue = 360f,
+                            animationSpec = infiniteRepeatable(
+                                animation = tween(1000, easing = LinearEasing),
+                                repeatMode = RepeatMode.Restart
+                            ),
+                            label = "flexSyncRotation"
+                        )
+                        IconButton(
+                            onClick = onSyncGitHub,
+                            enabled = !isSyncing,
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.CloudSync,
+                                contentDescription = "Sync",
+                                tint = if (isSyncing) Color(0xFFFBBF24) else Color(0xFF34D399),
+                                modifier = if (isSyncing) Modifier.graphicsLayer { rotationZ = syncRotation } else Modifier
+                            )
+                        }
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("📖 메인 대화면 전환", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        Button(
+                            onClick = onToggleFlexMode,
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4F46E5)),
+                            shape = RoundedCornerShape(10.dp),
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                        ) {
+                            Icon(Icons.Default.VerticalSplit, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.White)
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("📖 메인 대화면 전환", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        }
                     }
                 }
                 DaySelectorTabs(days = availableDays, selectedDay = selectedDay, onSelectDay = onSelectDay, horizontalPadding = 16)

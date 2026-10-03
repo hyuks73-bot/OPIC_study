@@ -46,6 +46,7 @@ class MainActivity : ComponentActivity() {
             }
             val isPlaying by PlaybackService.isPlayingFlow.collectAsState()
             val currentPlayingId by PlaybackService.currentPlayingSentenceId.collectAsState()
+            val isSyncing by GitHubSyncWorker.isSyncingFlow.collectAsState()
 
             // Real-time Galaxy Fold 8 screen configuration & hinge tracking
             val configuration = LocalConfiguration.current
@@ -77,6 +78,7 @@ class MainActivity : ComponentActivity() {
                 isFlexMode = isFlexMode,
                 isPlaying = isPlaying,
                 currentPlayingId = currentPlayingId,
+                isSyncing = isSyncing,
                 onPlaySentence = { sentence, repeatCount ->
                     playSentenceViaService(sentence, repeatCount)
                 },
@@ -103,8 +105,21 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun triggerGitHubSync() {
-        val syncRequest = OneTimeWorkRequestBuilder<GitHubSyncWorker>().build()
-        WorkManager.getInstance(this).enqueue(syncRequest)
+        if (GitHubSyncWorker.isSyncingFlow.value) {
+            android.widget.Toast.makeText(this, "이미 최신 데이터 동기화가 진행 중입니다...", android.widget.Toast.LENGTH_SHORT).show()
+            return
+        }
+        android.widget.Toast.makeText(this, "🔄 GitHub 최신 학습 데이터 동기화 시작...", android.widget.Toast.LENGTH_SHORT).show()
+        lifecycleScope.launch(Dispatchers.IO) {
+            val success = GitHubSyncWorker.performSync(applicationContext)
+            kotlinx.coroutines.withContext(Dispatchers.Main) {
+                if (success) {
+                    android.widget.Toast.makeText(this@MainActivity, "✅ 동기화 완료! 새로운 학습 세트가 반영되었습니다.", android.widget.Toast.LENGTH_SHORT).show()
+                } else {
+                    android.widget.Toast.makeText(this@MainActivity, "⚠️ 동기화 실패: 네트워크 상태를 확인해 주세요.", android.widget.Toast.LENGTH_LONG).show()
+                }
+            }
+        }
     }
 
     private fun playSentenceViaService(sentence: Sentence, repeatCount: Int) {
