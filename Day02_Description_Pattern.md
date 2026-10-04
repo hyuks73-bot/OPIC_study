@@ -60,45 +60,28 @@
 
 ### 🗣️ 맞춤 IH/AL 스크립트: 내 방 묘사하기 (소리 내어 읽어보세요!)
 
-#### 1️⃣ Sentence 1
-![Bedroom 1](images/bed_1.jpg)
-> **Well, speaking of my bedroom**, it's definitely my favorite space in the house.
-
-#### 2️⃣ Sentence 2
-![Bedroom 2](images/bed_2.jpg)
+> **[Intro]**  
+> Well, speaking of my bedroom, it's definitely my favorite space in the house.  
 > I have a **king-size bed**, and right next to it, there's a small side table for my phone and smartwatch chargers.
-
-#### 3️⃣ Sentence 3
-![Bedroom 3](images/bed_3.jpg)
-> **What's really cool is that** my room light has a **built-in ceiling fan** controlled by a remote.
-
-#### 4️⃣ Sentence 4
-![Bedroom 4](images/bed_4.jpg)
-> Because of the ceiling fan, my room stays **very cool in the summer** even without a standing fan.
-
-#### 5️⃣ Sentence 5
-![Bedroom 5](images/bed_5.jpg)
+>
+> **[Body 1: 스마트 조명 & 실링 팬]**  
+> What's really cool is that my room light has a **built-in ceiling fan** controlled by a remote.  
+> Because of the ceiling fan, my room stays **very cool in the summer** even without a standing fan.  
 > Also, the light **turns on automatically every morning**, which helps me wake up right away.
-
-#### 6️⃣ Sentence 6
-![Bedroom 6](images/bed_6.jpg)
-> **Another great thing is that** I have an **attached bathroom** in my room.
-
-#### 7️⃣ Sentence 7
-![Bedroom 7](images/bed_7.jpg)
+>
+> **[Body 2: 방 안 전용 욕실]**  
+> Another great thing is that I have an **attached bathroom** in my room.  
 > Even when I wake up early to take a shower and get ready for work, **I don't disturb my family members** sleeping in other rooms.
-
-#### 8️⃣ Sentence 8
-![Bedroom 8](images/bed_8.jpg)
-> Sometimes while I'm sleeping, my **cats sneak into my room** and sleep right between my legs.
-
-#### 9️⃣ Sentence 9
-![Bedroom 9](images/bed_9.jpg)
+>
+> **[Body 3: 귀여운 고양이 에피소드]**  
+> Sometimes while I'm sleeping, my **cats sneak into my room** and sleep right between my legs.  
 > They are super cute, but I occasionally wake up in the middle of the night because **I feel too hot!**
+>
+> **[Outro]**  
+> So, all in all, my bedroom is **super comfortable and convenient** for my daily life.  
+> I just love spending time there.
 
-#### 🔟 Sentence 10
-![Bedroom 10](images/bed_10.jpg)
-> **So, all in all**, my bedroom is **super comfortable and convenient** for my daily life. I just love spending time there.
+---
 
 ---
 
@@ -106,38 +89,30 @@
 
 사용자님께서 제공해주신 내용으로 구성한 **OPIc IH/AL 등급 고득점 맞춤 스크립트**입니다.
 
-### 🗣️ 추천 IH 맞춤 스크립트 (문장별 연상 그림과 함께 기억하기!)
+### 📝 키워드 흐름 (Mind Map)
+* **Intro**: 집 근처 **수변 공원(Waterfront park)** 소개 / 약 5km 길이 (`stretches for about 5km`)
+* **Body 1 (루틴)**: 매주 주말마다 달리기하러 방문 (`visit every single weekend to go jogging`) / 왕복 1시간 (`round trip takes about an hour`)
+* **Body 2 (풍경/특징)**: 아름다운 꽃과 나무가 많음 (`full of colorful flowers and trees`) ➔ 지루하지 않음 (`never gets boring`)
+* **Outro**: 덕분에 주말마다 달리며 건강 유지 (`Thanks to this park, I can stick to my running routine`)
 
-#### 1️⃣ Sentence 1
-![Park 1](images/park_1.jpg)
-> **Well, speaking of my favorite park**, there is a lovely **waterfront park** located very close to my house.
+---
 
-#### 2️⃣ Sentence 2
-![Park 2](images/park_2.jpg)
+### 🗣️ 추천 IH 맞춤 스크립트 (소리 내어 읽어보세요!)
+
+> **[Intro]**  
+> Well, speaking of my favorite park, there is a lovely **waterfront park** located very close to my house.  
 > It's quite long, and it **stretches for about 5 kilometers** along the water.
-
-#### 3️⃣ Sentence 3
-![Park 3](images/park_3.jpg)
-> **You know**, I visit this park **every single weekend to go jogging**.
-
-#### 4️⃣ Sentence 4
-![Park 4](images/park_4.jpg)
+>
+> **[Body 1: 루틴 & 활동]**  
+> You know, I visit this park **every single weekend to go jogging**.  
 > A **round trip** usually takes me about **an hour**, which is just the right amount of exercise for me.
-
-#### 5️⃣ Sentence 5
-![Park 5](images/park_5.jpg)
-> **What I love most about this park is that** there are so many **beautiful flowers and lush trees** along the trail.
-
-#### 6️⃣ Sentence 6
-![Park 6](images/park_6.jpg)
+>
+> **[Body 2: 풍경 & 특징]**  
+> What I love most about this park is that there are **so many beautiful flowers and lush trees** along the trail.  
 > Because the scenery is so nice, running there **never gets boring at all**.
-
-#### 7️⃣ Sentence 7
-![Park 7](images/park_7.jpg)
-> **So, thanks to this park**, I think I am able to stick to my weekend running routine and **stay in shape**.
-
-#### 8️⃣ Sentence 8
-![Park 8](images/park_8.jpg)
+>
+> **[Outro]**  
+> So, **thanks to this park**, I think I am able to stick to my weekend running routine and **stay in shape**.  
 > It's definitely my favorite spot in my neighborhood.
 
 ---

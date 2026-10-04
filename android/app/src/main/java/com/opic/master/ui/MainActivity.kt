@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalView
 import androidx.window.layout.FoldingFeature
 import androidx.window.layout.WindowInfoTracker
 import androidx.work.OneTimeWorkRequestBuilder
@@ -47,6 +48,11 @@ class MainActivity : ComponentActivity() {
             val isPlaying by PlaybackService.isPlayingFlow.collectAsState()
             val currentPlayingId by PlaybackService.currentPlayingSentenceId.collectAsState()
             val isSyncing by GitHubSyncWorker.isSyncingFlow.collectAsState()
+
+            val currentView = LocalView.current
+            LaunchedEffect(isPlaying) {
+                currentView.keepScreenOn = isPlaying
+            }
 
             // Real-time Galaxy Fold 8 screen configuration & hinge tracking
             val configuration = LocalConfiguration.current

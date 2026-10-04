@@ -123,6 +123,7 @@ manifest = {
 # Target file paths to sync across workspaces and Android project
 target_paths = [
     os.path.join(base_dir, 'data_manifest.json'),
+    os.path.join(base_dir, 'android', 'app', 'src', 'main', 'assets', 'data_manifest.json'),
     r'd:\VSCODE\영어공부\OPIC_IH\data_manifest.json',
     r'C:\Users\hyuks\OneDrive\English_study\OPIC_IH\data_manifest.json',
     r'C:\Users\hyuks\OneDrive\English_study\OPIC_IH\android\app\src\main\assets\data_manifest.json'
