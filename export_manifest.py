@@ -7,8 +7,8 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 index_path = os.path.join(base_dir, 'index.html')
 
 if not os.path.exists(index_path):
-    # Fallback to OneDrive or VS Code workspace if run from another cwd
-    for alt in [r'C:\Users\hyuks\OneDrive\English_study\OPIC_IH\index.html', r'd:\VSCODE\영어공부\OPIC_IH\index.html']:
+    # Fallback to English_study or OneDrive workspace if run from another cwd
+    for alt in [r'D:\VSCODE\English_study\OPIC_IH\index.html', r'C:\Users\hyuks\OneDrive\English_study\OPIC_IH\index.html']:
         if os.path.exists(alt):
             index_path = alt
             base_dir = os.path.dirname(alt)
@@ -124,7 +124,8 @@ manifest = {
 target_paths = [
     os.path.join(base_dir, 'data_manifest.json'),
     os.path.join(base_dir, 'android', 'app', 'src', 'main', 'assets', 'data_manifest.json'),
-    r'd:\VSCODE\영어공부\OPIC_IH\data_manifest.json',
+    r'D:\VSCODE\English_study\OPIC_IH\data_manifest.json',
+    r'D:\VSCODE\English_study\OPIC_IH\android\app\src\main\assets\data_manifest.json',
     r'C:\Users\hyuks\OneDrive\English_study\OPIC_IH\data_manifest.json',
     r'C:\Users\hyuks\OneDrive\English_study\OPIC_IH\android\app\src\main\assets\data_manifest.json'
 ]
