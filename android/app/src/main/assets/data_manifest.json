@@ -704,10 +704,10 @@
         },
         {
           "id": "day7_rp2_5",
-          "en": "Whichever time works for you, <mark>I'll definitely treat you to a delicious lunch and coffee</mark> to <mark>make it up to you</mark>. Let me know!",
-          "ko": "둘 중 언제든 너 편한 시간에 맞출게, 미안한 마음을 갚을 수 있게 맛있는 점심이랑 커피는 내가 꼭 살게. 어떻게 생각하는지 알려줘!",
-          "guide": "<strong>WHICHever time works for you</strong>, <span class=\"slash\">/</span> <strong>I'll DEFinitely TREAT you</strong> <span class=\"slash\">/</span> to a <strong>deLIcious LUNCH and coffee</strong> <span class=\"slash\">/</span> to <strong>MAKE IT UP to you</strong>. <span class=\"slash\">/</span> Let me know!",
-          "tip": "[고급 보상 표현] treat you to [트릿 유 투: 밥/커피를 사다] | make it up to you [메이킷 업투유: 만회하다/보상하다]",
+          "en": "Whichever time works for you, <mark>I'll definitely treat you to a delicious lunch and coffee</mark> to <mark>make it up to you</mark>. <mark>Let me know what you think</mark>, and <mark>I'm so sorry again</mark>!",
+          "ko": "둘 중 언제든 너 편한 시간에 맞출게, 미안한 마음을 갚을 수 있게 맛있는 점심이랑 커피는 내가 꼭 살게. 어떻게 생각하는지 알려줘, 그리고 다시 한번 정말 미안해!",
+          "guide": "<strong>WHICHever time works for you</strong>, <span class=\"slash\">/</span> <strong>I'll DEFinitely TREAT you</strong> <span class=\"slash\">/</span> to a <strong>deLIcious LUNCH and coffee</strong> <span class=\"slash\">/</span> to <strong>MAKE IT UP to you</strong>. <span class=\"slash\">/</span> <strong>Let me know WHAT you think</strong>, <span class=\"slash\">/</span> and <strong>I'm so SORry again</strong>!",
+          "tip": "[고급 보상 표현] treat you to [트릿 유 투: 밥/커피를 사다] | make it up to you [메이킷 업투유: 만회하다/보상하다] | Let me know what you think [어떻게 생각하는지 알려줘]",
           "audio_url": "audio/day7_rp2_5.mp3",
           "image_url": "images/day7_rp2_5.jpg"
         }
