@@ -1377,6 +1377,7 @@ fun Fold8AdaptiveApp(
                 isPlaying = isPlaying,
                 repeatCount = repeatCount,
                 repeatSpeeds = repeatSpeeds,
+                currentRepeatIndex = currentRepeatIndex,
                 onOpenSettings = { showSettingsDialog = true },
                 showCoaching = showCoaching,
                 onToggleCoaching = { showCoaching = !showCoaching },
@@ -1657,22 +1658,36 @@ fun CoverDisplayLayout(
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Repeat count badge on left of "🗣️ 낭독 / 🖼️ 이미지 / 접기"
+                        // Dynamic Repeat progress badge
+                        val displayRepeat = if (isPlaying) currentRepeatIndex.coerceIn(1, repeatCount) else 1
                         Surface(
                             shape = RoundedCornerShape(8.dp),
-                            color = if (isPlaying) Color(0xFF1E1B4B) else Color(0xFF1E293B),
+                            color = if (isPlaying) Color(0xFF312E81) else Color(0xFF1E293B),
                             border = BorderStroke(
                                 1.dp,
-                                if (isPlaying) Color(0xFF4338CA) else Color(0xFF334155)
+                                if (isPlaying) Color(0xFF818CF8) else Color(0xFF334155)
                             )
                         ) {
-                            Text(
-                                text = "${currentRepeatIndex.coerceIn(1, repeatCount)}/${repeatCount}회",
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 5.dp),
-                                fontSize = 11.sp,
-                                color = if (isPlaying) Color(0xFFA5B4FC) else Color(0xFF94A3B8),
-                                fontWeight = FontWeight.ExtraBold
-                            )
+                            Row(
+                                modifier = Modifier.padding(horizontal = 7.dp, vertical = 5.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(3.dp)
+                            ) {
+                                if (isPlaying) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(6.dp)
+                                            .clip(CircleShape)
+                                            .background(Color(0xFF34D399))
+                                    )
+                                }
+                                Text(
+                                    text = if (isPlaying) "🔁 ${displayRepeat}/${repeatCount}회" else "🔁 ${repeatCount}회",
+                                    fontSize = 11.sp,
+                                    color = if (isPlaying) Color.White else Color(0xFF94A3B8),
+                                    fontWeight = FontWeight.ExtraBold
+                                )
+                            }
                         }
 
                         // 1. Coaching ON (낭독·강세) Button
