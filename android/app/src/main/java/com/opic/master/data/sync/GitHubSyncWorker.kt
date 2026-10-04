@@ -59,8 +59,11 @@ class GitHubSyncWorker(
                     dao.deleteSentencesNotInDays(activeDayKeys)
                 }
 
-                // 3. Prepare audio directory & existing records to preserve user settings
+                // 3. Prepare audio & images directory & existing records to preserve user settings
                 val audioDir = File(context.filesDir, "audio").apply {
+                    if (!exists()) mkdirs()
+                }
+                val imagesDir = File(context.filesDir, "images").apply {
                     if (!exists()) mkdirs()
                 }
                 val existingSentences = dao.getAllSentencesList().associateBy { it.id }
@@ -111,7 +114,7 @@ class GitHubSyncWorker(
                     }
                 }
 
-                // 4. Download any missing MP3 audio files in the background
+                // 4. Download any missing or updated MP3 audio and image files in the background
                 var allAudioDownloaded = true
                 for (sentence in sentenceEntities) {
                     val audioFile = File(audioDir, "${sentence.id}.mp3")
@@ -131,6 +134,26 @@ class GitHubSyncWorker(
                             }
                         } catch (_: Exception) {
                             allAudioDownloaded = false
+                        }
+                    }
+
+                    // Download or update scene image from GitHub
+                    if (sentence.imageUrl.isNotEmpty()) {
+                        val imgFileName = sentence.imageUrl.substringAfterLast("/")
+                        val imageFile = File(imagesDir, imgFileName)
+                        val imageUrl = "$GITHUB_RAW_BASE/${sentence.imageUrl}"
+                        val imageReq = Request.Builder().url(imageUrl).build()
+                        try {
+                            client.newCall(imageReq).execute().use { imgResp ->
+                                if (imgResp.isSuccessful && imgResp.body != null) {
+                                    FileOutputStream(imageFile).use { output ->
+                                        imgResp.body!!.byteStream().copyTo(output)
+                                    }
+                                    dao.updateImageDownloaded(sentence.id, imageFile.absolutePath)
+                                }
+                            }
+                        } catch (_: Exception) {
+                            // Non-critical, fallback to asset or existing image
                         }
                     }
                 }

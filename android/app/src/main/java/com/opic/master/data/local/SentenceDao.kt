@@ -32,6 +32,9 @@ interface SentenceDao {
     @Query("UPDATE sentences SET localAudioPath = :localPath, isDownloaded = 1 WHERE id = :id")
     suspend fun updateAudioDownloaded(id: String, localPath: String)
 
+    @Query("UPDATE sentences SET localImagePath = :localPath WHERE id = :id")
+    suspend fun updateImageDownloaded(id: String, localPath: String)
+
     @Query("SELECT * FROM days ORDER BY orderIndex ASC")
     fun getAllDays(): Flow<List<DayEntity>>
 
