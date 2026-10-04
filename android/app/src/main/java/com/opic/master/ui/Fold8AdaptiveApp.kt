@@ -1734,10 +1734,14 @@ fun MainDualPaneLayout(
                     .weight(1f)
                     .fillMaxHeight()
                     .background(Color(0xFF0F172A))
-                    .padding(20.dp),
-                verticalArrangement = Arrangement.SpaceBetween
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
             ) {
-                Column {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -1774,7 +1778,7 @@ fun MainDualPaneLayout(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
                     Surface(
                         color = Color(0xFF131D33),
@@ -1782,33 +1786,33 @@ fun MainDualPaneLayout(
                         border = BorderStroke(1.dp, Color(0xFF1E293B)),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Column(modifier = Modifier.padding(18.dp)) {
+                        Column(modifier = Modifier.padding(14.dp)) {
                             Text(
                                 text = activeSentence?.let { cleanSentenceText(it.en) } ?: "문장을 선택해 주세요.",
                                 color = Color.White,
-                                fontSize = 19.sp,
+                                fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
-                                lineHeight = 28.sp
+                                lineHeight = 26.sp
                             )
-                            Spacer(modifier = Modifier.height(10.dp))
+                            Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = activeSentence?.ko ?: "",
                                 color = Color(0xFF94A3B8),
                                 fontSize = 13.sp,
-                                lineHeight = 20.sp
+                                lineHeight = 19.sp
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
                     CoachingGuideCard(
                         guide = activeSentence?.guide ?: "",
                         tip = activeSentence?.tip ?: "",
-                        fontSize = 15.sp
+                        fontSize = 14.sp
                     )
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     PlaybackRepeatProgressIndicator(
                         currentRepeatIndex = currentRepeatIndex,
@@ -1816,13 +1820,17 @@ fun MainDualPaneLayout(
                         isPlaying = isPlaying
                     )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
 
                     DragSpeedSlider(
                         currentSpeed = repeatSpeeds.getOrElse(0) { 1.0f },
                         onSpeedChange = onSpeedChange
                     )
+
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
 
                 // Bottom Player Control Deck
                 Row(
@@ -1919,155 +1927,162 @@ fun FlexModeLayout(
             .statusBarsPadding()
             .navigationBarsPadding()
     ) {
-        // Mode Header & Day Selector
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            color = Color(0xFF0F172A),
-            tonalElevation = 4.dp
-        ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "📐 갤럭시 Z 폴드 8 플렉스 거치 모드 (L자 스탠드)",
-                        color = Color(0xFFA5B4FC),
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        val infiniteTransition = rememberInfiniteTransition(label = "flexSyncTransition")
-                        val syncRotation by infiniteTransition.animateFloat(
-                            initialValue = 0f,
-                            targetValue = 360f,
-                            animationSpec = infiniteRepeatable(
-                                animation = tween(1000, easing = LinearEasing),
-                                repeatMode = RepeatMode.Restart
-                            ),
-                            label = "flexSyncRotation"
-                        )
-                        IconButton(
-                            onClick = onSyncGitHub,
-                            enabled = !isSyncing,
-                            modifier = Modifier.size(32.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.CloudSync,
-                                contentDescription = "Sync",
-                                tint = if (isSyncing) Color(0xFFFBBF24) else Color(0xFF34D399),
-                                modifier = if (isSyncing) Modifier.graphicsLayer { rotationZ = syncRotation } else Modifier
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Button(
-                            onClick = onToggleFlexMode,
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4F46E5)),
-                            shape = RoundedCornerShape(10.dp),
-                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
-                        ) {
-                            Icon(Icons.Default.VerticalSplit, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.White)
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text("📖 메인 대화면 전환", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                        }
-                    }
-                }
-                DaySelectorTabs(days = availableDays, selectedDay = selectedDay, onSelectDay = onSelectDay, horizontalPadding = 16)
-                Spacer(modifier = Modifier.height(4.dp))
-            }
-        }
-
-        // TOP HALF: Reading Stand (독서대)
-        Box(
+        // TOP HALF: Header + Reading Stand (독서대) - Exactly 50% of screen height
+        Column(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
+            // Mode Header & Day Selector inside Top Half
             Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = Color(0xFF020617),
-                shape = RoundedCornerShape(20.dp),
-                border = BorderStroke(1.dp, Color(0xFF1E293B)),
-                shadowElevation = 8.dp
+                modifier = Modifier.fillMaxWidth(),
+                color = Color(0xFF0F172A),
+                tonalElevation = 4.dp
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                        .verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "[상단 디스플레이: 낭독 독서대]",
-                                fontSize = 11.sp,
-                                color = Color(0xFF94A3B8),
-                                fontWeight = FontWeight.Medium
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 6.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "📐 갤럭시 Z 폴드 8 플렉스 거치 모드 (L자 스탠드)",
+                            color = Color(0xFFA5B4FC),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            val infiniteTransition = rememberInfiniteTransition(label = "flexSyncTransition")
+                            val syncRotation by infiniteTransition.animateFloat(
+                                initialValue = 0f,
+                                targetValue = 360f,
+                                animationSpec = infiniteRepeatable(
+                                    animation = tween(1000, easing = LinearEasing),
+                                    repeatMode = RepeatMode.Restart
+                                ),
+                                label = "flexSyncRotation"
                             )
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(7.dp)
-                                        .clip(CircleShape)
-                                        .background(if (isPlaying) Color(0xFF10B981) else Color(0xFF64748B))
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = if (isPlaying) "● 섀도잉 모드 재생 중" else "● 거치 대기 중",
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (isPlaying) Color(0xFF34D399) else Color(0xFF94A3B8)
+                            IconButton(
+                                onClick = onSyncGitHub,
+                                enabled = !isSyncing,
+                                modifier = Modifier.size(28.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.CloudSync,
+                                    contentDescription = "Sync",
+                                    tint = if (isSyncing) Color(0xFFFBBF24) else Color(0xFF34D399),
+                                    modifier = if (isSyncing) Modifier.graphicsLayer { rotationZ = syncRotation } else Modifier
                                 )
                             }
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Button(
+                                onClick = onToggleFlexMode,
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4F46E5)),
+                                shape = RoundedCornerShape(8.dp),
+                                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp)
+                            ) {
+                                Icon(Icons.Default.VerticalSplit, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color.White)
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("📖 대화면 전환", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                            }
+                        }
+                    }
+                    DaySelectorTabs(days = availableDays, selectedDay = selectedDay, onSelectDay = onSelectDay, horizontalPadding = 16)
+                    Spacer(modifier = Modifier.height(2.dp))
+                }
+            }
+
+            // Reading Stand Card filling the remainder of top half
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 6.dp)
+            ) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = Color(0xFF020617),
+                    shape = RoundedCornerShape(16.dp),
+                    border = BorderStroke(1.dp, Color(0xFF1E293B)),
+                    shadowElevation = 6.dp
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(14.dp)
+                            .verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "[상단 디스플레이: 낭독 독서대]",
+                                    fontSize = 11.sp,
+                                    color = Color(0xFF94A3B8),
+                                    fontWeight = FontWeight.Medium
+                                )
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(7.dp)
+                                            .clip(CircleShape)
+                                            .background(if (isPlaying) Color(0xFF10B981) else Color(0xFF64748B))
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = if (isPlaying) "● 섀도잉 모드 재생 중" else "● 거치 대기 중",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (isPlaying) Color(0xFF34D399) else Color(0xFF94A3B8)
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Text(
+                                text = if (totalCount > 0) "Sentence ${currentIndex + 1} / $totalCount" else "Sentence",
+                                color = Color(0xFF818CF8),
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.ExtraBold
+                            )
+
+                            Spacer(modifier = Modifier.height(6.dp))
+
+                            val cleanEn = activeSentence?.let { cleanSentenceText(it.en) } ?: "선택된 문장이 없습니다."
+                            Text(
+                                text = "\"$cleanEn\"",
+                                color = Color.White,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                lineHeight = 26.sp
+                            )
+
+                            CoachingGuideCard(
+                                guide = activeSentence?.guide ?: "",
+                                tip = activeSentence?.tip ?: "",
+                                modifier = Modifier.padding(top = 8.dp),
+                                containerColor = Color(0xFF082F49).copy(alpha = 0.55f),
+                                borderColor = Color(0xFF0284C7).copy(alpha = 0.4f),
+                                fontSize = 14.sp
+                            )
                         }
 
-                        Spacer(modifier = Modifier.height(10.dp))
-
-                        Text(
-                            text = if (totalCount > 0) "Sentence ${currentIndex + 1} / $totalCount" else "Sentence",
-                            color = Color(0xFF818CF8),
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.ExtraBold
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        val cleanEn = activeSentence?.let { cleanSentenceText(it.en) } ?: "선택된 문장이 없습니다."
-                        Text(
-                            text = "\"$cleanEn\"",
-                            color = Color.White,
-                            fontSize = 19.sp,
-                            fontWeight = FontWeight.Bold,
-                            lineHeight = 28.sp
-                        )
-
-                        CoachingGuideCard(
-                            guide = activeSentence?.guide ?: "",
-                            tip = activeSentence?.tip ?: "",
-                            modifier = Modifier.padding(top = 10.dp),
-                            containerColor = Color(0xFF082F49).copy(alpha = 0.55f),
-                            borderColor = Color(0xFF0284C7).copy(alpha = 0.4f),
-                            fontSize = 15.sp
-                        )
-                    }
-
-                    if (!activeSentence?.ko.isNullOrEmpty()) {
-                        Spacer(modifier = Modifier.height(10.dp))
-                        Text(
-                            text = activeSentence.ko,
-                            color = Color(0xFF94A3B8),
-                            fontSize = 13.sp,
-                            lineHeight = 19.sp
-                        )
+                        if (!activeSentence?.ko.isNullOrEmpty()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = activeSentence.ko,
+                                color = Color(0xFF94A3B8),
+                                fontSize = 13.sp,
+                                lineHeight = 19.sp
+                            )
+                        }
                     }
                 }
             }
