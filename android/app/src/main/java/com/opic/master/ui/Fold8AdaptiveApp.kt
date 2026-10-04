@@ -1358,6 +1358,8 @@ fun Fold8AdaptiveApp(
                 onOpenSettings = { showSettingsDialog = true },
                 showCoaching = showCoaching,
                 onToggleCoaching = { showCoaching = !showCoaching },
+                coachingDisplayMode = coachingDisplayMode,
+                onCoachingDisplayModeChange = { handleDisplayModeChange(it) },
                 onSelectSentence = {
                     activeSentence = it
                     onPlaySentence(it, repeatCount, repeatSpeeds)
@@ -1452,6 +1454,8 @@ fun CoverDisplayLayout(
     onOpenSettings: () -> Unit,
     showCoaching: Boolean,
     onToggleCoaching: () -> Unit,
+    coachingDisplayMode: CoachingDisplayMode = CoachingDisplayMode.PRONUNCIATION,
+    onCoachingDisplayModeChange: (CoachingDisplayMode) -> Unit = {},
     onSelectSentence: (Sentence) -> Unit,
     onPlayAll: () -> Unit,
     onTogglePlay: () -> Unit,
@@ -1627,23 +1631,80 @@ fun CoverDisplayLayout(
                     }
 
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        // 1. Coaching ON (낭독·강세) Button
                         Surface(
                             shape = RoundedCornerShape(8.dp),
-                            color = if (showCoaching) Color(0xFF0369A1) else Color(0xFF1E293B),
-                            modifier = Modifier.clickable { onToggleCoaching() }
+                            color = if (showCoaching && coachingDisplayMode == CoachingDisplayMode.PRONUNCIATION) Color(0xFF0369A1) else Color(0xFF1E293B),
+                            border = BorderStroke(
+                                1.dp,
+                                if (showCoaching && coachingDisplayMode == CoachingDisplayMode.PRONUNCIATION) Color(0xFF38BDF8) else Color(0xFF334155)
+                            ),
+                            modifier = Modifier.clickable {
+                                if (!showCoaching) onToggleCoaching()
+                                onCoachingDisplayModeChange(CoachingDisplayMode.PRONUNCIATION)
+                            }
                         ) {
-                            Text(
-                                text = "🗣️ 코칭 ${if (showCoaching) "ON" else "OFF"}",
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
-                                fontSize = 11.sp,
-                                color = if (showCoaching) Color.White else Color(0xFF94A3B8),
-                                fontWeight = FontWeight.Bold
-                            )
+                            Row(
+                                modifier = Modifier.padding(horizontal = 7.dp, vertical = 5.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(3.dp)
+                            ) {
+                                Text(
+                                    text = "🗣️ 낭독",
+                                    fontSize = 11.sp,
+                                    color = if (showCoaching && coachingDisplayMode == CoachingDisplayMode.PRONUNCIATION) Color.White else Color(0xFF94A3B8),
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                         }
-                        Text("${sentences.size}개 문장", fontSize = 11.sp, color = Color(0xFF94A3B8))
+
+                        // 2. Image (연상 이미지) Button
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = if (showCoaching && coachingDisplayMode == CoachingDisplayMode.IMAGE) Color(0xFF6366F1) else Color(0xFF1E293B),
+                            border = BorderStroke(
+                                1.dp,
+                                if (showCoaching && coachingDisplayMode == CoachingDisplayMode.IMAGE) Color(0xFFA5B4FC) else Color(0xFF334155)
+                            ),
+                            modifier = Modifier.clickable {
+                                if (!showCoaching) onToggleCoaching()
+                                onCoachingDisplayModeChange(CoachingDisplayMode.IMAGE)
+                            }
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 7.dp, vertical = 5.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(3.dp)
+                            ) {
+                                Text(
+                                    text = "🖼️ 이미지",
+                                    fontSize = 11.sp,
+                                    color = if (showCoaching && coachingDisplayMode == CoachingDisplayMode.IMAGE) Color.White else Color(0xFF94A3B8),
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+
+                        // 3. OFF (접기) Button
+                        if (showCoaching) {
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = Color(0xFF1E293B),
+                                border = BorderStroke(1.dp, Color(0xFF475569)),
+                                modifier = Modifier.clickable { onToggleCoaching() }
+                            ) {
+                                Text(
+                                    text = "접기",
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 5.dp),
+                                    fontSize = 10.sp,
+                                    color = Color(0xFF94A3B8),
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -1730,10 +1791,15 @@ fun CoverDisplayLayout(
                             )
 
                             if (showCoaching) {
-                                CoachingGuideCard(
-                                    guide = sentence.guide,
-                                    tip = sentence.tip,
-                                    modifier = Modifier.padding(top = 8.dp)
+                                SentenceMediaCoachingSection(
+                                    sentence = sentence,
+                                    displayMode = coachingDisplayMode,
+                                    onDisplayModeChange = onCoachingDisplayModeChange,
+                                    modifier = Modifier.padding(top = 8.dp),
+                                    containerColor = Color(0xFF0B1120),
+                                    borderColor = Color(0xFF1E3A5F),
+                                    fontSize = 13.5.sp,
+                                    imageHeight = 170.dp
                                 )
                             }
 
