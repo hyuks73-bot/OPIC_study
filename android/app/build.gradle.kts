@@ -62,6 +62,9 @@ dependencies {
     implementation("androidx.compose.material3.adaptive:adaptive-navigation:1.0.0")
     implementation("androidx.window:window:1.3.0")
 
+    // Coil Image Loader for Jetpack Compose
+    implementation("io.coil-kt:coil-compose:2.7.0")
+
     // Media3 ExoPlayer & MediaSession (Background & Screen-Off Playback)
     val media3Version = "1.4.1"
     implementation("androidx.media3:media3-exoplayer:$media3Version")

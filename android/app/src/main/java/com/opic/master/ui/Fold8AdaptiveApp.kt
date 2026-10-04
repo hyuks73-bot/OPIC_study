@@ -39,8 +39,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CloudSync
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
@@ -83,7 +85,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -690,6 +695,239 @@ fun CoachingGuideCard(
     }
 }
 
+/**
+ * Visual mode toggle for coaching card area:
+ * Allows user to switch between "🗣️ 낭독·강세" coaching guide and "🖼️ 이미지" scene illustration.
+ */
+enum class CoachingDisplayMode {
+    PRONUNCIATION,
+    IMAGE
+}
+
+@Composable
+fun SentenceMediaCoachingSection(
+    sentence: Sentence?,
+    displayMode: CoachingDisplayMode,
+    onDisplayModeChange: (CoachingDisplayMode) -> Unit,
+    modifier: Modifier = Modifier,
+    containerColor: Color = Color(0xFF0F2338),
+    borderColor: Color = Color(0xFF0284C7).copy(alpha = 0.6f),
+    fontSize: TextUnit = 17.sp,
+    imageHeight: androidx.compose.ui.unit.Dp = 220.dp
+) {
+    val context = LocalContext.current
+    val imageModel = remember(sentence?.id, sentence?.localImagePath, sentence?.imageUrl) {
+        val local = sentence?.localImagePath
+        if (!local.isNullOrEmpty() && java.io.File(local).exists()) {
+            java.io.File(local)
+        } else {
+            // Check bundled APK asset first (e.g. file:///android_asset/images/{id}.jpg)
+            val imgFileName = if (!sentence?.imageUrl.isNullOrEmpty()) {
+                sentence.imageUrl.substringAfterLast("/")
+            } else if (!sentence?.id.isNullOrEmpty()) {
+                "${sentence.id}.jpg"
+            } else ""
+
+            if (imgFileName.isNotEmpty()) {
+                "file:///android_asset/images/$imgFileName"
+            } else {
+                null
+            }
+        }
+    }
+
+    Surface(
+        color = containerColor,
+        shape = RoundedCornerShape(14.dp),
+        border = BorderStroke(1.dp, borderColor),
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+        ) {
+            // Top Toggle Buttons: [🗣️ 낭독·강세] vs [🖼️ 연상 이미지]
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Pronunciation Tab Button
+                    Surface(
+                        color = if (displayMode == CoachingDisplayMode.PRONUNCIATION) Color(0xFF0284C7) else Color(0xFF1E293B),
+                        shape = RoundedCornerShape(8.dp),
+                        border = BorderStroke(
+                            1.dp,
+                            if (displayMode == CoachingDisplayMode.PRONUNCIATION) Color(0xFF38BDF8) else Color(0xFF334155)
+                        ),
+                        modifier = Modifier.clickable { onDisplayModeChange(CoachingDisplayMode.PRONUNCIATION) }
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 9.dp, vertical = 5.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.RecordVoiceOver,
+                                contentDescription = null,
+                                tint = if (displayMode == CoachingDisplayMode.PRONUNCIATION) Color.White else Color(0xFF94A3B8),
+                                modifier = Modifier.size(13.dp)
+                            )
+                            Text(
+                                text = "낭독·강세",
+                                color = if (displayMode == CoachingDisplayMode.PRONUNCIATION) Color.White else Color(0xFF94A3B8),
+                                fontSize = 11.5.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+
+                    // Image Tab Button
+                    Surface(
+                        color = if (displayMode == CoachingDisplayMode.IMAGE) Color(0xFF6366F1) else Color(0xFF1E293B),
+                        shape = RoundedCornerShape(8.dp),
+                        border = BorderStroke(
+                            1.dp,
+                            if (displayMode == CoachingDisplayMode.IMAGE) Color(0xFFA5B4FC) else Color(0xFF334155)
+                        ),
+                        modifier = Modifier.clickable { onDisplayModeChange(CoachingDisplayMode.IMAGE) }
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 9.dp, vertical = 5.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Image,
+                                contentDescription = null,
+                                tint = if (displayMode == CoachingDisplayMode.IMAGE) Color.White else Color(0xFF94A3B8),
+                                modifier = Modifier.size(13.dp)
+                            )
+                            Text(
+                                text = "연상 이미지",
+                                color = if (displayMode == CoachingDisplayMode.IMAGE) Color.White else Color(0xFF94A3B8),
+                                fontSize = 11.5.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
+
+                Text(
+                    text = if (displayMode == CoachingDisplayMode.PRONUNCIATION) "발화 가이드" else "상황 시각화",
+                    color = Color(0xFF64748B),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Body Content based on active mode
+            when (displayMode) {
+                CoachingDisplayMode.PRONUNCIATION -> {
+                    val cleanGuide = remember(sentence?.guide) { cleanGuideText(sentence?.guide ?: "") }
+                    val tip = sentence?.tip ?: ""
+
+                    if (cleanGuide.isNotEmpty()) {
+                        Text(
+                            text = buildAnnotatedString {
+                                withStyle(SpanStyle(color = Color(0xFF38BDF8), fontWeight = FontWeight.Bold)) {
+                                    append("🗣️ 낭독·강세: ")
+                                }
+                                withStyle(SpanStyle(color = Color(0xFFE0F2FE), fontWeight = FontWeight.Normal)) {
+                                    append(cleanGuide)
+                                }
+                            },
+                            fontSize = fontSize,
+                            lineHeight = (fontSize.value * 1.45f).sp
+                        )
+                    }
+
+                    if (tip.isNotEmpty()) {
+                        if (cleanGuide.isNotEmpty()) Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            text = buildAnnotatedString {
+                                withStyle(SpanStyle(color = Color(0xFFFBBF24), fontWeight = FontWeight.Bold)) {
+                                    append("💡 팁: ")
+                                }
+                                withStyle(SpanStyle(color = Color(0xFFCBD5E1), fontWeight = FontWeight.Normal)) {
+                                    append(tip)
+                                }
+                            },
+                            fontSize = (fontSize.value - 0.5f).sp,
+                            lineHeight = ((fontSize.value - 0.5f) * 1.45f).sp
+                        )
+                    }
+
+                    if (cleanGuide.isEmpty() && tip.isEmpty()) {
+                        Text(
+                            text = "제공된 낭독 및 강세 가이드가 없습니다.",
+                            color = Color(0xFF64748B),
+                            fontSize = 12.sp
+                        )
+                    }
+                }
+
+                CoachingDisplayMode.IMAGE -> {
+                    if (imageModel != null) {
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(imageHeight),
+                            shape = RoundedCornerShape(10.dp),
+                            color = Color(0xFF020617),
+                            border = BorderStroke(1.dp, Color(0xFF1E293B))
+                        ) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                AsyncImage(
+                                    model = ImageRequest.Builder(context)
+                                        .data(imageModel)
+                                        .crossfade(true)
+                                        .build(),
+                                    contentDescription = sentence?.id ?: "Sentence Illustration",
+                                    contentScale = ContentScale.Fit,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .clip(RoundedCornerShape(10.dp))
+                                )
+                            }
+                        }
+                    } else {
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(120.dp),
+                            shape = RoundedCornerShape(10.dp),
+                            color = Color(0xFF020617),
+                            border = BorderStroke(1.dp, Color(0xFF1E293B))
+                        ) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "등록된 연상 이미지가 없습니다.",
+                                    color = Color(0xFF64748B),
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Composable
 fun PlaybackRepeatProgressIndicator(
     currentRepeatIndex: Int,
@@ -973,6 +1211,22 @@ fun Fold8AdaptiveApp(
     var showCoaching by remember { mutableStateOf(true) }
     var showSettingsDialog by remember { mutableStateOf(false) }
 
+    val savedDisplayModeStr = remember(prefs) { prefs.getString("coaching_display_mode", CoachingDisplayMode.PRONUNCIATION.name) }
+    var coachingDisplayMode by remember(savedDisplayModeStr) {
+        mutableStateOf(
+            try {
+                CoachingDisplayMode.valueOf(savedDisplayModeStr ?: CoachingDisplayMode.PRONUNCIATION.name)
+            } catch (_: Exception) {
+                CoachingDisplayMode.PRONUNCIATION
+            }
+        )
+    }
+
+    fun handleDisplayModeChange(newMode: CoachingDisplayMode) {
+        coachingDisplayMode = newMode
+        prefs.edit().putString("coaching_display_mode", newMode.name).apply()
+    }
+
     fun handleSaveSettings(newCount: Int, newSpeeds: List<Float>) {
         repeatCount = newCount
         repeatSpeeds = newSpeeds
@@ -1129,6 +1383,8 @@ fun Fold8AdaptiveApp(
                 repeatSpeeds = repeatSpeeds,
                 currentRepeatIndex = currentRepeatIndex,
                 currentSpeed = effectiveCurrentSpeed,
+                coachingDisplayMode = coachingDisplayMode,
+                onCoachingDisplayModeChange = { handleDisplayModeChange(it) },
                 onSpeedChange = { handleSpeedChange(it) },
                 onOpenSettings = { showSettingsDialog = true },
                 onPlayAll = { onPlayAll(filteredSentences, repeatCount, repeatSpeeds) },
@@ -1157,6 +1413,8 @@ fun Fold8AdaptiveApp(
                 repeatSpeeds = repeatSpeeds,
                 currentRepeatIndex = currentRepeatIndex,
                 currentSpeed = effectiveCurrentSpeed,
+                coachingDisplayMode = coachingDisplayMode,
+                onCoachingDisplayModeChange = { handleDisplayModeChange(it) },
                 onSpeedChange = { handleSpeedChange(it) },
                 onOpenSettings = { showSettingsDialog = true },
                 onSelectSentence = {
@@ -1512,6 +1770,8 @@ fun MainDualPaneLayout(
     repeatSpeeds: List<Float>,
     currentRepeatIndex: Int = 1,
     currentSpeed: Float = 1.0f,
+    coachingDisplayMode: CoachingDisplayMode = CoachingDisplayMode.PRONUNCIATION,
+    onCoachingDisplayModeChange: (CoachingDisplayMode) -> Unit = {},
     onSpeedChange: (Float) -> Unit = {},
     onOpenSettings: () -> Unit,
     onSelectSentence: (Sentence) -> Unit,
@@ -1892,13 +2152,15 @@ fun MainDualPaneLayout(
 
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    // Prominent Coaching Guide (낭독·강세 & 팁) Card - Font 17sp Maintained
-                    CoachingGuideCard(
-                        guide = activeSentence?.guide ?: "",
-                        tip = activeSentence?.tip ?: "",
+                    // Sentence Media Coaching Section (낭독·강세 & 연상 이미지 토글 버튼)
+                    SentenceMediaCoachingSection(
+                        sentence = activeSentence,
+                        displayMode = coachingDisplayMode,
+                        onDisplayModeChange = onCoachingDisplayModeChange,
                         containerColor = Color(0xFF0F2338),
                         borderColor = Color(0xFF0284C7).copy(alpha = 0.6f),
-                        fontSize = 17.sp
+                        fontSize = 17.sp,
+                        imageHeight = 260.dp
                     )
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -1935,6 +2197,8 @@ fun FlexModeLayout(
     repeatSpeeds: List<Float> = emptyList(),
     currentRepeatIndex: Int = 1,
     currentSpeed: Float = 1.0f,
+    coachingDisplayMode: CoachingDisplayMode = CoachingDisplayMode.PRONUNCIATION,
+    onCoachingDisplayModeChange: (CoachingDisplayMode) -> Unit = {},
     onSpeedChange: (Float) -> Unit = {},
     onOpenSettings: () -> Unit = {},
     onPlayAll: () -> Unit = {},
@@ -2094,13 +2358,15 @@ fun FlexModeLayout(
                                 lineHeight = 26.sp
                             )
 
-                            CoachingGuideCard(
-                                guide = activeSentence?.guide ?: "",
-                                tip = activeSentence?.tip ?: "",
+                            SentenceMediaCoachingSection(
+                                sentence = activeSentence,
+                                displayMode = coachingDisplayMode,
+                                onDisplayModeChange = onCoachingDisplayModeChange,
                                 modifier = Modifier.padding(top = 8.dp),
                                 containerColor = Color(0xFF082F49).copy(alpha = 0.55f),
                                 borderColor = Color(0xFF0284C7).copy(alpha = 0.4f),
-                                fontSize = 14.sp
+                                fontSize = 14.sp,
+                                imageHeight = 180.dp
                             )
                         }
 
