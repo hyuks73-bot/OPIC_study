@@ -1718,129 +1718,34 @@ fun MainDualPaneLayout(
                         }
                     }
                 }
-            }
 
-            // HINGE SEPARATOR
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .width(1.dp)
-                    .background(Color(0xFF1E293B))
-            )
+                Spacer(modifier = Modifier.height(10.dp))
 
-            // RIGHT PANE: Focused Shadowing Studio (Weight 1f)
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .background(Color(0xFF0F172A))
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Surface(
-                                color = Color(0xFF6366F1),
-                                shape = RoundedCornerShape(6.dp)
-                            ) {
-                                Text(
-                                    text = activeSentence?.id?.uppercase() ?: "SENTENCE",
-                                    color = Color.White,
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-                                )
-                            }
-                            Text(
-                                text = "👨‍💼 Andrew HD Neural Voice",
-                                color = Color(0xFFA5B4FC),
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
+                // Left Pane Bottom: Repeat Progress & Speed Slider
+                PlaybackRepeatProgressIndicator(
+                    currentRepeatIndex = currentRepeatIndex,
+                    repeatTargetCount = repeatCount,
+                    isPlaying = isPlaying
+                )
 
-                        RepeatSpeedSettingButton(
-                            repeatCount = repeatCount,
-                            repeatSpeeds = repeatSpeeds,
-                            onClick = onOpenSettings
-                        )
-                    }
+                Spacer(modifier = Modifier.height(6.dp))
 
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    Surface(
-                        color = Color(0xFF131D33),
-                        shape = RoundedCornerShape(16.dp),
-                        border = BorderStroke(1.dp, Color(0xFF1E293B)),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(modifier = Modifier.padding(14.dp)) {
-                            Text(
-                                text = activeSentence?.let { cleanSentenceText(it.en) } ?: "문장을 선택해 주세요.",
-                                color = Color.White,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                lineHeight = 26.sp
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = activeSentence?.ko ?: "",
-                                color = Color(0xFF94A3B8),
-                                fontSize = 13.sp,
-                                lineHeight = 19.sp
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    CoachingGuideCard(
-                        guide = activeSentence?.guide ?: "",
-                        tip = activeSentence?.tip ?: "",
-                        fontSize = 14.sp
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    PlaybackRepeatProgressIndicator(
-                        currentRepeatIndex = currentRepeatIndex,
-                        repeatTargetCount = repeatCount,
-                        isPlaying = isPlaying
-                    )
-
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    DragSpeedSlider(
-                        currentSpeed = repeatSpeeds.getOrElse(0) { 1.0f },
-                        onSpeedChange = onSpeedChange
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
+                DragSpeedSlider(
+                    currentSpeed = repeatSpeeds.getOrElse(0) { 1.0f },
+                    onSpeedChange = onSpeedChange
+                )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Bottom Player Control Deck
+                // Left Pane Bottom: Player Control Deck
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     FilledIconButton(
                         onClick = onPrev,
-                        modifier = Modifier.size(48.dp),
+                        modifier = Modifier.size(46.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color(0xFF1E293B))
                     ) {
@@ -1849,7 +1754,7 @@ fun MainDualPaneLayout(
 
                     Button(
                         onClick = onTogglePlay,
-                        modifier = Modifier.weight(1f).height(48.dp),
+                        modifier = Modifier.weight(1f).height(46.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (isPlaying) Color(0xFF4338CA) else Color(0xFF6366F1)
                         ),
@@ -1870,7 +1775,7 @@ fun MainDualPaneLayout(
 
                     FilledIconButton(
                         onClick = onStop,
-                        modifier = Modifier.size(48.dp),
+                        modifier = Modifier.size(46.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color(0xFF1E293B))
                     ) {
@@ -1879,12 +1784,111 @@ fun MainDualPaneLayout(
 
                     FilledIconButton(
                         onClick = onNext,
-                        modifier = Modifier.size(48.dp),
+                        modifier = Modifier.size(46.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color(0xFF1E293B))
                     ) {
                         Icon(Icons.Default.SkipNext, contentDescription = "Next", tint = Color.White)
                     }
+                }
+            }
+
+            // HINGE SEPARATOR
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(1.dp)
+                    .background(Color(0xFF1E293B))
+            )
+
+            // RIGHT PANE: Focused Shadowing Studio (낭독·강세 집중 스튜디오)
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .background(Color(0xFF0F172A))
+                    .padding(horizontal = 18.dp, vertical = 14.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Surface(
+                                color = Color(0xFF6366F1),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Text(
+                                    text = activeSentence?.id?.uppercase() ?: "SENTENCE",
+                                    color = Color.White,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                                )
+                            }
+                            Text(
+                                text = "👨‍💼 Andrew HD Neural Voice",
+                                color = Color(0xFFA5B4FC),
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+
+                        RepeatSpeedSettingButton(
+                            repeatCount = repeatCount,
+                            repeatSpeeds = repeatSpeeds,
+                            onClick = onOpenSettings
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    // English Sentence & Korean Translation Card with Large Font
+                    Surface(
+                        color = Color(0xFF131D33),
+                        shape = RoundedCornerShape(18.dp),
+                        border = BorderStroke(1.5.dp, Color(0xFF2E3856)),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(modifier = Modifier.padding(18.dp)) {
+                            Text(
+                                text = activeSentence?.let { cleanSentenceText(it.en) } ?: "문장을 선택해 주세요.",
+                                color = Color.White,
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                lineHeight = 32.sp
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(
+                                text = activeSentence?.ko ?: "",
+                                color = Color(0xFFCBD5E1),
+                                fontSize = 15.sp,
+                                lineHeight = 22.sp
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    // Prominent Coaching Guide (낭독·강세 & 팁) Card with Enlarged Font
+                    CoachingGuideCard(
+                        guide = activeSentence?.guide ?: "",
+                        tip = activeSentence?.tip ?: "",
+                        containerColor = Color(0xFF0F2338),
+                        borderColor = Color(0xFF0284C7).copy(alpha = 0.6f),
+                        fontSize = 17.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(14.dp))
                 }
             }
         }
