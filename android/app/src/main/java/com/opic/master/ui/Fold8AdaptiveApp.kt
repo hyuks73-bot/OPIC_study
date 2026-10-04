@@ -931,6 +931,7 @@ fun Fold8AdaptiveApp(
     onTogglePlay: () -> Unit,
     onStop: () -> Unit,
     onUpdateSettings: (Int, List<Float>) -> Unit = { _, _ -> },
+    onSetTemporarySpeed: (Float) -> Unit = {},
     isSyncing: Boolean = false,
     onSyncGitHub: () -> Unit
 ) {
@@ -1072,9 +1073,21 @@ fun Fold8AdaptiveApp(
 
     val isDisplayingFlex = isUnfolded && (isFlexMode || isManualFlexActive)
 
+    // Temporary speed override applied ONLY to the current repeat iteration
+    var tempSpeedOverride by remember { mutableStateOf<Float?>(null) }
+
+    // When the repeat count advances or sentence changes or playback stops, reset the temporary override
+    LaunchedEffect(currentRepeatIndex, currentPlayingId, isPlaying) {
+        tempSpeedOverride = null
+    }
+
+    // Effective playback speed for the currently playing iteration
+    val effectiveCurrentSpeed = tempSpeedOverride
+        ?: repeatSpeeds.getOrElse((currentRepeatIndex - 1).coerceAtLeast(0)) { 1.0f }
+
     fun handleSpeedChange(newSpeed: Float) {
-        val newSpeeds = List(repeatCount) { newSpeed }
-        handleSaveSettings(repeatCount, newSpeeds)
+        tempSpeedOverride = newSpeed
+        onSetTemporarySpeed(newSpeed)
     }
 
     when {
@@ -1115,6 +1128,7 @@ fun Fold8AdaptiveApp(
                 repeatCount = repeatCount,
                 repeatSpeeds = repeatSpeeds,
                 currentRepeatIndex = currentRepeatIndex,
+                currentSpeed = effectiveCurrentSpeed,
                 onSpeedChange = { handleSpeedChange(it) },
                 onOpenSettings = { showSettingsDialog = true },
                 onPlayAll = { onPlayAll(filteredSentences, repeatCount, repeatSpeeds) },
@@ -1142,6 +1156,7 @@ fun Fold8AdaptiveApp(
                 repeatCount = repeatCount,
                 repeatSpeeds = repeatSpeeds,
                 currentRepeatIndex = currentRepeatIndex,
+                currentSpeed = effectiveCurrentSpeed,
                 onSpeedChange = { handleSpeedChange(it) },
                 onOpenSettings = { showSettingsDialog = true },
                 onSelectSentence = {
@@ -1496,6 +1511,7 @@ fun MainDualPaneLayout(
     repeatCount: Int,
     repeatSpeeds: List<Float>,
     currentRepeatIndex: Int = 1,
+    currentSpeed: Float = 1.0f,
     onSpeedChange: (Float) -> Unit = {},
     onOpenSettings: () -> Unit,
     onSelectSentence: (Sentence) -> Unit,
@@ -1894,7 +1910,7 @@ fun MainDualPaneLayout(
                 ) {
                     Spacer(modifier = Modifier.height(6.dp))
                     DragSpeedSlider(
-                        currentSpeed = repeatSpeeds.getOrElse(0) { 1.0f },
+                        currentSpeed = currentSpeed,
                         onSpeedChange = onSpeedChange
                     )
                 }
@@ -1918,6 +1934,7 @@ fun FlexModeLayout(
     repeatCount: Int,
     repeatSpeeds: List<Float> = emptyList(),
     currentRepeatIndex: Int = 1,
+    currentSpeed: Float = 1.0f,
     onSpeedChange: (Float) -> Unit = {},
     onOpenSettings: () -> Unit = {},
     onPlayAll: () -> Unit = {},
@@ -2160,7 +2177,7 @@ fun FlexModeLayout(
                     )
 
                     DragSpeedSlider(
-                        currentSpeed = repeatSpeeds.getOrElse(0) { 1.0f },
+                        currentSpeed = currentSpeed,
                         onSpeedChange = onSpeedChange
                     )
 

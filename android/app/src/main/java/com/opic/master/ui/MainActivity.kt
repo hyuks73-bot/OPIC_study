@@ -105,6 +105,9 @@ class MainActivity : ComponentActivity() {
                 onUpdateSettings = { newRepeat, speeds ->
                     updatePlaybackSettings(newRepeat, speeds)
                 },
+                onSetTemporarySpeed = { speed ->
+                    setTemporarySpeed(speed)
+                },
                 onSyncGitHub = {
                     triggerGitHubSync()
                 },
@@ -189,6 +192,14 @@ class MainActivity : ComponentActivity() {
             action = PlaybackService.ACTION_UPDATE_SETTINGS
             putExtra(PlaybackService.EXTRA_REPEAT_COUNT, repeatCount)
             putExtra(PlaybackService.EXTRA_REPEAT_SPEEDS, speeds.toFloatArray())
+        }
+        startService(intent)
+    }
+
+    private fun setTemporarySpeed(speed: Float) {
+        val intent = Intent(this, PlaybackService::class.java).apply {
+            action = PlaybackService.ACTION_SET_TEMPORARY_SPEED
+            putExtra(PlaybackService.EXTRA_TEMPORARY_SPEED, speed)
         }
         startService(intent)
     }

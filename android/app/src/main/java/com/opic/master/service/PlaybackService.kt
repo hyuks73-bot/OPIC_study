@@ -61,12 +61,14 @@ class PlaybackService : MediaSessionService() {
         const val ACTION_RESUME = "ACTION_RESUME"
         const val ACTION_PREV = "ACTION_PREV"
         const val ACTION_NEXT = "ACTION_NEXT"
+        const val ACTION_SET_TEMPORARY_SPEED = "ACTION_SET_TEMPORARY_SPEED"
 
         const val EXTRA_AUDIO_PATH = "EXTRA_AUDIO_PATH"
         const val EXTRA_SENTENCE_TITLE = "EXTRA_SENTENCE_TITLE"
         const val EXTRA_SENTENCE_ID = "EXTRA_SENTENCE_ID"
         const val EXTRA_REPEAT_COUNT = "EXTRA_REPEAT_COUNT"
         const val EXTRA_REPEAT_SPEEDS = "EXTRA_REPEAT_SPEEDS"
+        const val EXTRA_TEMPORARY_SPEED = "EXTRA_TEMPORARY_SPEED"
 
         const val EXTRA_AUDIO_PATHS = "EXTRA_AUDIO_PATHS"
         const val EXTRA_SENTENCE_TITLES = "EXTRA_SENTENCE_TITLES"
@@ -302,6 +304,11 @@ class PlaybackService : MediaSessionService() {
                     currentRepeat = 0
                     playCurrentPlaylistItem()
                 }
+            }
+
+            ACTION_SET_TEMPORARY_SPEED -> {
+                val tempSpeed = intent.getFloatExtra(EXTRA_TEMPORARY_SPEED, 1.0f)
+                player.setPlaybackSpeed(tempSpeed)
             }
         }
 
