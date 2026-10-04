@@ -1,14 +1,32 @@
 package com.opic.master.ui
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
+import android.content.Context
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import android.content.Context
 import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
@@ -19,9 +37,47 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.CloudSync
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SkipNext
+import androidx.compose.material.icons.filled.SkipPrevious
+import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.VerticalSplit
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,6 +96,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.opic.master.data.model.Sentence
 import kotlinx.coroutines.flow.first
+import java.util.Locale
+import kotlin.math.abs
+import kotlin.math.round
 
 // =========================================================================
 // DATA MODELS & PRECOMPILED REGEX UTILITIES (Optimized for Zero-GC in UI)
@@ -61,7 +120,7 @@ val DEFAULT_DAYS = listOf(
     DayMeta("day6", "Day 6", "휴일 루틴 & 홈캉스", "🏖️")
 )
 
-fun naturalDayComparator(): Comparator<String> = Comparator { a, b ->
+val NATURAL_DAY_COMPARATOR = Comparator<String> { a, b ->
     val numA = a.filter { it.isDigit() }.toIntOrNull() ?: 0
     val numB = b.filter { it.isDigit() }.toIntOrNull() ?: 0
     if (numA != numB) numA.compareTo(numB) else a.compareTo(b)
@@ -81,7 +140,7 @@ fun cleanGuideText(guide: String): String =
         .replace(MULTI_SPACE_REGEX, " ")
         .trim()
 
-fun naturalSentenceComparator(): Comparator<Sentence> = Comparator { a, b ->
+val NATURAL_SENTENCE_COMPARATOR = Comparator<Sentence> { a, b ->
     if (a.orderIndex != b.orderIndex) {
         return@Comparator a.orderIndex.compareTo(b.orderIndex)
     }
@@ -116,7 +175,7 @@ fun DaySelectorTabs(
             .padding(horizontal = horizontalPadding.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(days) { meta ->
+        items(days, key = { it.key }) { meta ->
             val isSelected = selectedDay == meta.key
             Surface(
                 shape = CircleShape,
@@ -631,6 +690,207 @@ fun CoachingGuideCard(
     }
 }
 
+@Composable
+fun PlaybackRepeatProgressIndicator(
+    currentRepeatIndex: Int,
+    repeatTargetCount: Int,
+    isPlaying: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val displayIndex = currentRepeatIndex.coerceIn(1, repeatTargetCount)
+    Surface(
+        color = if (isPlaying) Color(0xFF1E1B4B) else Color(0xFF0F172A),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(
+            1.dp,
+            if (isPlaying) Color(0xFF4F46E5) else Color(0xFF1E293B)
+        ),
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(if (isPlaying) Color(0xFF10B981) else Color(0xFF64748B))
+                    )
+                    Text(
+                        text = if (isPlaying) "🔄 섀도잉 반복 진행 중" else "⏸️ 반복 대기 중",
+                        color = if (isPlaying) Color(0xFF34D399) else Color(0xFF94A3B8),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Surface(
+                    color = if (isPlaying) Color(0xFF4338CA) else Color(0xFF1E293B),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = "현재 $displayIndex / $repeatTargetCount 회차",
+                        color = if (isPlaying) Color.White else Color(0xFF94A3B8),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                    )
+                }
+            }
+
+            // Step Indicator Chips (1..repeatTargetCount)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                for (step in 1..repeatTargetCount) {
+                    val isCompleted = isPlaying && step < displayIndex
+                    val isCurrent = isPlaying && step == displayIndex
+
+                    Surface(
+                        modifier = Modifier.weight(1f),
+                        color = when {
+                            isCurrent -> Color(0xFF6366F1)
+                            isCompleted -> Color(0xFF064E3B)
+                            else -> Color(0xFF1E293B)
+                        },
+                        shape = RoundedCornerShape(6.dp),
+                        border = BorderStroke(
+                            1.dp,
+                            when {
+                                isCurrent -> Color(0xFFA5B4FC)
+                                isCompleted -> Color(0xFF059669)
+                                else -> Color(0xFF334155)
+                            }
+                        )
+                    ) {
+                        Text(
+                            text = when {
+                                isCompleted -> "${step}회 ✓"
+                                isCurrent -> "▶ ${step}회"
+                                else -> "${step}회"
+                            },
+                            color = when {
+                                isCurrent -> Color.White
+                                isCompleted -> Color(0xFF34D399)
+                                else -> Color(0xFF64748B)
+                            },
+                            fontSize = 10.sp,
+                            fontWeight = if (isCurrent) FontWeight.ExtraBold else FontWeight.Medium,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(vertical = 4.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DragSpeedSlider(
+    currentSpeed: Float,
+    onSpeedChange: (Float) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var sliderValue by remember(currentSpeed) { mutableFloatStateOf(currentSpeed.coerceIn(0.5f, 2.0f)) }
+
+    Surface(
+        color = Color(0xFF0F172A),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, Color(0xFF1E293B)),
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Text(
+                        text = "⚡ 배속 드래그 조절",
+                        color = Color(0xFF7DD3FC),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Surface(
+                        color = Color(0xFF1E1B4B),
+                        shape = RoundedCornerShape(6.dp),
+                        border = BorderStroke(1.dp, Color(0xFF4338CA))
+                    ) {
+                        Text(
+                            text = String.format(Locale.US, "%.1fx", sliderValue),
+                            color = Color(0xFFA5B4FC),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp)
+                        )
+                    }
+                }
+
+                // Quick Presets
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    listOf(0.8f, 1.0f, 1.2f, 1.5f).forEach { preset ->
+                        Surface(
+                            color = if (abs(sliderValue - preset) < 0.05f) Color(0xFF4338CA) else Color(0xFF1E293B),
+                            shape = RoundedCornerShape(6.dp),
+                            modifier = Modifier.clickable {
+                                sliderValue = preset
+                                onSpeedChange(preset)
+                            }
+                        ) {
+                            Text(
+                                text = "${preset}x",
+                                color = if (abs(sliderValue - preset) < 0.05f) Color.White else Color(0xFF94A3B8),
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(2.dp))
+
+            Slider(
+                value = sliderValue,
+                onValueChange = { newValue ->
+                    val rounded = (round(newValue * 10f) / 10f).coerceIn(0.5f, 2.0f)
+                    sliderValue = rounded
+                    onSpeedChange(rounded)
+                },
+                valueRange = 0.5f..2.0f,
+                steps = 14,
+                colors = SliderDefaults.colors(
+                    thumbColor = Color(0xFF818CF8),
+                    activeTrackColor = Color(0xFF6366F1),
+                    inactiveTrackColor = Color(0xFF1E293B)
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(32.dp)
+            )
+        }
+    }
+}
+
 // =========================================================================
 // AUTO-SCROLL HELPER
 // =========================================================================
@@ -665,6 +925,7 @@ fun Fold8AdaptiveApp(
     isFlexMode: Boolean,
     isPlaying: Boolean,
     currentPlayingId: String?,
+    currentRepeatIndex: Int = 1,
     onPlaySentence: (Sentence, Int, List<Float>) -> Unit,
     onPlayAll: (List<Sentence>, Int, List<Float>) -> Unit,
     onTogglePlay: () -> Unit,
@@ -677,7 +938,7 @@ fun Fold8AdaptiveApp(
         if (days.isNotEmpty()) {
             days
         } else if (sentences.isNotEmpty()) {
-            val distinctKeys = sentences.map { it.dayKey }.distinct().sortedWith(naturalDayComparator())
+            val distinctKeys = sentences.map { it.dayKey }.distinct().sortedWith(NATURAL_DAY_COMPARATOR)
             distinctKeys.map { key ->
                 DEFAULT_DAYS.find { it.key == key } ?: run {
                     val num = key.filter { it.isDigit() }
@@ -744,7 +1005,7 @@ fun Fold8AdaptiveApp(
 
     val filteredSentences = remember(sentences, selectedDay) {
         sentences.filter { it.dayKey == selectedDay }
-            .sortedWith(naturalSentenceComparator())
+            .sortedWith(NATURAL_SENTENCE_COMPARATOR)
     }
 
     val currentActiveSentence = activeSentence?.takeIf { s -> filteredSentences.any { it.id == s.id } }
@@ -811,6 +1072,11 @@ fun Fold8AdaptiveApp(
 
     val isDisplayingFlex = isUnfolded && (isFlexMode || isManualFlexActive)
 
+    fun handleSpeedChange(newSpeed: Float) {
+        val newSpeeds = List(repeatCount) { newSpeed }
+        handleSaveSettings(repeatCount, newSpeeds)
+    }
+
     when {
         !isUnfolded -> {
             CoverDisplayLayout(
@@ -848,6 +1114,8 @@ fun Fold8AdaptiveApp(
                 isPlaying = isPlaying,
                 repeatCount = repeatCount,
                 repeatSpeeds = repeatSpeeds,
+                currentRepeatIndex = currentRepeatIndex,
+                onSpeedChange = { handleSpeedChange(it) },
                 onOpenSettings = { showSettingsDialog = true },
                 onTogglePlay = handleToggleOrPlayActive,
                 onStop = onStop,
@@ -872,6 +1140,8 @@ fun Fold8AdaptiveApp(
                 isPlaying = isPlaying,
                 repeatCount = repeatCount,
                 repeatSpeeds = repeatSpeeds,
+                currentRepeatIndex = currentRepeatIndex,
+                onSpeedChange = { handleSpeedChange(it) },
                 onOpenSettings = { showSettingsDialog = true },
                 onSelectSentence = {
                     activeSentence = it
@@ -1125,7 +1395,7 @@ fun CoverDisplayLayout(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
                 contentPadding = PaddingValues(bottom = 16.dp)
             ) {
-                items(sentences) { sentence ->
+                items(sentences, key = { it.id }) { sentence ->
                     val isThisActive = activeSentence?.id == sentence.id
                     val isThisPlaying = isThisActive && isPlaying
 
@@ -1224,6 +1494,8 @@ fun MainDualPaneLayout(
     isPlaying: Boolean,
     repeatCount: Int,
     repeatSpeeds: List<Float>,
+    currentRepeatIndex: Int = 1,
+    onSpeedChange: (Float) -> Unit = {},
     onOpenSettings: () -> Unit,
     onSelectSentence: (Sentence) -> Unit,
     onPlayAll: () -> Unit,
@@ -1405,7 +1677,7 @@ fun MainDualPaneLayout(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.weight(1f)
                 ) {
-                    items(sentences) { s ->
+                    items(sentences, key = { it.id }) { s ->
                         val isSelected = s.id == activeSentence?.id
                         val isThisPlaying = isSelected && isPlaying
 
@@ -1535,6 +1807,21 @@ fun MainDualPaneLayout(
                         tip = activeSentence?.tip ?: "",
                         fontSize = 15.sp
                     )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    PlaybackRepeatProgressIndicator(
+                        currentRepeatIndex = currentRepeatIndex,
+                        repeatTargetCount = repeatCount,
+                        isPlaying = isPlaying
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    DragSpeedSlider(
+                        currentSpeed = repeatSpeeds.getOrElse(0) { 1.0f },
+                        onSpeedChange = onSpeedChange
+                    )
                 }
 
                 // Bottom Player Control Deck
@@ -1610,6 +1897,8 @@ fun FlexModeLayout(
     isPlaying: Boolean,
     repeatCount: Int,
     repeatSpeeds: List<Float> = emptyList(),
+    currentRepeatIndex: Int = 1,
+    onSpeedChange: (Float) -> Unit = {},
     onOpenSettings: () -> Unit = {},
     onTogglePlay: () -> Unit,
     onStop: () -> Unit,
@@ -1835,6 +2124,17 @@ fun FlexModeLayout(
                             fontWeight = FontWeight.Medium
                         )
                     }
+
+                    PlaybackRepeatProgressIndicator(
+                        currentRepeatIndex = currentRepeatIndex,
+                        repeatTargetCount = repeatCount,
+                        isPlaying = isPlaying
+                    )
+
+                    DragSpeedSlider(
+                        currentSpeed = repeatSpeeds.getOrElse(0) { 1.0f },
+                        onSpeedChange = onSpeedChange
+                    )
 
                     // Full-width prominent Repeat & Speed settings button in the center
                     Surface(

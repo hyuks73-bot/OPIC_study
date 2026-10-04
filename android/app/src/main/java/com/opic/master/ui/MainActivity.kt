@@ -2,17 +2,21 @@ package com.opic.master.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.*
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalView
+import androidx.lifecycle.lifecycleScope
 import androidx.window.layout.FoldingFeature
 import androidx.window.layout.WindowInfoTracker
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.lifecycle.lifecycleScope
 import com.opic.master.data.local.AppDatabase
 import com.opic.master.data.model.Sentence
 import com.opic.master.data.sync.GitHubSyncWorker
@@ -20,8 +24,7 @@ import com.opic.master.service.PlaybackService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-
-private val HTML_TAG_REGEX = Regex("<.*?>")
+import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
 
@@ -36,7 +39,7 @@ class MainActivity : ComponentActivity() {
             AppDatabase.seedDatabaseIfEmpty(this@MainActivity, db.sentenceDao())
         }
 
-        // 2. Trigger background differential GitHub Sync via WorkManager
+        // 2. Trigger background differential GitHub Sync
         triggerGitHubSync()
 
         setContent {
@@ -47,6 +50,7 @@ class MainActivity : ComponentActivity() {
             }
             val isPlaying by PlaybackService.isPlayingFlow.collectAsState()
             val currentPlayingId by PlaybackService.currentPlayingSentenceId.collectAsState()
+            val currentRepeatIndex by PlaybackService.currentRepeatFlow.collectAsState()
             val isSyncing by GitHubSyncWorker.isSyncingFlow.collectAsState()
 
             val currentView = LocalView.current
@@ -65,7 +69,7 @@ class MainActivity : ComponentActivity() {
                 WindowInfoTracker.getOrCreate(this@MainActivity)
                     .windowLayoutInfo(this@MainActivity)
                     .collectLatest { layoutInfo ->
-                        val foldFeature = layoutInfo.displayFeatures.filterIsInstance<FoldingFeature>().firstOrNull()
+                        val foldFeature = layoutInfo.displayFeatures.firstNotNullOfOrNull { it as? FoldingFeature }
                         foldingFeatureState = foldFeature?.state
                     }
             }
@@ -84,6 +88,7 @@ class MainActivity : ComponentActivity() {
                 isFlexMode = isFlexMode,
                 isPlaying = isPlaying,
                 currentPlayingId = currentPlayingId,
+                currentRepeatIndex = currentRepeatIndex,
                 isSyncing = isSyncing,
                 onPlaySentence = { sentence, repeatCount, speeds ->
                     playSentenceViaService(sentence, repeatCount, speeds)
@@ -102,35 +107,35 @@ class MainActivity : ComponentActivity() {
                 },
                 onSyncGitHub = {
                     triggerGitHubSync()
-                }
+                },
             )
         }
     }
 
     private fun triggerGitHubSync() {
         if (GitHubSyncWorker.isSyncingFlow.value) {
-            android.widget.Toast.makeText(this, "이미 최신 데이터 동기화가 진행 중입니다...", android.widget.Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "이미 최신 데이터 동기화가 진행 중입니다...", Toast.LENGTH_SHORT).show()
             return
         }
-        android.widget.Toast.makeText(this, "🔄 GitHub 최신 학습 데이터 동기화 시작...", android.widget.Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "🔄 GitHub 최신 학습 데이터 동기화 시작...", Toast.LENGTH_SHORT).show()
         lifecycleScope.launch(Dispatchers.IO) {
             val success = GitHubSyncWorker.performSync(applicationContext)
-            kotlinx.coroutines.withContext(Dispatchers.Main) {
+            withContext(Dispatchers.Main) {
                 if (success) {
-                    android.widget.Toast.makeText(this@MainActivity, "✅ 동기화 완료! 새로운 학습 세트가 반영되었습니다.", android.widget.Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, "✅ 동기화 완료! 새로운 학습 세트가 반영되었습니다.", Toast.LENGTH_SHORT).show()
                 } else {
-                    android.widget.Toast.makeText(this@MainActivity, "⚠️ 동기화 실패: 네트워크 상태를 확인해 주세요.", android.widget.Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@MainActivity, "⚠️ 동기화 실패: 네트워크 상태를 확인해 주세요.", Toast.LENGTH_LONG).show()
                 }
             }
         }
     }
 
     private fun playSentenceViaService(sentence: Sentence, repeatCount: Int, speeds: List<Float> = emptyList()) {
-        val path = sentence.localAudioPath ?: "https://raw.githubusercontent.com/hyuks73-bot/OPIC_study/main/${sentence.audioUrl}"
+        val path = sentence.localAudioPath ?: "${GitHubSyncWorker.GITHUB_RAW_BASE}/${sentence.audioUrl}"
         val intent = Intent(this, PlaybackService::class.java).apply {
             action = PlaybackService.ACTION_PLAY_SENTENCE
             putExtra(PlaybackService.EXTRA_AUDIO_PATH, path)
-            putExtra(PlaybackService.EXTRA_SENTENCE_TITLE, sentence.en.replace(HTML_TAG_REGEX, ""))
+            putExtra(PlaybackService.EXTRA_SENTENCE_TITLE, cleanSentenceText(sentence.en))
             putExtra(PlaybackService.EXTRA_SENTENCE_ID, sentence.id)
             putExtra(PlaybackService.EXTRA_REPEAT_COUNT, repeatCount)
             if (speeds.isNotEmpty()) {
@@ -142,9 +147,15 @@ class MainActivity : ComponentActivity() {
 
     private fun playAllViaService(sentences: List<Sentence>, repeatCount: Int, speeds: List<Float> = emptyList()) {
         if (sentences.isEmpty()) return
-        val paths = ArrayList(sentences.map { it.localAudioPath ?: "https://raw.githubusercontent.com/hyuks73-bot/OPIC_study/main/${it.audioUrl}" })
-        val titles = ArrayList(sentences.map { it.en.replace(HTML_TAG_REGEX, "") })
-        val ids = ArrayList(sentences.map { it.id })
+        val paths = ArrayList<String>(sentences.size)
+        val titles = ArrayList<String>(sentences.size)
+        val ids = ArrayList<String>(sentences.size)
+
+        for (s in sentences) {
+            paths.add(s.localAudioPath ?: "${GitHubSyncWorker.GITHUB_RAW_BASE}/${s.audioUrl}")
+            titles.add(cleanSentenceText(s.en))
+            ids.add(s.id)
+        }
 
         val intent = Intent(this, PlaybackService::class.java).apply {
             action = PlaybackService.ACTION_PLAY_ALL

@@ -18,12 +18,15 @@ import java.io.FileOutputStream
 
 class GitHubSyncWorker(
     appContext: Context,
-    workerParams: WorkerParameters
+    workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams) {
 
     companion object {
         const val GITHUB_RAW_BASE = "https://raw.githubusercontent.com/hyuks73-bot/OPIC_study/main"
         const val MANIFEST_URL = "$GITHUB_RAW_BASE/data_manifest.json"
+
+        private val sharedHttpClient by lazy { OkHttpClient() }
+        private val sharedGson by lazy { Gson() }
 
         private val _isSyncingFlow = MutableStateFlow(false)
         val isSyncingFlow = _isSyncingFlow.asStateFlow()
@@ -31,8 +34,8 @@ class GitHubSyncWorker(
         suspend fun performSync(context: Context): Boolean = withContext(Dispatchers.IO) {
             _isSyncingFlow.value = true
             try {
-                val client = OkHttpClient()
-                val gson = Gson()
+                val client = sharedHttpClient
+                val gson = sharedGson
                 val dao = AppDatabase.getDatabase(context).sentenceDao()
 
                 // 1. Fetch manifest.json safely with auto-closeable response
@@ -86,7 +89,7 @@ class GitHubSyncWorker(
                                 localImagePath = existing?.localImagePath,
                                 isDownloaded = isDownloaded,
                                 bookmark = existing?.bookmark ?: false,
-                                repeatCount = existing?.repeatCount ?: 3
+                                repeatCount = existing?.repeatCount ?: 3,
                             )
                         )
                     }
@@ -126,7 +129,7 @@ class GitHubSyncWorker(
                                     allAudioDownloaded = false
                                 }
                             }
-                        } catch (e: Exception) {
+                        } catch (_: Exception) {
                             allAudioDownloaded = false
                         }
                     }

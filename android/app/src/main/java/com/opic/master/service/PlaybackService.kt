@@ -4,7 +4,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
@@ -14,9 +13,15 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import com.opic.master.ui.MainActivity
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class PlaybackService : MediaSessionService() {
 
@@ -355,17 +360,15 @@ class PlaybackService : MediaSessionService() {
             .build()
 
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                "OPIc Shadowing Player",
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                description = "화면이 꺼진 상태에서도 문장 섀도잉 음원을 무중단 연속 재생합니다."
-            }
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(channel)
+        val channel = NotificationChannel(
+            CHANNEL_ID,
+            "OPIc Shadowing Player",
+            NotificationManager.IMPORTANCE_LOW
+        ).apply {
+            description = "화면이 꺼진 상태에서도 문장 섀도잉 음원을 무중단 연속 재생합니다."
         }
+        val manager = getSystemService(NotificationManager::class.java)
+        manager?.createNotificationChannel(channel)
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? = mediaSession

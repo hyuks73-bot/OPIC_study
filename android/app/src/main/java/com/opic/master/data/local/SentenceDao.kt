@@ -1,28 +1,33 @@
 package com.opic.master.data.local
 
-import androidx.room.*
+import android.content.Context
+import androidx.room.Dao
+import androidx.room.Database
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Room
+import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.google.gson.Gson
 import com.opic.master.data.model.DayEntity
+import com.opic.master.data.model.ManifestResponse
 import com.opic.master.data.model.Sentence
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
 @Dao
 interface SentenceDao {
     @Query("SELECT * FROM sentences ORDER BY orderIndex ASC, id ASC")
     fun getAllSentences(): Flow<List<Sentence>>
 
-    @Query("SELECT * FROM sentences WHERE dayKey = :dayKey ORDER BY orderIndex ASC, id ASC")
-    fun getSentencesByDay(dayKey: String): Flow<List<Sentence>>
-
     @Query("SELECT * FROM sentences WHERE id = :id LIMIT 1")
     suspend fun getSentenceById(id: String): Sentence?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(sentences: List<Sentence>)
-
-    @Update
-    suspend fun update(sentence: Sentence)
 
     @Query("UPDATE sentences SET localAudioPath = :localPath, isDownloaded = 1 WHERE id = :id")
     suspend fun updateAudioDownloaded(id: String, localPath: String)
@@ -44,9 +49,6 @@ interface SentenceDao {
 
     @Query("SELECT * FROM sentences")
     suspend fun getAllSentencesList(): List<Sentence>
-
-    @Query("SELECT COUNT(*) FROM sentences WHERE isDownloaded = 1")
-    fun getDownloadedCount(): Flow<Int>
 }
 
 @Database(entities = [Sentence::class, DayEntity::class], version = 3, exportSchema = false)
@@ -69,12 +71,12 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
-        fun getDatabase(context: android.content.Context): AppDatabase {
+        fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "opic_master_database"
+                    "opic_master_database",
                 )
                 .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                 .build()
@@ -104,16 +106,16 @@ abstract class AppDatabase : RoomDatabase() {
                 tabLabel = tabLabel,
                 title = title,
                 emoji = emoji,
-                orderIndex = orderIndex
+                orderIndex = orderIndex,
             )
         }
 
-        suspend fun seedDatabaseIfEmpty(context: android.content.Context, dao: SentenceDao) {
-            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+        suspend fun seedDatabaseIfEmpty(context: Context, dao: SentenceDao) {
+            withContext(Dispatchers.IO) {
                 if (dao.getSentenceById("day1_1") == null) {
                     try {
                         val jsonString = context.assets.open("data_manifest.json").bufferedReader().use { it.readText() }
-                        val manifest = com.google.gson.Gson().fromJson(jsonString, com.opic.master.data.model.ManifestResponse::class.java)
+                        val manifest = Gson().fromJson(jsonString, ManifestResponse::class.java)
                         
                         var dayOrderCounter = 0
                         val dayEntities = manifest.days.map { (dayKey, dayData) ->
@@ -133,7 +135,7 @@ abstract class AppDatabase : RoomDatabase() {
                                     guide = item.guide,
                                     tip = item.tip,
                                     audioUrl = item.audioUrl,
-                                    imageUrl = item.imageUrl
+                                    imageUrl = item.imageUrl,
                                 )
                             }
                         }
