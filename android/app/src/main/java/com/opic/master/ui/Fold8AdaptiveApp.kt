@@ -1721,18 +1721,11 @@ fun MainDualPaneLayout(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // Left Pane Bottom: Repeat Progress & Speed Slider
+                // Left Pane Bottom: Repeat Progress
                 PlaybackRepeatProgressIndicator(
                     currentRepeatIndex = currentRepeatIndex,
                     repeatTargetCount = repeatCount,
                     isPlaying = isPlaying
-                )
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                DragSpeedSlider(
-                    currentSpeed = repeatSpeeds.getOrElse(0) { 1.0f },
-                    onSpeedChange = onSpeedChange
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -1807,11 +1800,14 @@ fun MainDualPaneLayout(
                     .weight(1f)
                     .fillMaxHeight()
                     .background(Color(0xFF0F172A))
-                    .padding(horizontal = 18.dp, vertical = 14.dp)
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
+                // Scrollable Top Content
                 Column(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .weight(1f)
+                        .fillMaxWidth()
                         .verticalScroll(rememberScrollState())
                 ) {
                     Row(
@@ -1825,20 +1821,20 @@ fun MainDualPaneLayout(
                         ) {
                             Surface(
                                 color = Color(0xFF6366F1),
-                                shape = RoundedCornerShape(8.dp)
+                                shape = RoundedCornerShape(6.dp)
                             ) {
                                 Text(
                                     text = activeSentence?.id?.uppercase() ?: "SENTENCE",
                                     color = Color.White,
-                                    fontSize = 13.sp,
+                                    fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
                                 )
                             }
                             Text(
                                 text = "👨‍💼 Andrew HD Neural Voice",
                                 color = Color(0xFFA5B4FC),
-                                fontSize = 13.sp,
+                                fontSize = 12.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
                         }
@@ -1850,36 +1846,36 @@ fun MainDualPaneLayout(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                    // English Sentence & Korean Translation Card with Large Font
+                    // English Sentence & Korean Translation Card with Compact Size
                     Surface(
                         color = Color(0xFF131D33),
-                        shape = RoundedCornerShape(18.dp),
-                        border = BorderStroke(1.5.dp, Color(0xFF2E3856)),
+                        shape = RoundedCornerShape(14.dp),
+                        border = BorderStroke(1.dp, Color(0xFF2E3856)),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Column(modifier = Modifier.padding(18.dp)) {
+                        Column(modifier = Modifier.padding(14.dp)) {
                             Text(
                                 text = activeSentence?.let { cleanSentenceText(it.en) } ?: "문장을 선택해 주세요.",
                                 color = Color.White,
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                lineHeight = 32.sp
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.Bold,
+                                lineHeight = 25.sp
                             )
-                            Spacer(modifier = Modifier.height(12.dp))
+                            Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = activeSentence?.ko ?: "",
-                                color = Color(0xFFCBD5E1),
-                                fontSize = 15.sp,
-                                lineHeight = 22.sp
+                                color = Color(0xFF94A3B8),
+                                fontSize = 13.sp,
+                                lineHeight = 19.sp
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                    // Prominent Coaching Guide (낭독·강세 & 팁) Card with Enlarged Font
+                    // Prominent Coaching Guide (낭독·강세 & 팁) Card - Font 17sp Maintained
                     CoachingGuideCard(
                         guide = activeSentence?.guide ?: "",
                         tip = activeSentence?.tip ?: "",
@@ -1888,7 +1884,18 @@ fun MainDualPaneLayout(
                         fontSize = 17.sp
                     )
 
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+
+                // Right Pane Bottom: Speed Slider Only
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Spacer(modifier = Modifier.height(6.dp))
+                    DragSpeedSlider(
+                        currentSpeed = repeatSpeeds.getOrElse(0) { 1.0f },
+                        onSpeedChange = onSpeedChange
+                    )
                 }
             }
         }
