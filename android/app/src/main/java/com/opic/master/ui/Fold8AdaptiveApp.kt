@@ -1117,6 +1117,7 @@ fun Fold8AdaptiveApp(
                 currentRepeatIndex = currentRepeatIndex,
                 onSpeedChange = { handleSpeedChange(it) },
                 onOpenSettings = { showSettingsDialog = true },
+                onPlayAll = { onPlayAll(filteredSentences, repeatCount, repeatSpeeds) },
                 onTogglePlay = handleToggleOrPlayActive,
                 onStop = onStop,
                 onPlaySentence = { s ->
@@ -1919,6 +1920,7 @@ fun FlexModeLayout(
     currentRepeatIndex: Int = 1,
     onSpeedChange: (Float) -> Unit = {},
     onOpenSettings: () -> Unit = {},
+    onPlayAll: () -> Unit = {},
     onTogglePlay: () -> Unit,
     onStop: () -> Unit,
     onPlaySentence: (Sentence) -> Unit,
@@ -2228,49 +2230,65 @@ fun FlexModeLayout(
                     ) {
                         FilledIconButton(
                             onClick = onPrev,
-                            modifier = Modifier.size(48.dp),
+                            modifier = Modifier.size(46.dp),
                             shape = RoundedCornerShape(14.dp),
                             colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color(0xFF1E293B))
                         ) {
                             Icon(Icons.Default.SkipPrevious, contentDescription = "Prev", modifier = Modifier.size(24.dp), tint = Color.White)
                         }
 
-                        Spacer(modifier = Modifier.width(18.dp))
+                        Spacer(modifier = Modifier.width(12.dp))
 
                         FilledIconButton(
                             onClick = onTogglePlay,
-                            modifier = Modifier.size(64.dp),
-                            shape = RoundedCornerShape(22.dp),
+                            modifier = Modifier.size(60.dp),
+                            shape = RoundedCornerShape(20.dp),
                             colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color(0xFF6366F1))
                         ) {
                             Icon(
                                 imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
                                 contentDescription = if (isPlaying) "Pause" else "Play",
-                                modifier = Modifier.size(34.dp),
+                                modifier = Modifier.size(32.dp),
                                 tint = Color.White
                             )
                         }
 
-                        Spacer(modifier = Modifier.width(14.dp))
+                        Spacer(modifier = Modifier.width(10.dp))
 
                         FilledIconButton(
                             onClick = onStop,
-                            modifier = Modifier.size(48.dp),
+                            modifier = Modifier.size(46.dp),
                             shape = RoundedCornerShape(14.dp),
                             colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color(0xFF1E293B))
                         ) {
                             Icon(Icons.Default.Stop, contentDescription = "Stop", modifier = Modifier.size(24.dp), tint = Color(0xFFEF4444))
                         }
 
-                        Spacer(modifier = Modifier.width(18.dp))
+                        Spacer(modifier = Modifier.width(12.dp))
 
                         FilledIconButton(
                             onClick = onNext,
-                            modifier = Modifier.size(48.dp),
+                            modifier = Modifier.size(46.dp),
                             shape = RoundedCornerShape(14.dp),
                             colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color(0xFF1E293B))
                         ) {
                             Icon(Icons.Default.SkipNext, contentDescription = "Next", modifier = Modifier.size(24.dp), tint = Color.White)
+                        }
+
+                        Spacer(modifier = Modifier.width(14.dp))
+
+                        // 전체 연속 청취 버튼
+                        Button(
+                            onClick = onPlayAll,
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF312E81)),
+                            shape = RoundedCornerShape(14.dp),
+                            border = BorderStroke(1.dp, Color(0xFF6366F1)),
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 10.dp),
+                            modifier = Modifier.height(46.dp)
+                        ) {
+                            Icon(Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color(0xFFA5B4FC))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("전체 연속", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
                         }
                     }
 
