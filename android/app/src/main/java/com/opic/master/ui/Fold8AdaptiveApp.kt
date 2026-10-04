@@ -709,6 +709,9 @@ fun SentenceMediaCoachingSection(
     sentence: Sentence?,
     displayMode: CoachingDisplayMode,
     onDisplayModeChange: (CoachingDisplayMode) -> Unit,
+    currentRepeatIndex: Int = 1,
+    repeatTargetCount: Int = 3,
+    isPlaying: Boolean = false,
     modifier: Modifier = Modifier,
     containerColor: Color = Color(0xFF0F2338),
     borderColor: Color = Color(0xFF0284C7).copy(alpha = 0.6f),
@@ -747,7 +750,7 @@ fun SentenceMediaCoachingSection(
                 .fillMaxWidth()
                 .padding(12.dp)
         ) {
-            // Top Toggle Buttons: [🗣️ 낭독·강세] vs [🖼️ 연상 이미지]
+            // Top Toggle Buttons: Repeat Badge + [🗣️ 낭독·강세] vs [🖼️ 연상 이미지]
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -757,6 +760,25 @@ fun SentenceMediaCoachingSection(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    // Repeat Count Badge on the left of 낭독/이미지
+                    val displayIndex = currentRepeatIndex.coerceIn(1, repeatTargetCount)
+                    Surface(
+                        color = if (isPlaying) Color(0xFF1E1B4B) else Color(0xFF1E293B),
+                        shape = RoundedCornerShape(8.dp),
+                        border = BorderStroke(
+                            1.dp,
+                            if (isPlaying) Color(0xFF4338CA) else Color(0xFF334155)
+                        )
+                    ) {
+                        Text(
+                            text = "${displayIndex}/${repeatTargetCount}회",
+                            color = if (isPlaying) Color(0xFFA5B4FC) else Color(0xFF94A3B8),
+                            fontSize = 11.5.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            modifier = Modifier.padding(horizontal = 7.dp, vertical = 4.dp)
+                        )
+                    }
+
                     // Pronunciation Tab Button
                     Surface(
                         color = if (displayMode == CoachingDisplayMode.PRONUNCIATION) Color(0xFF0284C7) else Color(0xFF1E293B),
@@ -1451,6 +1473,7 @@ fun CoverDisplayLayout(
     isPlaying: Boolean,
     repeatCount: Int,
     repeatSpeeds: List<Float>,
+    currentRepeatIndex: Int = 1,
     onOpenSettings: () -> Unit,
     showCoaching: Boolean,
     onToggleCoaching: () -> Unit,
@@ -1634,6 +1657,24 @@ fun CoverDisplayLayout(
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        // Repeat count badge on left of "🗣️ 낭독 / 🖼️ 이미지 / 접기"
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = if (isPlaying) Color(0xFF1E1B4B) else Color(0xFF1E293B),
+                            border = BorderStroke(
+                                1.dp,
+                                if (isPlaying) Color(0xFF4338CA) else Color(0xFF334155)
+                            )
+                        ) {
+                            Text(
+                                text = "${currentRepeatIndex.coerceIn(1, repeatCount)}/${repeatCount}회",
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 5.dp),
+                                fontSize = 11.sp,
+                                color = if (isPlaying) Color(0xFFA5B4FC) else Color(0xFF94A3B8),
+                                fontWeight = FontWeight.ExtraBold
+                            )
+                        }
+
                         // 1. Coaching ON (낭독·강세) Button
                         Surface(
                             shape = RoundedCornerShape(8.dp),
@@ -1795,6 +1836,9 @@ fun CoverDisplayLayout(
                                     sentence = sentence,
                                     displayMode = coachingDisplayMode,
                                     onDisplayModeChange = onCoachingDisplayModeChange,
+                                    currentRepeatIndex = currentRepeatIndex,
+                                    repeatTargetCount = repeatCount,
+                                    isPlaying = isThisPlaying,
                                     modifier = Modifier.padding(top = 8.dp),
                                     containerColor = Color(0xFF0B1120),
                                     borderColor = Color(0xFF1E3A5F),
