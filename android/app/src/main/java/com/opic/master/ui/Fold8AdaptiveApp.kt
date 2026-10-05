@@ -122,7 +122,8 @@ val DEFAULT_DAYS = listOf(
     DayMeta("day3", "Day 3", "주말 루틴 & 자전거", "🏃"),
     DayMeta("day4", "Day 4", "과거 경험 & 롤플레이", "🎸"),
     DayMeta("day5", "Day 5", "렌터카 & 가족 여행", "🚗"),
-    DayMeta("day6", "Day 6", "휴일 루틴 & 홈캉스", "🏖️")
+    DayMeta("day6", "Day 6", "휴일 루틴 & 홈캉스", "🏖️"),
+    DayMeta("day7", "Day 7", "롤플레이 실전 (Q11 & Q12)", "🎭")
 )
 
 val NATURAL_DAY_COMPARATOR = Comparator<String> { a, b ->
@@ -640,6 +641,136 @@ fun PlaybackSettingsDialog(
                 Text("취소", color = Color(0xFF94A3B8))
             }
         }
+    )
+}
+
+/**
+ * Story Memory Guide Popup Dialog (스토리 암기 가이드 & 2-in-1 마인드맵 시트)
+ * Displays the summary mindmap sheet (images/day{N}_summary_mindmap.jpg)
+ * and day selection tabs to quickly review the storytelling flow for any Day.
+ */
+@Composable
+fun MemoryGuideDialog(
+    initialDay: String,
+    availableDays: List<DayMeta>,
+    onDismiss: () -> Unit
+) {
+    var selectedDayKey by remember(initialDay) { mutableStateOf(initialDay) }
+    val context = LocalContext.current
+    val currentMeta = availableDays.find { it.key == selectedDayKey }
+        ?: availableDays.firstOrNull()
+        ?: DEFAULT_DAYS.first()
+
+    val mindmapAssetUrl = remember(selectedDayKey) {
+        "file:///android_asset/images/${selectedDayKey}_summary_mindmap.jpg"
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "🗺️",
+                        fontSize = 20.sp
+                    )
+                    Column {
+                        Text(
+                            text = "스토리 암기 가이드",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 17.sp,
+                            color = Color.White
+                        )
+                        Text(
+                            text = "${currentMeta.emoji} ${currentMeta.title}",
+                            fontSize = 12.sp,
+                            color = Color(0xFFFBBF24),
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
+                Surface(
+                    color = Color(0xFF065F46),
+                    shape = RoundedCornerShape(6.dp)
+                ) {
+                    Text(
+                        text = "2-in-1 마인드맵 시트",
+                        color = Color(0xFFA7F3D0),
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    )
+                }
+            }
+        },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                // Day selector tabs inside dialog
+                DaySelectorTabs(
+                    days = availableDays,
+                    selectedDay = selectedDayKey,
+                    onSelectDay = { selectedDayKey = it },
+                    horizontalPadding = 0
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Mindmap image preview card
+                Surface(
+                    color = Color(0xFF0F172A),
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, Color(0xFF334155)),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(10.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        AsyncImage(
+                            model = ImageRequest.Builder(context)
+                                .data(mindmapAssetUrl)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = "${currentMeta.tabLabel} 스토리 암기 마인드맵",
+                            contentScale = ContentScale.FillWidth,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(8.dp))
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = "💡 키워드 연상 흐름으로 답변 스토리라인을 머릿속에 시각화하세요.",
+                            color = Color(0xFF94A3B8),
+                            fontSize = 11.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4F46E5)),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Text("닫기", fontWeight = FontWeight.Bold, color = Color.White)
+            }
+        },
+        containerColor = Color(0xFF1E293B)
     )
 }
 
@@ -1232,6 +1363,7 @@ fun Fold8AdaptiveApp(
     var repeatSpeeds by remember { mutableStateOf(savedSpeeds) }
     var showCoaching by remember { mutableStateOf(true) }
     var showSettingsDialog by remember { mutableStateOf(false) }
+    var showMemoryGuideDialog by remember { mutableStateOf(false) }
 
     val savedDisplayModeStr = remember(prefs) { prefs.getString("coaching_display_mode", CoachingDisplayMode.PRONUNCIATION.name) }
     var coachingDisplayMode by remember(savedDisplayModeStr) {
@@ -1271,6 +1403,14 @@ fun Fold8AdaptiveApp(
                 handleSaveSettings(count, speeds)
                 showSettingsDialog = false
             }
+        )
+    }
+
+    if (showMemoryGuideDialog) {
+        MemoryGuideDialog(
+            initialDay = selectedDay,
+            availableDays = availableDays,
+            onDismiss = { showMemoryGuideDialog = false }
         )
     }
 
@@ -1452,6 +1592,7 @@ fun Fold8AdaptiveApp(
                 onPrev = { handlePrevSentence() },
                 onNext = { handleNextSentence() },
                 onToggleFlexMode = { isManualFlexActive = true },
+                onOpenMemoryGuide = { showMemoryGuideDialog = true },
                 onSyncGitHub = onSyncGitHub,
                 isSyncing = isSyncing
             )
@@ -1906,6 +2047,7 @@ fun MainDualPaneLayout(
     onPrev: () -> Unit,
     onNext: () -> Unit,
     onToggleFlexMode: () -> Unit,
+    onOpenMemoryGuide: () -> Unit = {},
     isSyncing: Boolean = false,
     onSyncGitHub: () -> Unit
 ) {
@@ -1935,6 +2077,18 @@ fun MainDualPaneLayout(
                     }
                 },
                 actions = {
+                    Button(
+                        onClick = onOpenMemoryGuide,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD97706)),
+                        shape = RoundedCornerShape(10.dp),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        Text("🗺️", fontSize = 13.sp)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("암기 가이드", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+
                     Button(
                         onClick = onToggleFlexMode,
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4F46E5)),
