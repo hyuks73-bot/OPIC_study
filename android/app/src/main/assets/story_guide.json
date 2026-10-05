@@ -1,0 +1,617 @@
+{
+  "day1": {
+    "title": "Day 1: 서베이 전략 & 기초 입트기",
+    "chain": "🏠 2룸 아파트 혼자 산다 ➔ 🎬 취미 3개(영화/공원/음악) ➔ 🏃‍♂️ 주말 공원 조깅 ➔ 🛋️ 집에서 홈캉스 & 🎸 라이브 콘서트!",
+    "sec1": [
+      "Topic 1: 서베이 전략 & 기초 입트기",
+      [
+        [
+          "day1_1",
+          "1️⃣ 주거 형태",
+          "LIVE ALONE",
+          "I live alone in...",
+          "two-bedroom apartment (방 2개 아파트)"
+        ],
+        [
+          "day1_2",
+          "2️⃣ 3가지 취미",
+          "LIKE",
+          "I like...",
+          "watching movies ↗ / going to parks ↗ / listening to music ↘"
+        ],
+        [
+          "day1_3",
+          "3️⃣ 공원 조깅",
+          "ENJOY",
+          "I enjoy...",
+          "taking a walk & jogging at waterfront park every weekend"
+        ],
+        [
+          "day1_4",
+          "4️⃣ 홈캉스 선호",
+          "PREFER",
+          "I prefer...",
+          "staycation at home & listening to soft music"
+        ],
+        [
+          "day1_5",
+          "5️⃣ 콘서트 감상",
+          "LOVE",
+          "I love...",
+          "going to concerts & watching live shows"
+        ]
+      ]
+    ],
+    "sec2": null
+  },
+  "day2": {
+    "title": "Day 2: 묘사 패턴 (수변공원 & 내 방)",
+    "chain": "🌳 수변공원: 5km 길이 ➔ 주말 1시간 조깅 ➔ 꽃나무 최애 장소! | 🛏️ 내 방: 킹침대&협탁 ➔ 실링팬 ➔ 개별욕실 ➔ 고양이 수면!",
+    "sec1": [
+      "Topic 1: 수변공원 묘사 (Waterfront Park)",
+      [
+        [
+          "park_1",
+          "1️⃣ 위치 소개",
+          "LOVELY PARK",
+          "Well, speaking of...",
+          "waterfront park very close to my house"
+        ],
+        [
+          "park_2",
+          "2️⃣ 5km 길이",
+          "STRETCHES",
+          "It's quite long...",
+          "stretches for about 5km along the water"
+        ],
+        [
+          "park_3",
+          "3️⃣ 주말 조깅",
+          "VISIT",
+          "You know...",
+          "visit every single weekend to go jogging"
+        ],
+        [
+          "park_4",
+          "4️⃣ 운동 시간",
+          "TAKES AN HOUR",
+          "A round trip...",
+          "takes about an hour, just right exercise"
+        ],
+        [
+          "park_5",
+          "5️⃣ 꽃과 나무",
+          "LOVE MOST",
+          "What I love most is...",
+          "beautiful flowers & lush trees along trail"
+        ],
+        [
+          "park_6",
+          "6️⃣ 풍경",
+          "NEVER BORING",
+          "Because the scenery...",
+          "running there never gets boring at all"
+        ],
+        [
+          "park_7",
+          "7️⃣ 루틴 유지",
+          "STICK TO ROUTINE",
+          "So, thanks to...",
+          "stick to weekend running & stay in shape"
+        ],
+        [
+          "park_8",
+          "8️⃣ 최애 장소",
+          "FAVORITE SPOT",
+          "It's definitely...",
+          "my favorite spot in my neighborhood"
+        ]
+      ]
+    ],
+    "sec2": [
+      "Topic 2: 내 방 묘사 (My Bedroom)",
+      [
+        [
+          "bed_1",
+          "1️⃣ 최애 공간",
+          "FAVORITE SPACE",
+          "Well, speaking of...",
+          "definitely my favorite space in the house"
+        ],
+        [
+          "bed_2",
+          "2️⃣ 킹사이즈 침대",
+          "KING-SIZE BED",
+          "I have...",
+          "king-size bed & side table for chargers"
+        ],
+        [
+          "bed_3",
+          "3️⃣ 실링팬 조명",
+          "CEILING FAN",
+          "What's really cool is...",
+          "built-in ceiling fan controlled by remote"
+        ],
+        [
+          "bed_4",
+          "4️⃣ 여름 시원함",
+          "STAYS COOL",
+          "Because of...",
+          "stays very cool in summer without standing fan"
+        ],
+        [
+          "bed_5",
+          "5️⃣ 자동 기상",
+          "TURNS ON AUTOMATICALLY",
+          "Also, the light...",
+          "turns on every morning, helps me wake up"
+        ],
+        [
+          "bed_6",
+          "6️⃣ 개별 욕실",
+          "ATTACHED BATHROOM",
+          "Another great thing is...",
+          "attached bathroom in my room"
+        ],
+        [
+          "bed_7",
+          "7️⃣ 가족 방해 안됨",
+          "DON'T DISTURB",
+          "Even when I wake...",
+          "early shower doesn't disturb family"
+        ],
+        [
+          "bed_8",
+          "8️⃣ 고양이 수면",
+          "CATS SNEAK IN",
+          "Sometimes while...",
+          "cats sneak in & sleep between my legs"
+        ],
+        [
+          "bed_9",
+          "9️⃣ 더워서 기상",
+          "FEEL TOO HOT",
+          "They are super cute, but...",
+          "occasionally wake up in night, feel too hot"
+        ],
+        [
+          "bed_10",
+          "🔟 쾌적한 방",
+          "SUPER COMFORTABLE",
+          "So, all in all...",
+          "super comfortable & convenient for daily life"
+        ]
+      ]
+    ]
+  },
+  "day3": {
+    "title": "Day 3: 루틴 패턴 (조깅 & 음악감상)",
+    "chain": "🏃 조깅: 런닝화&워치 ➔ 10km 주행 ➔ 쿨다운 ➔ 주말 활력! | 🎵 음악: 편한 옷 ➔ 스피커 ➔ 침대 어쿠스틱 ➔ 스트레스 해소!",
+    "sec1": [
+      "Topic 1: 수변공원 조깅 루틴 (Park Jogging)",
+      [
+        [
+          "day3_park_1",
+          "1️⃣ 주말 방문",
+          "TEND TO VISIT",
+          "Well, as I mentioned...",
+          "visit waterfront park every single weekend"
+        ],
+        [
+          "day3_park_2",
+          "2️⃣ 외출 준비",
+          "PUT ON & GRAB",
+          "First of all, before...",
+          "running shoes & wireless earbuds & smartwatch"
+        ],
+        [
+          "day3_park_3",
+          "3️⃣ 10km 주행",
+          "RUN THE TRAIL",
+          "Once I get to...",
+          "run trail all the way & back (10km round trip)"
+        ],
+        [
+          "day3_park_4",
+          "4️⃣ 쿨다운 & 귀가",
+          "COOLDOWN WALK",
+          "Right after running...",
+          "5 min cooldown walk ➔ catch breath ➔ head home"
+        ],
+        [
+          "day3_park_5",
+          "5️⃣ 주말 활력",
+          "KICK OFF WEEKEND",
+          "All in all, this...",
+          "perfect way to kick off weekend & stay healthy"
+        ]
+      ]
+    ],
+    "sec2": [
+      "Topic 2: 음악 감상 루틴 (Music Listening)",
+      [
+        [
+          "day3_music_1",
+          "1️⃣ 집 힐링",
+          "UNWIND & LISTEN",
+          "Well, whenever I...",
+          "unwind at home, listening to music is go-to"
+        ],
+        [
+          "day3_music_2",
+          "2️⃣ 편한 옷 & 스피커",
+          "CHANGE & TURN ON",
+          "First off, I...",
+          "change comfortable clothes & turn on speaker"
+        ],
+        [
+          "day3_music_3",
+          "3️⃣ 침대 누워 감상",
+          "LIE DOWN & PLAY",
+          "After that, I...",
+          "lie down on king-size bed & play soft acoustic"
+        ],
+        [
+          "day3_music_4",
+          "4️⃣ 스트레스 해소",
+          "DE-STRESS & RECHARGE",
+          "So, to wrap it up...",
+          "really helps me de-stress & recharge batteries"
+        ]
+      ]
+    ]
+  },
+  "day4": {
+    "title": "Day 4: 과거 경험 (15km 조깅 & YB 콘서트)",
+    "chain": "🏃 조깅: 일요일 ➔ 새 코스 ➔ 길 잃음 ➔ 15km 완주 ➔ 마라톤 자신감! | 🎤 YB콘서트: 스피커 앞 스탠딩 ➔ 떼창과 전율 ➔ 아내와 추억!",
+    "sec1": [
+      "Topic 1: 15km 길치 조깅 경험 (15km Lost Jogging)",
+      [
+        [
+          "day4_park_1",
+          "1️⃣ 특별한 기억",
+          "MEMORABLE",
+          "I remember one...",
+          "memorable experience at waterfront park"
+        ],
+        [
+          "day4_park_2",
+          "2️⃣ 6개월 전 일요일",
+          "HEADED OUT",
+          "It was about...",
+          "6 months ago Sunday morning jog along trail"
+        ],
+        [
+          "day4_park_3",
+          "3️⃣ 새 코스 탐방",
+          "DISCOVERED PATH",
+          "At some point...",
+          "discovered extended path, ran extra 15 min"
+        ],
+        [
+          "day4_park_4",
+          "4️⃣ 길 잃음",
+          "WRONG TURN",
+          "But on the way back...",
+          "took wrong turn, completely lost"
+        ],
+        [
+          "day4_park_5",
+          "5️⃣ 15km 완주",
+          "RUN 15KM TOTAL",
+          "I kept running...",
+          "ran total of 15km before I knew it"
+        ],
+        [
+          "day4_park_6",
+          "6️⃣ 다리 풀림",
+          "LEGS GAVE OUT",
+          "My legs completely...",
+          "walked rest of the way home"
+        ],
+        [
+          "day4_park_7",
+          "7️⃣ 최초 15km",
+          "FIRST TIME IN LIFE",
+          "It was the first time...",
+          "ever run 15km in my life by accident"
+        ],
+        [
+          "day4_park_8",
+          "8️⃣ 마라톤 자신감",
+          "GAVE CONFIDENCE",
+          "But strangely, that...",
+          "confidence ➔ complete half marathon someday"
+        ]
+      ]
+    ],
+    "sec2": [
+      "Topic 2: YB 락콘서트 경험 (YB Rock Concert)",
+      [
+        [
+          "day4_concert_1",
+          "1️⃣ 콘서트 기억",
+          "ROCK CONCERT",
+          "Actually, I have...",
+          "rock concert before I got married"
+        ],
+        [
+          "day4_concert_2",
+          "2️⃣ 아내와 YB 콘서트",
+          "YOON DO-HYUN BAND",
+          "My wife and I...",
+          "went to see Yoon Do-hyun Band live"
+        ],
+        [
+          "day4_concert_3",
+          "3️⃣ 스탠딩 석",
+          "THUNDEROUS LOUD",
+          "We had standing...",
+          "next to speakers, thunderous loud music"
+        ],
+        [
+          "day4_concert_4",
+          "4️⃣ 떼창 열기",
+          "SINGING ALONG",
+          "The whole crowd...",
+          "singing along passionately, electric energy"
+        ],
+        [
+          "day4_concert_5",
+          "5️⃣ 하나 됨",
+          "BECOME ONE",
+          "At that moment...",
+          "thousands of strangers had all become one"
+        ],
+        [
+          "day4_concert_6",
+          "6️⃣ 특별한 추억",
+          "SHARED MOMENT",
+          "It was such...",
+          "shared moment with person who became my wife"
+        ]
+      ]
+    ]
+  },
+  "day5": {
+    "title": "Day 5: 해외 여행 (일본 료칸 & 렌트카)",
+    "chain": "🇯🇵 료칸: 엄마 생신 ➔ 온천 료칸 ➔ 가이세키 식사 ➔ 엄마 대만족! | 🚗 렌트카: 3남매 역할분담 ➔ 내 담당 렌트카 ➔ 좌측통행 적응 ➔ 힐링!",
+    "sec1": [
+      "Topic 1: 일본 전통 온천 료칸 (Japan Trip & Ryokan)",
+      [
+        [
+          "day5_japan_1",
+          "1️⃣ 연례 가족 전통",
+          "TAKE TRIP",
+          "Well, in my family...",
+          "mother, sisters & I ➔ overseas trip for mother's birthday"
+        ],
+        [
+          "day5_japan_2",
+          "2️⃣ 일본 선택 이유",
+          "FLIGHT IS SO SHORT",
+          "To be honest...",
+          "not fan of flying, but Japan flight is so short"
+        ],
+        [
+          "day5_japan_3",
+          "3️⃣ 봄 료칸 숙박",
+          "TRAVELED & STAYED",
+          "Just this past spring...",
+          "four of us stayed at traditional hot spring ryokan"
+        ],
+        [
+          "day5_japan_4",
+          "4️⃣ 가이세키 식사",
+          "AUTHENTIC MEALS",
+          "What made it so...",
+          "delicious authentic meals fully provided at lodging"
+        ],
+        [
+          "day5_japan_5",
+          "5️⃣ 완벽한 일과",
+          "JOG ➔ SIGHTSEEING ➔ SOAK",
+          "Our daily routine...",
+          "morning jog ➔ daytime sightseeing ➔ evening hot spring"
+        ],
+        [
+          "day5_japan_6",
+          "6️⃣ 감동 마무리",
+          "MOTHER LOVED IT",
+          "Best of all...",
+          "mother loved every moment, deeply meaningful"
+        ]
+      ]
+    ],
+    "sec2": [
+      "Topic 2: 렌트카 드라이브 & 팀워크 (Rental Car & Teamwork)",
+      [
+        [
+          "day5_rental_1",
+          "1️⃣ 3남매 역할분담",
+          "DIVIDE UP ROLES",
+          "Whenever we prepare...",
+          "three siblings divide up roles for smooth trip"
+        ],
+        [
+          "day5_rental_2",
+          "2️⃣ 누나&여동생",
+          "BOOKED",
+          "For our recent trip...",
+          "older sister=lodging, younger sister=flight"
+        ],
+        [
+          "day5_rental_3",
+          "3️⃣ 내 담당 렌트카",
+          "RENTAL CAR & PERMIT",
+          "My responsibility was...",
+          "reserving rental car & international driving permit"
+        ],
+        [
+          "day5_rental_4",
+          "4️⃣ 좌측 통행",
+          "RIGHT STEERING / LEFT DRIVE",
+          "When I started driving...",
+          "steering wheel on right, drive on left, took time to adjust"
+        ],
+        [
+          "day5_rental_5",
+          "5️⃣ 적응 후 편리함",
+          "CONCENTRATE ➔ CONVENIENT",
+          "At first, I had to...",
+          "concentrate hard at first, but incredibly convenient"
+        ],
+        [
+          "day5_rental_6",
+          "6️⃣ 숨은 명소",
+          "VISIT HIDDEN SPOTS",
+          "We were able to...",
+          "visit scenic hidden spots, move at own pace"
+        ],
+        [
+          "day5_rental_7",
+          "7️⃣ 최고의 여행",
+          "SMOOTHEST TRIP",
+          "Thanks to our...",
+          "teamwork & rental car = smoothest family trip ever"
+        ]
+      ]
+    ]
+  },
+  "day6": {
+    "title": "Day 6: 휴일 루틴 & 홈 스테이케이션",
+    "chain": "🌅 8시 기상 ➔ 🏃 수변공원 조깅 ➔ 🚿 샤워&점심 ➔ 🎬 영화&영어공부 ➔ 🐱 고양이 힐링 ➔ 🔋 재충전 100%!",
+    "sec1": [
+      "Topic 1: 휴일 루틴 & 홈 스테이케이션 (Holiday Routine)",
+      [
+        [
+          "day6_holiday_1",
+          "1️⃣ 건강한 휴일",
+          "KEEP ROUTINE",
+          "Well, when it comes to...",
+          "keep healthy & productive routine on holidays"
+        ],
+        [
+          "day6_holiday_2",
+          "2️⃣ 8시 기상 & 조깅",
+          "WAKE AT 8AM & JOG",
+          "Even on holidays...",
+          "wake up 8 AM ➔ salad & yogurt ➔ jog at waterfront park"
+        ],
+        [
+          "day6_holiday_3",
+          "3️⃣ 샤워 & 점심",
+          "SHOWER & LUNCH",
+          "After getting back...",
+          "refreshing shower & delicious family lunch"
+        ],
+        [
+          "day6_holiday_4",
+          "4️⃣ 영화 & 영어 공부",
+          "RELAX & STUDY",
+          "In the afternoon...",
+          "relax in room, watch movies, study English 1-2 hours"
+        ],
+        [
+          "day6_holiday_5",
+          "5️⃣ 배달음식 & 고양이",
+          "ORDER FOOD & CATS",
+          "In the evening...",
+          "order delicious food, relax with my cats"
+        ],
+        [
+          "day6_holiday_6",
+          "6️⃣ 재충전 마무리",
+          "DE-STRESS & RECHARGE",
+          "So, to wrap it up...",
+          "peaceful day off ➔ de-stress & recharge batteries"
+        ]
+      ]
+    ],
+    "sec2": null
+  },
+  "day7": {
+    "title": "Day 7: 롤플레이 실전 (질문하기 & 문제해결)",
+    "chain": "📞 RP1: 민수야 통화 가능? ➔ 조깅 갈래? ➔ 9시 어때? ➔ 브런치 ➔ 픽업갈까? | 🚨 RP2: 내일 못 감 ➔ 엄마 집안일 ➔ 일요일 대안 ➔ 점심+커피 쏜다!",
+    "sec1": [
+      "Topic 1: Roleplay 1 - 공원 조깅 제안 (Park Jogging Proposal)",
+      [
+        [
+          "day7_rp1_1",
+          "1️⃣ 인사 & 토요일 시간",
+          "DO YOU HAVE A MINUTE?",
+          "Hey Min-su, it's Hyuk!",
+          "free this Saturday morning to talk?"
+        ],
+        [
+          "day7_rp1_2",
+          "2️⃣ 공원 조깅 제안",
+          "GOING FOR JOG & WALK",
+          "You know the waterfront...",
+          "weather is amazing, going for light jog & walk"
+        ],
+        [
+          "day7_rp1_3",
+          "3️⃣ 시간 조율",
+          "WHAT TIME WORKS?",
+          "What time works best...",
+          "around 9 or 10 in the morning okay?"
+        ],
+        [
+          "day7_rp1_4",
+          "4️⃣ 브런치/커피 제안",
+          "GRAB BRUNCH OR COFFEE",
+          "Also, after running...",
+          "grab brunch or cup of coffee nearby?"
+        ],
+        [
+          "day7_rp1_5",
+          "5️⃣ 픽업 & 콜백 요청",
+          "PICK UP OR MEET ENTRANCE",
+          "Oh, and should I...",
+          "pick you up in car or meet at entrance? call back!"
+        ]
+      ]
+    ],
+    "sec2": [
+      "Topic 2: Roleplay 2 - 급한 집안일 약속 변경 (Errand & Compensation)",
+      [
+        [
+          "day7_rp2_1",
+          "1️⃣ 취소 사과",
+          "UNEXPECTED ERRAND",
+          "Hey Min-su, it's Hyuk again...",
+          "unexpected errand came up, cannot make it tomorrow"
+        ],
+        [
+          "day7_rp2_2",
+          "2️⃣ 어머니 집안일",
+          "URGENT FAMILY ERRAND",
+          "My mother just called...",
+          "asked help with urgent family errand"
+        ],
+        [
+          "day7_rp2_3",
+          "3️⃣ 일요일 아침 대안",
+          "AVAILABLE ON SUNDAY?",
+          "I feel so bad...",
+          "available Sunday morning instead? weather looks great"
+        ],
+        [
+          "day7_rp2_4",
+          "4️⃣ 내일 오후 5시 대안",
+          "MEET AT 5 PM TOMORROW?",
+          "If Sunday doesn't work...",
+          "meet late tomorrow afternoon around 5 PM"
+        ],
+        [
+          "day7_rp2_5",
+          "5️⃣ 점심+커피 보상",
+          "TREAT TO LUNCH & COFFEE",
+          "Whichever time works...",
+          "treat to delicious lunch & coffee to make it up!"
+        ]
+      ]
+    ]
+  }
+}

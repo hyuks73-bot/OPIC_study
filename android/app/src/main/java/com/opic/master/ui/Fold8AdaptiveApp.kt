@@ -38,7 +38,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CloudSync
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
@@ -101,6 +103,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.opic.master.data.model.Sentence
 import kotlinx.coroutines.flow.first
+import org.json.JSONArray
+import org.json.JSONObject
 import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.round
@@ -645,9 +649,78 @@ fun PlaybackSettingsDialog(
 }
 
 /**
- * Story Memory Guide Popup Dialog (스토리 암기 가이드 & 2-in-1 마인드맵 시트)
- * Displays the summary mindmap sheet (images/day{N}_summary_mindmap.jpg)
- * and day selection tabs to quickly review the storytelling flow for any Day.
+ * Data structures for Story Flowchart Guide
+ */
+data class StoryFlowItem(
+    val id: String,
+    val label: String,
+    val verb: String,
+    val opener: String,
+    val key: String
+)
+
+data class StoryFlowSection(
+    val title: String,
+    val items: List<StoryFlowItem>
+)
+
+data class StoryDayGuide(
+    val title: String,
+    val chain: String,
+    val sec1: StoryFlowSection?,
+    val sec2: StoryFlowSection?
+)
+
+fun parseStoryGuideJson(jsonStr: String): Map<String, StoryDayGuide> {
+    val result = mutableMapOf<String, StoryDayGuide>()
+    try {
+        val root = JSONObject(jsonStr)
+        val keys = root.keys()
+        while (keys.hasNext()) {
+            val dayKey = keys.next()
+            val dayObj = root.optJSONObject(dayKey) ?: continue
+            val title = dayObj.optString("title", "")
+            val chain = dayObj.optString("chain", "")
+
+            fun parseSec(secArr: JSONArray?): StoryFlowSection? {
+                if (secArr == null || secArr.length() < 2) return null
+                val secTitle = secArr.optString(0, "")
+                val itemsArr = secArr.optJSONArray(1) ?: return null
+                val itemsList = mutableListOf<StoryFlowItem>()
+                for (i in 0 until itemsArr.length()) {
+                    val itemArr = itemsArr.optJSONArray(i) ?: continue
+                    if (itemArr.length() >= 5) {
+                        itemsList.add(
+                            StoryFlowItem(
+                                id = itemArr.optString(0, ""),
+                                label = itemArr.optString(1, ""),
+                                verb = itemArr.optString(2, ""),
+                                opener = itemArr.optString(3, ""),
+                                key = itemArr.optString(4, "")
+                            )
+                        )
+                    }
+                }
+                return StoryFlowSection(secTitle, itemsList)
+            }
+
+            val sec1 = parseSec(dayObj.optJSONArray("sec1"))
+            val sec2 = parseSec(dayObj.optJSONArray("sec2"))
+            result[dayKey] = StoryDayGuide(title, chain, sec1, sec2)
+        }
+    } catch (_: Exception) {}
+    return result
+}
+
+enum class MemoryGuideViewMode {
+    STORY_GUIDE,
+    MINDMAP_SHEET
+}
+
+/**
+ * Story Memory Guide Popup Dialog (스토리 암기 가이드 & 마인드맵 시트 선택 팝업)
+ * Displays structured flowchart cards (Trigger, Verb, Opener, Keyword)
+ * and toggleable 2-in-1 mindmap image sheet.
  */
 @Composable
 fun MemoryGuideDialog(
@@ -656,10 +729,23 @@ fun MemoryGuideDialog(
     onDismiss: () -> Unit
 ) {
     var selectedDayKey by remember(initialDay) { mutableStateOf(initialDay) }
+    var viewMode by remember { mutableStateOf(MemoryGuideViewMode.STORY_GUIDE) }
     val context = LocalContext.current
+
     val currentMeta = availableDays.find { it.key == selectedDayKey }
         ?: availableDays.firstOrNull()
         ?: DEFAULT_DAYS.first()
+
+    val storyGuidesMap = remember(context) {
+        try {
+            val jsonStr = context.assets.open("story_guide.json").bufferedReader().use { it.readText() }
+            parseStoryGuideJson(jsonStr)
+        } catch (_: Exception) {
+            emptyMap()
+        }
+    }
+
+    val currentStoryGuide = storyGuidesMap[selectedDayKey]
 
     val mindmapAssetUrl = remember(selectedDayKey) {
         "file:///android_asset/images/${selectedDayKey}_summary_mindmap.jpg"
@@ -668,45 +754,110 @@ fun MemoryGuideDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "🗺️",
-                        fontSize = 20.sp
-                    )
-                    Column {
-                        Text(
-                            text = "스토리 암기 가이드",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 17.sp,
-                            color = Color.White
-                        )
-                        Text(
-                            text = "${currentMeta.emoji} ${currentMeta.title}",
-                            fontSize = 12.sp,
-                            color = Color(0xFFFBBF24),
-                            fontWeight = FontWeight.SemiBold
-                        )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(text = "📖", fontSize = 20.sp)
+                        Column {
+                            Text(
+                                text = "암기 가이드 마인드맵",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                color = Color.White
+                            )
+                            Text(
+                                text = "${currentMeta.tabLabel}: ${currentMeta.title}",
+                                fontSize = 11.5.sp,
+                                color = Color(0xFF38BDF8),
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
                     }
-                }
-                Surface(
-                    color = Color(0xFF065F46),
-                    shape = RoundedCornerShape(6.dp)
-                ) {
-                    Text(
-                        text = "2-in-1 마인드맵 시트",
-                        color = Color(0xFFA7F3D0),
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                    )
+
+                    // Top Right Mode Switcher Tabs
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // 1. 스토리 암기 가이드 Tab (Default)
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = if (viewMode == MemoryGuideViewMode.STORY_GUIDE) Color(0xFF0284C7) else Color(0xFF1E293B),
+                            border = BorderStroke(
+                                1.dp,
+                                if (viewMode == MemoryGuideViewMode.STORY_GUIDE) Color(0xFF38BDF8) else Color(0xFF334155)
+                            ),
+                            modifier = Modifier.clickable { viewMode = MemoryGuideViewMode.STORY_GUIDE }
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 9.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Description,
+                                    contentDescription = null,
+                                    tint = if (viewMode == MemoryGuideViewMode.STORY_GUIDE) Color.White else Color(0xFF94A3B8),
+                                    modifier = Modifier.size(13.dp)
+                                )
+                                Text(
+                                    text = "스토리 암기 가이드",
+                                    fontSize = 11.5.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (viewMode == MemoryGuideViewMode.STORY_GUIDE) Color.White else Color(0xFF94A3B8)
+                                )
+                            }
+                        }
+
+                        // 2. 마인드맵 시트 Tab
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = if (viewMode == MemoryGuideViewMode.MINDMAP_SHEET) Color(0xFF0284C7) else Color(0xFF1E293B),
+                            border = BorderStroke(
+                                1.dp,
+                                if (viewMode == MemoryGuideViewMode.MINDMAP_SHEET) Color(0xFF38BDF8) else Color(0xFF334155)
+                            ),
+                            modifier = Modifier.clickable { viewMode = MemoryGuideViewMode.MINDMAP_SHEET }
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 9.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Image,
+                                    contentDescription = null,
+                                    tint = if (viewMode == MemoryGuideViewMode.MINDMAP_SHEET) Color.White else Color(0xFF94A3B8),
+                                    modifier = Modifier.size(13.dp)
+                                )
+                                Text(
+                                    text = "마인드맵 시트",
+                                    fontSize = 11.5.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (viewMode == MemoryGuideViewMode.MINDMAP_SHEET) Color.White else Color(0xFF94A3B8)
+                                )
+                            }
+                        }
+
+                        IconButton(
+                            onClick = onDismiss,
+                            modifier = Modifier.size(28.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "닫기",
+                                tint = Color(0xFF94A3B8),
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                    }
                 }
             }
         },
@@ -716,7 +867,7 @@ fun MemoryGuideDialog(
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
             ) {
-                // Day selector tabs inside dialog
+                // Day Selector Tabs
                 DaySelectorTabs(
                     days = availableDays,
                     selectedDay = selectedDayKey,
@@ -726,37 +877,168 @@ fun MemoryGuideDialog(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // Mindmap image preview card
-                Surface(
-                    color = Color(0xFF0F172A),
-                    shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, Color(0xFF334155)),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier.padding(10.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        AsyncImage(
-                            model = ImageRequest.Builder(context)
-                                .data(mindmapAssetUrl)
-                                .crossfade(true)
-                                .build(),
-                            contentDescription = "${currentMeta.tabLabel} 스토리 암기 마인드맵",
-                            contentScale = ContentScale.FillWidth,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(8.dp))
-                        )
+                when (viewMode) {
+                    MemoryGuideViewMode.STORY_GUIDE -> {
+                        if (currentStoryGuide != null) {
+                            // 1. 스토리 연상 암기 트리거 Box
+                            if (currentStoryGuide.chain.isNotEmpty()) {
+                                Surface(
+                                    color = Color(0xFFF97316).copy(alpha = 0.12f),
+                                    shape = RoundedCornerShape(10.dp),
+                                    border = BorderStroke(1.dp, Color(0xFFF97316).copy(alpha = 0.6f)),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Column(modifier = Modifier.padding(12.dp)) {
+                                        Text(
+                                            text = "⚡ 스토리 연상 암기 트리거",
+                                            color = Color(0xFFFDBA74),
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 12.5.sp
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = currentStoryGuide.chain,
+                                            color = Color(0xFFFFEDD5),
+                                            fontSize = 12.sp,
+                                            lineHeight = 18.sp,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                }
+                                Spacer(modifier = Modifier.height(12.dp))
+                            }
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                            // 2. Sections (sec1, sec2)
+                            listOfNotNull(currentStoryGuide.sec1, currentStoryGuide.sec2).forEach { section ->
+                                Surface(
+                                    color = Color(0xFF131D33),
+                                    shape = RoundedCornerShape(12.dp),
+                                    border = BorderStroke(1.dp, Color(0xFF1E293B)),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Column(modifier = Modifier.padding(12.dp)) {
+                                        Text(
+                                            text = "📌 ${section.title}",
+                                            color = Color(0xFF38BDF8),
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 13.5.sp
+                                        )
+                                        Spacer(modifier = Modifier.height(10.dp))
 
-                        Text(
-                            text = "💡 키워드 연상 흐름으로 답변 스토리라인을 머릿속에 시각화하세요.",
-                            color = Color(0xFF94A3B8),
-                            fontSize = 11.sp,
-                            textAlign = TextAlign.Center
-                        )
+                                        section.items.forEach { item ->
+                                            Surface(
+                                                color = Color(0xFF0F172A),
+                                                shape = RoundedCornerShape(8.dp),
+                                                border = BorderStroke(1.dp, Color(0xFF1E293B)),
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(bottom = 8.dp)
+                                            ) {
+                                                Row(modifier = Modifier.fillMaxWidth()) {
+                                                    // Orange Left Accent Strip
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .width(4.dp)
+                                                            .fillMaxHeight()
+                                                            .background(Color(0xFFEA580C))
+                                                    )
+                                                    Column(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .padding(horizontal = 10.dp, vertical = 8.dp)
+                                                    ) {
+                                                        Row(
+                                                            verticalAlignment = Alignment.CenterVertically,
+                                                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                                        ) {
+                                                            // Verb Badge
+                                                            Surface(
+                                                                color = Color(0xFFEA580C),
+                                                                shape = RoundedCornerShape(4.dp)
+                                                            ) {
+                                                                Text(
+                                                                    text = item.verb,
+                                                                    color = Color.White,
+                                                                    fontSize = 11.sp,
+                                                                    fontWeight = FontWeight.ExtraBold,
+                                                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                                                )
+                                                            }
+                                                            // Label & Opener
+                                                            Text(
+                                                                text = "${item.label} • ${item.opener}",
+                                                                color = Color(0xFF38BDF8),
+                                                                fontSize = 12.sp,
+                                                                fontWeight = FontWeight.SemiBold
+                                                            )
+                                                        }
+
+                                                        Spacer(modifier = Modifier.height(4.dp))
+
+                                                        // Core Keyword Line
+                                                        Text(
+                                                            text = buildAnnotatedString {
+                                                                withStyle(SpanStyle(color = Color(0xFFF43F5E), fontWeight = FontWeight.Bold)) {
+                                                                    append("🎯 핵심 키워드: ")
+                                                                }
+                                                                withStyle(SpanStyle(color = Color(0xFFF1F5F9), fontWeight = FontWeight.Normal)) {
+                                                                    append(item.key)
+                                                                }
+                                                            },
+                                                            fontSize = 12.sp,
+                                                            lineHeight = 17.sp
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                Spacer(modifier = Modifier.height(12.dp))
+                            }
+                        } else {
+                            Text(
+                                text = "선택된 Day의 스토리 가이드 정보가 없습니다.",
+                                color = Color(0xFF94A3B8),
+                                fontSize = 12.sp,
+                                modifier = Modifier.padding(vertical = 16.dp)
+                            )
+                        }
+                    }
+
+                    MemoryGuideViewMode.MINDMAP_SHEET -> {
+                        Surface(
+                            color = Color(0xFF0F172A),
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, Color(0xFF334155)),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(10.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                AsyncImage(
+                                    model = ImageRequest.Builder(context)
+                                        .data(mindmapAssetUrl)
+                                        .crossfade(true)
+                                        .build(),
+                                    contentDescription = "${currentMeta.tabLabel} 스토리 암기 마인드맵",
+                                    contentScale = ContentScale.FillWidth,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(8.dp))
+                                )
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                Text(
+                                    text = "💡 키워드 연상 흐름으로 답변 스토리라인을 머릿속에 시각화하세요.",
+                                    color = Color(0xFF94A3B8),
+                                    fontSize = 11.sp,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -770,7 +1052,7 @@ fun MemoryGuideDialog(
                 Text("닫기", fontWeight = FontWeight.Bold, color = Color.White)
             }
         },
-        containerColor = Color(0xFF1E293B)
+        containerColor = Color(0xFF0B1120)
     )
 }
 
