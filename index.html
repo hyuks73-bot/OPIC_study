@@ -2156,6 +2156,56 @@
         }
       }, { passive: false });
     }
+  
+    /* Memory Guide Mindmap Modal Handlers */
+    function getActiveDayId() {
+      const activeTab = document.querySelector('.tab-content.active');
+      if (activeTab && activeTab.id) {
+        return activeTab.id;
+      }
+      return 'day1';
+    }
+
+    function openMemoryGuideModal(dayId) {
+      const currentDay = dayId || getActiveDayId();
+      const selectEl = document.getElementById('modalDaySelect');
+      if (selectEl) selectEl.value = currentDay;
+      switchModalDayImage(currentDay);
+      
+      const modal = document.getElementById('memoryGuideModal');
+      if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function switchModalDayImage(dayId) {
+      const imgEl = document.getElementById('modalMindmapImg');
+      if (imgEl) {
+        imgEl.src = `images/${dayId}_summary_mindmap.jpg`;
+      }
+    }
+
+    function closeMemoryGuideModal() {
+      const modal = document.getElementById('memoryGuideModal');
+      if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    }
+
+    function closeMemoryGuideModalOnBackdrop(e) {
+      if (e.target && e.target.id === 'memoryGuideModal') {
+        closeMemoryGuideModal();
+      }
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeMemoryGuideModal();
+      }
+    });
+
   </script>
 
   <!-- Memory Guide Mindmap Modal Popup -->
