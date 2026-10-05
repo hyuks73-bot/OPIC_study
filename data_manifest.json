@@ -641,10 +641,10 @@
         },
         {
           "id": "day7_rp1_3",
-          "en": "<mark>What time works best for you?</mark> Would <mark>around 9 or 10 in the morning</mark> be okay?",
+          "en": "<mark>What time works best for you?</mark> <mark>Around 9 or 10 in the morning</mark> would be okay?",
           "ko": "몇 시에 만나는 게 제일 편해? 아침 9시나 10시쯤 괜찮을까?",
-          "guide": "<strong>WHAT TIME works best for you?</strong> <span class=\"slash\">/</span> Would <strong>around NINE or TEN in the morning</strong> be okay?",
-          "tip": "[시간 묻기] What time works best for you? [왓타임 웍스 베스-포유: 언제가 제일 편해?] | Would ~ be okay? [우쥬~ 비 오케이?]",
+          "guide": "<strong>WHAT TIME works best for you?</strong> <span class=\"slash\">/</span> <strong>Around NINE or TEN in the morning</strong> would be okay?",
+          "tip": "[시간 묻기] What time works best for you? [왓타임 웍스 베스-포유: 언제가 제일 편해?] | ~ would be okay? [~ 우드비 오케이?: ~면 괜찮아?]",
           "audio_url": "audio/day7_rp1_3.mp3",
           "image_url": "images/day7_rp1_3.jpg"
         },
