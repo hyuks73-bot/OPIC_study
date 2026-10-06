@@ -1007,6 +1007,19 @@ fun MemoryGuideDialog(
                     }
 
                     MemoryGuideViewMode.MINDMAP_SHEET -> {
+                        val mindmapPartUrls = remember(selectedDayKey) {
+                            when (selectedDayKey) {
+                                "day1" -> listOf("file:///android_asset/mindmaps/day1.jpg")
+                                "day2" -> listOf("file:///android_asset/mindmaps/day2_part1.jpg", "file:///android_asset/mindmaps/day2_part2.jpg")
+                                "day3" -> listOf("file:///android_asset/mindmaps/day3_part1.jpg", "file:///android_asset/mindmaps/day3_part2.jpg")
+                                "day4" -> listOf("file:///android_asset/mindmaps/day4_part1.jpg", "file:///android_asset/mindmaps/day4_part2.jpg")
+                                "day5" -> listOf("file:///android_asset/mindmaps/day5_part1.jpg", "file:///android_asset/mindmaps/day5_part2.jpg")
+                                "day6" -> listOf("file:///android_asset/mindmaps/day6.jpg")
+                                "day7" -> listOf("file:///android_asset/mindmaps/day7_part1.jpg", "file:///android_asset/mindmaps/day7_part2.jpg")
+                                else -> listOf("file:///android_asset/images/${selectedDayKey}_summary_mindmap.jpg")
+                            }
+                        }
+
                         Surface(
                             color = Color(0xFF0F172A),
                             shape = RoundedCornerShape(12.dp),
@@ -1017,17 +1030,22 @@ fun MemoryGuideDialog(
                                 modifier = Modifier.padding(10.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                AsyncImage(
-                                    model = ImageRequest.Builder(context)
-                                        .data(mindmapAssetUrl)
-                                        .crossfade(true)
-                                        .build(),
-                                    contentDescription = "${currentMeta.tabLabel} 스토리 암기 마인드맵",
-                                    contentScale = ContentScale.FillWidth,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clip(RoundedCornerShape(8.dp))
-                                )
+                                mindmapPartUrls.forEachIndexed { idx, url ->
+                                    if (idx > 0) {
+                                        Spacer(modifier = Modifier.height(10.dp))
+                                    }
+                                    AsyncImage(
+                                        model = ImageRequest.Builder(context)
+                                            .data(url)
+                                            .crossfade(true)
+                                            .build(),
+                                        contentDescription = "${currentMeta.tabLabel} 스토리 암기 마인드맵 ${idx + 1}",
+                                        contentScale = ContentScale.FillWidth,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clip(RoundedCornerShape(8.dp))
+                                    )
+                                }
 
                                 Spacer(modifier = Modifier.height(8.dp))
 
