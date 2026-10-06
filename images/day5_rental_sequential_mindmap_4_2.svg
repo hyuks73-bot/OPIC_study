@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" width="100%" height="100%">
+<defs>
+
+      <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#fdfbf7"/>
+        <stop offset="100%" stop-color="#f1f5f9"/>
+      </linearGradient>
+      <linearGradient id="hubGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="100%" stop-color="#eff6ff"/>
+      </linearGradient>
+      <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.12"/>
+      </filter>
+      <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b" />
+      </marker>
+    
+</defs>
+<rect width="1200" height="600" rx="24" fill="url(#bgGrad)" stroke="#cbd5e1" stroke-width="2"/>
+<circle cx="600.0" cy="300.0" r="210" fill="none" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,6" opacity="0.5"/>
+<circle cx="600.0" cy="300.0" r="110" fill="url(#hubGrad)" stroke="#3b82f6" stroke-width="4" filter="url(#shadow)"/>
+<text x="600.0" y="278.0" text-anchor="middle" font-family="Pretendard, sans-serif" font-size="24" font-weight="900" fill="#1e3a8a">OPIc Day 5</text>
+<text x="600.0" y="312.0" text-anchor="middle" font-family="Pretendard, sans-serif" font-size="16" font-weight="800" fill="#2563eb">🚗 Roles & Rental Car Drive</text>
+<text x="600.0" y="340.0" text-anchor="middle" font-family="Pretendard, sans-serif" font-size="13" font-weight="600" fill="#64748b">순차 로드맵 (총 7개 문장 노드)</text>
+<path d="M 600.0 90.0 Q 698.1846281733983 96.44219791309516 764.3477129390069 169.27192630609989" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow)" opacity="0.75"/>
+<path d="M 764.3477129390069 169.27192630609989 Q 820.4273644349239 250.12237968514074 804.6177136048993 347.2397214122117" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow)" opacity="0.75"/>
+<path d="M 804.6177136048993 347.2397214122117 Q 776.8694434486456 440.688307880102 692.0579408257063 488.7467497228251" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow)" opacity="0.75"/>
+<path d="M 692.0579408257063 488.7467497228251 Q 600.0 526.0 507.9420591742937 488.74674972282503" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow)" opacity="0.75"/>
+<path d="M 507.9420591742937 488.74674972282503 Q 423.13055655135446 440.688307880102 395.38228639510066 347.2397214122117" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow)" opacity="0.75"/>
+<path d="M 395.38228639510066 347.2397214122117 Q 379.3571023908951 251.08464724998873 434.5177417425884 170.71109018161178" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow)" opacity="0.75"/>
+<path d="M 434.5177417425884 170.71109018161178 Q 500.92812082566843 96.87254553638829 600.0 90.0" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow)" opacity="0.75"/>
+<g filter="url(#shadow)">
+<circle cx="600.0" cy="90.0" r="22" fill="#ef4444" stroke="#ffffff" stroke-width="3"/>
+<text x="600.0" y="96.0" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="900" fill="#ffffff">1</text>
+</g>
+<g transform="translate(600.0, 54.0)">
+<text x="0" y="-6" text-anchor="middle" font-family="Pretendard, sans-serif" font-size="13" font-weight="700" fill="#1e293b">1. Whenever we prepare...</text>
+<text x="0" y="14" text-anchor="middle" font-family="Pretendard, sans-serif" font-size="14" font-weight="900" fill="#ef4444">➡️ [[3 SIBLINGS DIVIDE ROLES]] 📋</text>
+</g>
+<g filter="url(#shadow)">
+<circle cx="764.3477129390069" cy="169.27192630609989" r="22" fill="#f97316" stroke="#ffffff" stroke-width="3"/>
+<text x="764.3477129390069" y="175.27192630609989" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="900" fill="#ffffff">2</text>
+</g>
+<g transform="translate(797.2172555268082, 146.86139938714558)">
+<text x="0" y="-6" text-anchor="start" font-family="Pretendard, sans-serif" font-size="13" font-weight="700" fill="#1e293b">2. Sister booked...</text>
+<text x="0" y="14" text-anchor="start" font-family="Pretendard, sans-serif" font-size="14" font-weight="900" fill="#f97316">➡️ [[ACCOMMODATIONS & FLIGHTS]] 🏨</text>
+</g>
+<g filter="url(#shadow)">
+<circle cx="804.6177136048993" cy="347.2397214122117" r="22" fill="#f59e0b" stroke="#ffffff" stroke-width="3"/>
+<text x="804.6177136048993" y="353.2397214122117" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="900" fill="#ffffff">3</text>
+</g>
+<g transform="translate(845.5412563258792, 355.3379593685908)">
+<text x="0" y="-6" text-anchor="start" font-family="Pretendard, sans-serif" font-size="13" font-weight="700" fill="#1e293b">3. My responsibility...</text>
+<text x="0" y="14" text-anchor="start" font-family="Pretendard, sans-serif" font-size="14" font-weight="900" fill="#f59e0b">➡️ [[RESERVING RENTAL CAR & PERMIT]] 🚘</text>
+</g>
+<g filter="url(#shadow)">
+<circle cx="692.0579408257063" cy="488.7467497228251" r="22" fill="#10b981" stroke="#ffffff" stroke-width="3"/>
+<text x="692.0579408257063" y="494.7467497228251" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="900" fill="#ffffff">4</text>
+</g>
+<g transform="translate(710.4695289908475, 521.1033353895951)">
+<text x="0" y="-6" text-anchor="start" font-family="Pretendard, sans-serif" font-size="13" font-weight="700" fill="#1e293b">4. Driving in Japan...</text>
+<text x="0" y="14" text-anchor="start" font-family="Pretendard, sans-serif" font-size="14" font-weight="900" fill="#10b981">➡️ [[STEERING WHEEL ON RIGHT SIDE]] 🛞</text>
+</g>
+<g filter="url(#shadow)">
+<circle cx="507.9420591742937" cy="488.74674972282503" r="22" fill="#06b6d4" stroke="#ffffff" stroke-width="3"/>
+<text x="507.9420591742937" y="494.74674972282503" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="900" fill="#ffffff">5</text>
+</g>
+<g transform="translate(489.53047100915245, 521.103335389595)">
+<text x="0" y="-6" text-anchor="end" font-family="Pretendard, sans-serif" font-size="13" font-weight="700" fill="#1e293b">5. At first hard...</text>
+<text x="0" y="14" text-anchor="end" font-family="Pretendard, sans-serif" font-size="14" font-weight="900" fill="#06b6d4">➡️ [[GOT THE HANG OF IT]] 💡</text>
+</g>
+<g filter="url(#shadow)">
+<circle cx="395.38228639510066" cy="347.2397214122117" r="22" fill="#3b82f6" stroke="#ffffff" stroke-width="3"/>
+<text x="395.38228639510066" y="353.2397214122117" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="900" fill="#ffffff">6</text>
+</g>
+<g transform="translate(354.4587436741208, 355.3379593685908)">
+<text x="0" y="-6" text-anchor="end" font-family="Pretendard, sans-serif" font-size="13" font-weight="700" fill="#1e293b">6. Able to visit...</text>
+<text x="0" y="14" text-anchor="end" font-family="Pretendard, sans-serif" font-size="14" font-weight="900" fill="#3b82f6">➡️ [[SCENIC HIDDEN SPOTS WITHOUT TRANSIT]] 🏞️</text>
+</g>
+<g filter="url(#shadow)">
+<circle cx="434.5177417425884" cy="170.71109018161178" r="22" fill="#6366f1" stroke="#ffffff" stroke-width="3"/>
+<text x="434.5177417425884" y="176.71109018161178" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="900" fill="#ffffff">7</text>
+</g>
+<g transform="translate(401.4212900911061, 148.54727706988808)">
+<text x="0" y="-6" text-anchor="end" font-family="Pretendard, sans-serif" font-size="13" font-weight="700" fill="#1e293b">7. Thanks to teamwork...</text>
+<text x="0" y="14" text-anchor="end" font-family="Pretendard, sans-serif" font-size="14" font-weight="900" fill="#6366f1">➡️ [[SMOOTHEST FAMILY TRIP EVER]] 🌟</text>
+</g>
+</svg>

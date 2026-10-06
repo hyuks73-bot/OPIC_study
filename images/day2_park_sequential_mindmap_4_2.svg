@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" width="100%" height="100%">
+<defs>
+
+      <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#fdfbf7"/>
+        <stop offset="100%" stop-color="#f1f5f9"/>
+      </linearGradient>
+      <linearGradient id="hubGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="100%" stop-color="#eff6ff"/>
+      </linearGradient>
+      <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.12"/>
+      </filter>
+      <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b" />
+      </marker>
+    
+</defs>
+<rect width="1200" height="600" rx="24" fill="url(#bgGrad)" stroke="#cbd5e1" stroke-width="2"/>
+<circle cx="600.0" cy="300.0" r="210" fill="none" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,6" opacity="0.5"/>
+<circle cx="600.0" cy="300.0" r="110" fill="url(#hubGrad)" stroke="#3b82f6" stroke-width="4" filter="url(#shadow)"/>
+<text x="600.0" y="278.0" text-anchor="middle" font-family="Pretendard, sans-serif" font-size="24" font-weight="900" fill="#1e3a8a">OPIc Day 2</text>
+<text x="600.0" y="312.0" text-anchor="middle" font-family="Pretendard, sans-serif" font-size="16" font-weight="800" fill="#2563eb">🌳 Waterfront Park Description</text>
+<text x="600.0" y="340.0" text-anchor="middle" font-family="Pretendard, sans-serif" font-size="13" font-weight="600" fill="#64748b">순차 로드맵 (총 8개 문장 노드)</text>
+<path d="M 600.0 90.0 Q 686.4864557145103 91.20322565244919 748.492424049175 151.50757595082501" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow)" opacity="0.75"/>
+<path d="M 748.492424049175 151.50757595082501 Q 808.7967743475508 213.51354428548973 810.0 300.0" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow)" opacity="0.75"/>
+<path d="M 810.0 300.0 Q 808.7967743475508 386.48645571451027 748.492424049175 448.492424049175" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow)" opacity="0.75"/>
+<path d="M 748.492424049175 448.492424049175 Q 686.4864557145103 508.7967743475508 600.0 510.0" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow)" opacity="0.75"/>
+<path d="M 600.0 510.0 Q 513.5135442854897 508.7967743475508 451.50757595082507 448.492424049175" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow)" opacity="0.75"/>
+<path d="M 451.50757595082507 448.492424049175 Q 391.2032256524492 386.4864557145103 390.0 300.0" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow)" opacity="0.75"/>
+<path d="M 390.0 300.0 Q 391.2032256524492 213.51354428548973 451.50757595082496 151.50757595082504" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow)" opacity="0.75"/>
+<path d="M 451.50757595082496 151.50757595082504 Q 513.5135442854897 91.20322565244916 600.0 90.0" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow)" opacity="0.75"/>
+<g filter="url(#shadow)">
+<circle cx="600.0" cy="90.0" r="22" fill="#ef4444" stroke="#ffffff" stroke-width="3"/>
+<text x="600.0" y="96.0" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="900" fill="#ffffff">1</text>
+</g>
+<g transform="translate(600.0, 54.0)">
+<text x="0" y="-6" text-anchor="middle" font-family="Pretendard, sans-serif" font-size="13" font-weight="700" fill="#1e293b">1. Well, speaking of...</text>
+<text x="0" y="14" text-anchor="middle" font-family="Pretendard, sans-serif" font-size="14" font-weight="900" fill="#ef4444">➡️ [[THERE IS A PARK]] 🌳</text>
+</g>
+<g filter="url(#shadow)">
+<circle cx="748.492424049175" cy="151.50757595082501" r="22" fill="#f97316" stroke="#ffffff" stroke-width="3"/>
+<text x="748.492424049175" y="157.50757595082501" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="900" fill="#ffffff">2</text>
+</g>
+<g transform="translate(778.19090885901, 126.0517318281093)">
+<text x="0" y="-6" text-anchor="start" font-family="Pretendard, sans-serif" font-size="13" font-weight="700" fill="#1e293b">2. It's quite long...</text>
+<text x="0" y="14" text-anchor="start" font-family="Pretendard, sans-serif" font-size="14" font-weight="900" fill="#f97316">➡️ [[STRETCHES 5KM]] 🏃‍♂️</text>
+</g>
+<g filter="url(#shadow)">
+<circle cx="810.0" cy="300.0" r="22" fill="#f59e0b" stroke="#ffffff" stroke-width="3"/>
+<text x="810.0" y="306.0" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="900" fill="#ffffff">3</text>
+</g>
+<g transform="translate(852.0, 300.0)">
+<text x="0" y="-6" text-anchor="start" font-family="Pretendard, sans-serif" font-size="13" font-weight="700" fill="#1e293b">3. You know...</text>
+<text x="0" y="14" text-anchor="start" font-family="Pretendard, sans-serif" font-size="14" font-weight="900" fill="#f59e0b">➡️ [[VISIT EVERY WEEKEND]] 📅</text>
+</g>
+<g filter="url(#shadow)">
+<circle cx="748.492424049175" cy="448.492424049175" r="22" fill="#10b981" stroke="#ffffff" stroke-width="3"/>
+<text x="748.492424049175" y="454.492424049175" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="900" fill="#ffffff">4</text>
+</g>
+<g transform="translate(778.19090885901, 473.9482681718907)">
+<text x="0" y="-6" text-anchor="start" font-family="Pretendard, sans-serif" font-size="13" font-weight="700" fill="#1e293b">4. A round trip...</text>
+<text x="0" y="14" text-anchor="start" font-family="Pretendard, sans-serif" font-size="14" font-weight="900" fill="#10b981">➡️ [[TAKES AN HOUR]] ⏱️</text>
+</g>
+<g filter="url(#shadow)">
+<circle cx="600.0" cy="510.0" r="22" fill="#06b6d4" stroke="#ffffff" stroke-width="3"/>
+<text x="600.0" y="516.0" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="900" fill="#ffffff">5</text>
+</g>
+<g transform="translate(600.0, 546.0)">
+<text x="0" y="-6" text-anchor="middle" font-family="Pretendard, sans-serif" font-size="13" font-weight="700" fill="#1e293b">5. What I love most...</text>
+<text x="0" y="14" text-anchor="middle" font-family="Pretendard, sans-serif" font-size="14" font-weight="900" fill="#06b6d4">➡️ [[FLOWERS AND TREES]] 🌸</text>
+</g>
+<g filter="url(#shadow)">
+<circle cx="451.50757595082507" cy="448.492424049175" r="22" fill="#3b82f6" stroke="#ffffff" stroke-width="3"/>
+<text x="451.50757595082507" y="454.492424049175" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="900" fill="#ffffff">6</text>
+</g>
+<g transform="translate(421.80909114099006, 473.9482681718907)">
+<text x="0" y="-6" text-anchor="end" font-family="Pretendard, sans-serif" font-size="13" font-weight="700" fill="#1e293b">6. Scenery is nice...</text>
+<text x="0" y="14" text-anchor="end" font-family="Pretendard, sans-serif" font-size="14" font-weight="900" fill="#3b82f6">➡️ [[NEVER BORING]] 😊</text>
+</g>
+<g filter="url(#shadow)">
+<circle cx="390.0" cy="300.0" r="22" fill="#6366f1" stroke="#ffffff" stroke-width="3"/>
+<text x="390.0" y="306.0" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="900" fill="#ffffff">7</text>
+</g>
+<g transform="translate(348.0, 300.0)">
+<text x="0" y="-6" text-anchor="end" font-family="Pretendard, sans-serif" font-size="13" font-weight="700" fill="#1e293b">7. So, thanks to...</text>
+<text x="0" y="14" text-anchor="end" font-family="Pretendard, sans-serif" font-size="14" font-weight="900" fill="#6366f1">➡️ [[STICK TO ROUTINE & STAY IN SHAPE]] 💪</text>
+</g>
+<g filter="url(#shadow)">
+<circle cx="451.50757595082496" cy="151.50757595082504" r="22" fill="#8b5cf6" stroke="#ffffff" stroke-width="3"/>
+<text x="451.50757595082496" y="157.50757595082504" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="900" fill="#ffffff">8</text>
+</g>
+<g transform="translate(421.80909114098995, 126.05173182810933)">
+<text x="0" y="-6" text-anchor="end" font-family="Pretendard, sans-serif" font-size="13" font-weight="700" fill="#1e293b">8. It's definitely...</text>
+<text x="0" y="14" text-anchor="end" font-family="Pretendard, sans-serif" font-size="14" font-weight="900" fill="#8b5cf6">➡️ [[FAVORITE SPOT IN NEIGHBORHOOD]] ⭐</text>
+</g>
+</svg>
