@@ -133,8 +133,24 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun resolveAudioPath(sentence: Sentence): String {
+        if (!sentence.localAudioPath.isNullOrEmpty() && java.io.File(sentence.localAudioPath).exists()) {
+            return sentence.localAudioPath
+        }
+        val localFile = java.io.File(java.io.File(filesDir, "audio"), "${sentence.id}.mp3")
+        if (localFile.exists() && localFile.length() > 0L) {
+            return localFile.absolutePath
+        }
+        try {
+            assets.open("audio/${sentence.id}.mp3").close()
+            return "asset:///audio/${sentence.id}.mp3"
+        } catch (_: Exception) {
+        }
+        return "${GitHubSyncWorker.GITHUB_RAW_BASE}/${sentence.audioUrl}"
+    }
+
     private fun playSentenceViaService(sentence: Sentence, repeatCount: Int, speeds: List<Float> = emptyList()) {
-        val path = sentence.localAudioPath ?: "${GitHubSyncWorker.GITHUB_RAW_BASE}/${sentence.audioUrl}"
+        val path = resolveAudioPath(sentence)
         val intent = Intent(this, PlaybackService::class.java).apply {
             action = PlaybackService.ACTION_PLAY_SENTENCE
             putExtra(PlaybackService.EXTRA_AUDIO_PATH, path)
@@ -155,7 +171,7 @@ class MainActivity : ComponentActivity() {
         val ids = ArrayList<String>(sentences.size)
 
         for (s in sentences) {
-            paths.add(s.localAudioPath ?: "${GitHubSyncWorker.GITHUB_RAW_BASE}/${s.audioUrl}")
+            paths.add(resolveAudioPath(s))
             titles.add(cleanSentenceText(s.en))
             ids.add(s.id)
         }

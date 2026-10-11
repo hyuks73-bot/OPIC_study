@@ -142,7 +142,8 @@ abstract class AppDatabase : RoomDatabase() {
             withContext(Dispatchers.IO) {
                 val needsSeed = dao.getSentenceById("day1_1") == null ||
                         dao.getSentenceById("tr_1") == null ||
-                        dao.getSentenceById("park_1")?.dayKey != "day2-1"
+                        dao.getSentenceById("park_1")?.dayKey != "day2-1" ||
+                        dao.getSentenceById("day7_rp1_3")?.en?.contains("Around 9 or 10") != true
                 if (needsSeed) {
                     try {
                         val jsonString = context.assets.open("data_manifest.json").bufferedReader().use { it.readText() }
@@ -159,11 +160,39 @@ abstract class AppDatabase : RoomDatabase() {
                             dao.deleteSentencesNotInDays(activeDayKeys)
                         }
 
+                        val audioDir = java.io.File(context.filesDir, "audio").apply {
+                            if (!exists()) mkdirs()
+                        }
+                        val assetAudioList = try {
+                            context.assets.list("audio")?.toSet() ?: emptySet()
+                        } catch (_: Exception) {
+                            emptySet()
+                        }
+
+                        // Copy bundled updated audio assets to internal storage
+                        for (item in manifest.days.values.flatMap { it.sentences }) {
+                            if (assetAudioList.contains("${item.id}.mp3")) {
+                                val destFile = java.io.File(audioDir, "${item.id}.mp3")
+                                try {
+                                    context.assets.open("audio/${item.id}.mp3").use { input ->
+                                        java.io.FileOutputStream(destFile).use { output ->
+                                            input.copyTo(output)
+                                        }
+                                    }
+                                } catch (_: Exception) {
+                                }
+                            }
+                        }
+
                         val existingSentences = dao.getAllSentencesList().associateBy { it.id }
                         var orderIndexCounter = 0
                         val list = manifest.days.flatMap { (dayKey, dayData) ->
                             dayData.sentences.map { item ->
                                 val existing = existingSentences[item.id]
+                                val localAudioFile = java.io.File(audioDir, "${item.id}.mp3")
+                                val hasLocalAudio = localAudioFile.exists() && localAudioFile.length() > 0L
+                                val localAudioPath = if (hasLocalAudio) localAudioFile.absolutePath else existing?.localAudioPath
+                                val isDownloaded = hasLocalAudio || existing?.isDownloaded == true
                                 Sentence(
                                     id = item.id,
                                     dayKey = dayKey,
@@ -174,9 +203,9 @@ abstract class AppDatabase : RoomDatabase() {
                                     tip = item.tip,
                                     audioUrl = item.audioUrl,
                                     imageUrl = item.imageUrl,
-                                    localAudioPath = existing?.localAudioPath,
+                                    localAudioPath = localAudioPath,
                                     localImagePath = existing?.localImagePath,
-                                    isDownloaded = existing?.isDownloaded ?: false,
+                                    isDownloaded = isDownloaded,
                                     bookmark = existing?.bookmark ?: false,
                                     repeatCount = existing?.repeatCount ?: 3,
                                 )

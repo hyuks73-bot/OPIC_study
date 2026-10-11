@@ -126,4 +126,21 @@ for path in target_paths:
             f.write(manifest_json)
         print(f"Updated: {path}")
 
+# Sync MP3 audio files to Android assets if audio/ exists
+audio_src_dir = os.path.join(base_dir, 'audio')
+android_assets_audio = os.path.join(base_dir, 'android', 'app', 'src', 'main', 'assets', 'audio')
+if os.path.exists(audio_src_dir):
+    import shutil
+    os.makedirs(android_assets_audio, exist_ok=True)
+    copied_count = 0
+    for fname in os.listdir(audio_src_dir):
+        if fname.endswith('.mp3'):
+            src_f = os.path.join(audio_src_dir, fname)
+            dst_f = os.path.join(android_assets_audio, fname)
+            if not os.path.exists(dst_f) or os.path.getmtime(src_f) > os.path.getmtime(dst_f):
+                shutil.copy2(src_f, dst_f)
+                copied_count += 1
+    if copied_count > 0:
+        print(f"Synced {copied_count} MP3 audio files to Android assets: {android_assets_audio}")
+
 print(f"\nSuccessfully generated data_manifest.json (v{manifest['version']}) with {manifest['total_sentences']} sentences across {len(manifest['days'])} days ({', '.join(manifest['days'].keys())})!")

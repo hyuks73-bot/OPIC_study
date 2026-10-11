@@ -118,23 +118,25 @@ class GitHubSyncWorker(
                 var allAudioDownloaded = true
                 for (sentence in sentenceEntities) {
                     val audioFile = File(audioDir, "${sentence.id}.mp3")
-                    if (!audioFile.exists() || audioFile.length() == 0L) {
-                        val audioUrl = "$GITHUB_RAW_BASE/${sentence.audioUrl}"
-                        val audioReq = Request.Builder().url(audioUrl).build()
-                        try {
-                            client.newCall(audioReq).execute().use { audioResp ->
-                                if (audioResp.isSuccessful && audioResp.body != null) {
+                    val audioUrl = "$GITHUB_RAW_BASE/${sentence.audioUrl}"
+                    val audioReq = Request.Builder().url(audioUrl).build()
+                    try {
+                        client.newCall(audioReq).execute().use { audioResp ->
+                            if (audioResp.isSuccessful && audioResp.body != null) {
+                                val remoteLength = audioResp.body!!.contentLength()
+                                val needsDownload = !audioFile.exists() || audioFile.length() == 0L || (remoteLength > 0L && audioFile.length() != remoteLength)
+                                if (needsDownload) {
                                     FileOutputStream(audioFile).use { output ->
                                         audioResp.body!!.byteStream().copyTo(output)
                                     }
                                     dao.updateAudioDownloaded(sentence.id, audioFile.absolutePath)
-                                } else {
-                                    allAudioDownloaded = false
                                 }
+                            } else {
+                                allAudioDownloaded = false
                             }
-                        } catch (_: Exception) {
-                            allAudioDownloaded = false
                         }
+                    } catch (_: Exception) {
+                        allAudioDownloaded = false
                     }
 
                     // Download or update scene image from GitHub
