@@ -27,32 +27,27 @@ if app_version.count('.') == 1:
 # e.g., <button class="tab-btn" onclick="switchTab('day1')">📋 Day 1 서베이 전략</button>
 tab_pattern = re.findall(r'onclick="switchTab\(\'([^\']+)\'\)"[^>]*>([^<]+)</button>', content)
 
-# Standard titles for Days (Maintains 100% Android & Manifest compatibility)
-default_titles = {
-    'day1': 'Day 1: 서베이 전략 & 기초 입트기',
-    'day2': 'Day 2: 묘사 패턴 (수변공원 & 내 방)',
-    'day3': 'Day 3: 루틴 패턴 (조깅 & 음악감상)',
-    'day4': 'Day 4: 과거 경험 (15km 조깅 & YB 락콘서트)',
-    'day5': 'Day 5: 해외 여행 (일본 온천 가족여행 & 렌트카)',
-    'day6': 'Day 6: 휴일 루틴 & 홈 스테이케이션',
-    'day7': 'Day 7: 롤플레이 실전 (질문하기 & 문제해결)'
-}
+# Standard titles and array mappings for Days
+tab_definitions = [
+    ('transitions', '만능 전환어 & 연결 표현', 'transitionsData'),
+    ('day1', 'Day 1: 서베이 전략 & 기초 입트기', 'day1Data'),
+    ('day2-1', 'Day 2-1: 수변공원 묘사', 'parkData'),
+    ('day2-2', 'Day 2-2: 내 방 묘사', 'bedroomData'),
+    ('day3-1', 'Day 3-1: 수변공원 조깅 루틴', 'day3ParkData'),
+    ('day3-2', 'Day 3-2: 음악 감상 루틴', 'day3MusicData'),
+    ('day4-1', 'Day 4-1: 15km 길치 조깅 경험', 'day4ParkData'),
+    ('day4-2', 'Day 4-2: YB 락콘서트 경험', 'day4ConcertData'),
+    ('day5-1', 'Day 5-1: 일본 전통 온천 료칸', 'day5JapanData'),
+    ('day5-2', 'Day 5-2: 렌트카 가족 여행', 'day5RentalData'),
+    ('day6', 'Day 6: 휴일 루틴 & 홈 스테이케이션', 'day6HolidayData'),
+    ('day7-1', 'Day 7-1: 롤플레이 1 - 공원 조깅 제안', 'day7RP1Data'),
+    ('day7-2', 'Day 7-2: 롤플레이 2 - 약속 변경 및 보상', 'day7RP2Data'),
+]
 
-manifest_days = {k: {'title': v, 'sentences': []} for k, v in default_titles.items()}
+manifest_days = {k: {'title': v, 'sentences': []} for k, v, _ in tab_definitions}
 
-# 3. Known legacy variable mappings + dynamic day regex
-legacy_mapping = {
-    'day1Data': 'day1',
-    'parkData': 'day2',
-    'bedroomData': 'day2',
-    'day3ParkData': 'day3',
-    'day3MusicData': 'day3',
-    'day4ParkData': 'day4',
-    'day4ConcertData': 'day4',
-    'day5JapanData': 'day5',
-    'day5RentalData': 'day5',
-    'day6HolidayData': 'day6'
-}
+# 3. Known variable mappings to tab keys
+legacy_mapping = {var_name: tab_key for tab_key, _, var_name in tab_definitions}
 
 # Find all arrays defined in JS: const <name>Data = [...];
 all_arrays = re.findall(r'const\s+([A-Za-z0-9_]+Data)\s*=\s*\[(.*?)\];', content, re.DOTALL)

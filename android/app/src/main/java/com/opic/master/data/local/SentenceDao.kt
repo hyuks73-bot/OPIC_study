@@ -89,19 +89,44 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         fun createDayEntity(dayKey: String, title: String, orderIndex: Int): DayEntity {
-            val num = dayKey.filter { it.isDigit() }
-            val tabLabel = if (num.isNotEmpty()) "Day $num" else dayKey.uppercase()
+            val tabLabel = when (dayKey) {
+                "transitions" -> "만능 전환어"
+                "day1" -> "Day 1"
+                "day2-1" -> "Day 2-1"
+                "day2-2" -> "Day 2-2"
+                "day3-1" -> "Day 3-1"
+                "day3-2" -> "Day 3-2"
+                "day4-1" -> "Day 4-1"
+                "day4-2" -> "Day 4-2"
+                "day5-1" -> "Day 5-1"
+                "day5-2" -> "Day 5-2"
+                "day6" -> "Day 6"
+                "day7-1" -> "Day 7-1"
+                "day7-2" -> "Day 7-2"
+                else -> {
+                    val num = dayKey.filter { it.isDigit() || it == '-' }
+                    if (num.isNotEmpty()) "Day $num" else dayKey.uppercase()
+                }
+            }
             val emoji = when (dayKey) {
+                "transitions" -> "✨"
                 "day1" -> "📋"
+                "day2-1" -> "🌊"
+                "day2-2" -> "🛏️"
+                "day3-1" -> "🏃‍♂️"
+                "day3-2" -> "🎵"
+                "day4-1" -> "🏃"
+                "day4-2" -> "🎸"
+                "day5-1" -> "♨️"
+                "day5-2" -> "🚗"
+                "day6" -> "🏖️"
+                "day7-1" -> "📞"
+                "day7-2" -> "⚠️"
                 "day2" -> "🌊"
                 "day3" -> "🏃"
                 "day4" -> "🎸"
                 "day5" -> "🚗"
-                "day6" -> "🏖️"
                 "day7" -> "🎭"
-                "day8" -> "🍽️"
-                "day9" -> "🏥"
-                "day10" -> "✈️"
                 else -> "📖"
             }
             return DayEntity(
@@ -115,20 +140,30 @@ abstract class AppDatabase : RoomDatabase() {
 
         suspend fun seedDatabaseIfEmpty(context: Context, dao: SentenceDao) {
             withContext(Dispatchers.IO) {
-                if (dao.getSentenceById("day1_1") == null) {
+                val needsSeed = dao.getSentenceById("day1_1") == null ||
+                        dao.getSentenceById("tr_1") == null ||
+                        dao.getSentenceById("park_1")?.dayKey != "day2-1"
+                if (needsSeed) {
                     try {
                         val jsonString = context.assets.open("data_manifest.json").bufferedReader().use { it.readText() }
                         val manifest = Gson().fromJson(jsonString, ManifestResponse::class.java)
-                        
+
+                        val activeDayKeys = manifest.days.keys.toList()
                         var dayOrderCounter = 0
                         val dayEntities = manifest.days.map { (dayKey, dayData) ->
                             createDayEntity(dayKey, dayData.title, dayOrderCounter++)
                         }
                         dao.insertDays(dayEntities)
+                        if (activeDayKeys.isNotEmpty()) {
+                            dao.deleteDaysNotIn(activeDayKeys)
+                            dao.deleteSentencesNotInDays(activeDayKeys)
+                        }
 
+                        val existingSentences = dao.getAllSentencesList().associateBy { it.id }
                         var orderIndexCounter = 0
                         val list = manifest.days.flatMap { (dayKey, dayData) ->
                             dayData.sentences.map { item ->
+                                val existing = existingSentences[item.id]
                                 Sentence(
                                     id = item.id,
                                     dayKey = dayKey,
@@ -139,10 +174,19 @@ abstract class AppDatabase : RoomDatabase() {
                                     tip = item.tip,
                                     audioUrl = item.audioUrl,
                                     imageUrl = item.imageUrl,
+                                    localAudioPath = existing?.localAudioPath,
+                                    localImagePath = existing?.localImagePath,
+                                    isDownloaded = existing?.isDownloaded ?: false,
+                                    bookmark = existing?.bookmark ?: false,
+                                    repeatCount = existing?.repeatCount ?: 3,
                                 )
                             }
                         }
                         dao.insertAll(list)
+                        val activeSentenceIds = list.map { it.id }
+                        if (activeSentenceIds.isNotEmpty()) {
+                            dao.deleteSentencesNotIn(activeSentenceIds)
+                        }
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }

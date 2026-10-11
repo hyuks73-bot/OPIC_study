@@ -1,8 +1,175 @@
 {
   "version": "1.7.0",
-  "last_updated": "2026-10-11",
-  "total_sentences": 75,
+  "last_updated": "2026-10-12",
+  "total_sentences": 93,
   "days": {
+    "transitions": {
+      "title": "만능 전환어 & 연결 표현",
+      "sentences": [
+        {
+          "id": "tr_1",
+          "en": "<mark>Well, speaking of my favorite park</mark>, there is a lovely waterfront park right near my place.",
+          "ko": "음, 제가 가장 좋아하는 공원에 대해 말하자면, 우리 집 바로 근처에 어여쁜 수변 공원이 있습니다.",
+          "guide": "Well, <span class=\"slash\">/</span> <strong>SPEAKing of</strong> my favorite park, <span class=\"slash\">/</span> there is a <strong>LOVEly waterfront park</strong> right near my place.",
+          "tip": "[🎬 도입] Well, speaking of ~ [스피킹 오브: ~에 대해 말하자면] | 묘사 시작 시 90% 활용",
+          "audio_url": "audio/tr_1.mp3",
+          "image_url": "images/tr_1.jpg"
+        },
+        {
+          "id": "tr_2",
+          "en": "<mark>When it comes to my holidays or weekends</mark>, I usually like to keep a healthy daily routine.",
+          "ko": "음, 쉬는 날이나 주말에 대해 말씀드리자면, 저는 보통 건강한 하루 일과를 유지하는 것을 좋아합니다.",
+          "guide": "<strong>When it COMES to</strong> my holidays or weekends, <span class=\"slash\">/</span> I usually like to <strong>KEEP a HEALTHy daily routine</strong>.",
+          "tip": "[🎬 화제 전환] When it comes to ~ [웬 잇 컴스 투: ~에 대해 말하자면] | 새로운 주제로 넘어갈 때 최적",
+          "audio_url": "audio/tr_2.mp3",
+          "image_url": "images/tr_2.jpg"
+        },
+        {
+          "id": "tr_3",
+          "en": "<mark>As I mentioned before</mark>, I usually go to the waterfront park near my house every single weekend.",
+          "ko": "아까 말씀드렸듯이, 저는 보통 매주 주말마다 집 근처 수변 공원에 갑니다.",
+          "guide": "<strong>As I MENtioned before</strong>, <span class=\"slash\">/</span> I usually go to the waterfront park near my house.",
+          "tip": "[🎬 이전 언급 인용] As I mentioned before [애즈 아이 멘션드 비포: 아까 말씀드렸듯이] | 콤보 질문 연계 시 필수",
+          "audio_url": "audio/tr_3.mp3",
+          "image_url": "images/tr_3.jpg"
+        },
+        {
+          "id": "tr_4",
+          "en": "<mark>To be honest</mark>, I don't really like long flights because they're exhausting.",
+          "ko": "솔직히 말해서, 비행기를 오래 타는 것은 너무 지쳐서 별로 좋아하지 않습니다.",
+          "guide": "<strong>To be HONest</strong>, <span class=\"slash\">/</span> I don't really like long flights <span class=\"slash\">/</span> because they're <strong>exHAUSTing</strong>.",
+          "tip": "[🎬 솔직한 감정] To be honest [투 비 아니스트: 솔직히 말해서] | 호불호나 핑계를 말할 때 자연스러운 시작",
+          "audio_url": "audio/tr_4.mp3",
+          "image_url": "images/tr_4.jpg"
+        },
+        {
+          "id": "tr_5",
+          "en": "<mark>First of all, before heading out</mark>, I put on my running shoes and grab my wireless earbuds.",
+          "ko": "가장 먼저 밖으로 나가기 전에, 러닝화를 신은 뒤 무선 이어폰을 챙깁니다.",
+          "guide": "<strong>FIRST of all</strong>, <span class=\"slash\">/</span> <strong>before HEADing out</strong>, <span class=\"slash\">/</span> I put on my running shoes and grab my earbuds.",
+          "tip": "[⏱️ 루틴 시작] First of all [퍼스트 오브 올: 우선] | before heading out [비포 헤딩 아웃: 외출하기 전에]",
+          "audio_url": "audio/tr_5.mp3",
+          "image_url": "images/tr_5.jpg"
+        },
+        {
+          "id": "tr_6",
+          "en": "<mark>Once I get to the park</mark>, I run the trail all the way and back.",
+          "ko": "일단 공원에 도착하면, 산책로를 끝까지 달리고 돌아옵니다.",
+          "guide": "<strong>ONCE I get to the park</strong>, <span class=\"slash\">/</span> I run the trail all the way and back.",
+          "tip": "[⏱️ 도착 직후] Once I get to ~ [원스 아이 겟 투: 일단 ~에 도착하면] | 장소 이동 후 다음 동작 연결",
+          "audio_url": "audio/tr_6.mp3",
+          "image_url": "images/tr_6.jpg"
+        },
+        {
+          "id": "tr_7",
+          "en": "<mark>Right after running</mark>, I walk for about 5 minutes to catch my breath, and then I head back home.",
+          "ko": "달리기를 마친 직후에는 가쁜 숨을 고르기 위해 약 5분간 걸은 다음 집으로 돌아옵니다.",
+          "guide": "<strong>RIGHT after RUNning</strong>, <span class=\"slash\">/</span> I walk for about 5 minutes <span class=\"slash\">/</span> to <strong>CATCH my breath</strong>.",
+          "tip": "[⏱️ 연속 동작] Right after [롸잇 애프터: ~한 직후에] | catch my breath [숨을 고르다]",
+          "audio_url": "audio/tr_7.mp3",
+          "image_url": "images/tr_7.jpg"
+        },
+        {
+          "id": "tr_8",
+          "en": "I kept running around trying to find my way, and <mark>before I knew it</mark>, I had run a total of 15 kilometers.",
+          "ko": "계속 길을 찾으려고 이리저리 뛰어다녔고, 어느새 총 15킬로미터를 달려 있었습니다.",
+          "guide": "...and <strong>be-FORE I KNEW it</strong>, <span class=\"slash\">/</span> I had run a total of 15 kilometers.",
+          "tip": "[⏱️ 급진전] before I knew it [비포 아이 뉴 잇: 나도 모르는 사이에 / 어느새] | 시간·거리 경과 묘사",
+          "audio_url": "audio/tr_8.mp3",
+          "image_url": "images/tr_8.jpg"
+        },
+        {
+          "id": "tr_9",
+          "en": "<mark>At first</mark>, I had to concentrate really hard, but <mark>once I got the hang of it</mark>, it was incredibly convenient.",
+          "ko": "처음에는 엄청 집중해야 했지만, 일단 손에 익고 나자 믿을 수 없을 만큼 편리해졌습니다.",
+          "guide": "<strong>At FIRST</strong>, I had to concentrate, <span class=\"slash\">/</span> but <strong>once I got the HANG of it</strong>, <span class=\"slash\">/</span> it was convenient.",
+          "tip": "[⏱️ 대조 전개] At first [처음에는] ➔ once I got the hang of it [원스 아이 갓 더 행 오브 잇: 일단 손에 익자]",
+          "audio_url": "audio/tr_9.mp3",
+          "image_url": "images/tr_9.jpg"
+        },
+        {
+          "id": "tr_10",
+          "en": "But <mark>on the way back</mark>, I took a wrong turn and ended up getting totally lost.",
+          "ko": "그런데 돌아오는 길에 어쩌다 길을 잘못 들어 완전히 길을 잃어버렸습니다.",
+          "guide": "But <strong>on the WAY back</strong>, <span class=\"slash\">/</span> I took a wrong turn <span class=\"slash\">/</span> and ended up <strong>GETting TOtal-ly LOST</strong>.",
+          "tip": "[💥 사건 전환] on the way back [온 더 웨이 백: 돌아오는 길에] | take a wrong turn [길을 잘못 들다]",
+          "audio_url": "audio/tr_10.mp3",
+          "image_url": "images/tr_10.jpg"
+        },
+        {
+          "id": "tr_11",
+          "en": "<mark>Strangely</mark>, that experience gave me real confidence that I could do a half marathon someday.",
+          "ko": "신기하게도 그 경험이 언젠가는 하프 마라톤도 해낼 수 있을 거라는 진짜 자신감을 주었습니다.",
+          "guide": "<strong>STRANGEly</strong>, <span class=\"slash\">/</span> that experience gave me <strong>REAL CONfidence</strong>.",
+          "tip": "[💥 반전/깨달음] Strangely [스트레인지리: 신기하게도] 또는 Surprisingly [놀랍게도]",
+          "audio_url": "audio/tr_11.mp3",
+          "image_url": "images/tr_11.jpg"
+        },
+        {
+          "id": "tr_12",
+          "en": "<mark>What I love most about this park is that</mark> there are lots of pretty flowers and green trees along the path.",
+          "ko": "이 공원에서 제가 가장 좋아하는 점은 산책로를 따라 예쁜 꽃들과 푸른 나무들이 참 많다는 것입니다.",
+          "guide": "<strong>What I LOVE most about this park is that</strong> <span class=\"slash\">/</span> there are lots of pretty flowers.",
+          "tip": "[➕ 최고 장점] What I love most is that ~ [왓 아이 러브 모스트 이즈 댓: 제가 가장 좋아하는 점은]",
+          "audio_url": "audio/tr_12.mp3",
+          "image_url": "images/tr_12.jpg"
+        },
+        {
+          "id": "tr_13",
+          "en": "<mark>Another great thing is that</mark> I have an attached bathroom in my room.",
+          "ko": "또 다른 좋은 점은 방 안에 전용 욕실이 딸려 있다는 것입니다.",
+          "guide": "<strong>a-NOTHer GREAT thing is that</strong> <span class=\"slash\">/</span> I have an attached bathroom.",
+          "tip": "[➕ 두 번째 장점] Another great thing is that ~ [어나더 그레잇 띵 이즈 댓: 또 다른 좋은 점은]",
+          "audio_url": "audio/tr_13.mp3",
+          "image_url": "images/tr_13.jpg"
+        },
+        {
+          "id": "tr_14",
+          "en": "<mark>Best of all</mark>, my mother loved every single moment of it, which made the trip deeply meaningful.",
+          "ko": "무엇보다도 어머니께서 모든 순간을 너무나 좋아하셔서 이번 여행이 정말 깊은 의미가 있었습니다.",
+          "guide": "<strong>BEST of all</strong>, <span class=\"slash\">/</span> my mother loved every single moment.",
+          "tip": "[➕ 하이라이트] Best of all [베스트 오브 올: 무엇보다도 / 최고는] | 가장 핵심적인 결과 강조",
+          "audio_url": "audio/tr_14.mp3",
+          "image_url": "images/tr_14.jpg"
+        },
+        {
+          "id": "tr_15",
+          "en": "I'm really sorry, but <mark>something unexpected just came up</mark> and I don't think I can make it.",
+          "ko": "정말 미안한데 갑자기 예기치 못한 일이 생겨서 못 갈 것 같아.",
+          "guide": "I'm really sorry, <span class=\"slash\">/</span> but <strong>something unexPECTed just came up</strong>.",
+          "tip": "[🤝 롤플레이 비상] something unexpected just came up [썸띵 언익스펙티드 저스트 케임업]",
+          "audio_url": "audio/tr_15.mp3",
+          "image_url": "images/tr_15.jpg"
+        },
+        {
+          "id": "tr_16",
+          "en": "<mark>Either way</mark>, lunch and coffee are on me to make it up to you!",
+          "ko": "어느 쪽이든 너 편한 대로 해, 미안하니까 점심이랑 커피는 내가 쏠게!",
+          "guide": "<strong>EIther way</strong>, <span class=\"slash\">/</span> <strong>lunch and coffee are ON ME</strong> <span class=\"slash\">/</span> to make it up to you!",
+          "tip": "[🤝 대안 정리] Either way [이더 웨이: 둘 중 어느 쪽이든] | It's on me [내가 쏠게]",
+          "audio_url": "audio/tr_16.mp3",
+          "image_url": "images/tr_16.jpg"
+        },
+        {
+          "id": "tr_17",
+          "en": "<mark>All in all</mark>, this running routine is the perfect way to kick off my weekend and stay healthy.",
+          "ko": "전반적으로 이 달리기 루틴은 주말을 활기차게 시작하고 건강을 유지하는 완벽한 방법입니다.",
+          "guide": "<strong>ALL in all</strong>, <span class=\"slash\">/</span> this running routine is the perfect way to kick off my weekend.",
+          "tip": "[🏁 종합 요약] All in all [올 인 올: 전반적으로 종합해 보면] | 묘사/루틴 마무리 최고의 치트키",
+          "audio_url": "audio/tr_17.mp3",
+          "image_url": "images/tr_17.jpg"
+        },
+        {
+          "id": "tr_18",
+          "en": "<mark>So, to wrap it up</mark>, listening to music at home really helps me relax and recharge my batteries.",
+          "ko": "그래서 결론을 짓자면, 집에서 음악을 듣는 것은 긴 한 주를 보낸 후 편히 쉬고 재충전하는 데 큰 도움이 됩니다.",
+          "guide": "So, <span class=\"slash\">/</span> <strong>to WRAP it up</strong>, <span class=\"slash\">/</span> listening to music really helps me relax and recharge.",
+          "tip": "[🏁 결론 마침표] to wrap it up [투 랩 잇 업: 마무리하자면] | 긴 답변을 깔끔하게 끝맺는 필수 표현",
+          "audio_url": "audio/tr_18.mp3",
+          "image_url": "images/tr_18.jpg"
+        }
+      ]
+    },
     "day1": {
       "title": "Day 1: 서베이 전략 & 기초 입트기",
       "sentences": [
@@ -53,8 +220,8 @@
         }
       ]
     },
-    "day2": {
-      "title": "Day 2: 묘사 패턴 (수변공원 & 내 방)",
+    "day2-1": {
+      "title": "Day 2-1: 수변공원 묘사",
       "sentences": [
         {
           "id": "park_1",
@@ -127,7 +294,12 @@
           "tip": "[발음] definitely ➔ 데피니틀리❌ [데-퍼-늣-리⭕ (t소리 탈락)] | neighborhood [네이버-훗]",
           "audio_url": "audio/park_8.mp3",
           "image_url": "images/park_8.jpg"
-        },
+        }
+      ]
+    },
+    "day2-2": {
+      "title": "Day 2-2: 내 방 묘사",
+      "sentences": [
         {
           "id": "bed_1",
           "en": "<mark>Well, speaking of my bedroom</mark>, it's definitely my favorite space in the house.",
@@ -220,8 +392,8 @@
         }
       ]
     },
-    "day3": {
-      "title": "Day 3: 루틴 패턴 (조깅 & 음악감상)",
+    "day3-1": {
+      "title": "Day 3-1: 수변공원 조깅 루틴",
       "sentences": [
         {
           "id": "day3_park_1",
@@ -267,7 +439,12 @@
           "tip": "[연음] kick off ➔ [키-코프: 활기차게 시작하다] | [강세] PER-fect, HEAL-thy",
           "audio_url": "audio/day3_park_5.mp3",
           "image_url": "images/day3_park_5.jpg"
-        },
+        }
+      ]
+    },
+    "day3-2": {
+      "title": "Day 3-2: 음악 감상 루틴",
+      "sentences": [
         {
           "id": "day3_music_1",
           "en": "<mark>Well, whenever I want to relax at home</mark>, listening to music is my <mark>favorite thing to do</mark>.",
@@ -306,8 +483,8 @@
         }
       ]
     },
-    "day4": {
-      "title": "Day 4: 과거 경험 (15km 조깅 & YB 락콘서트)",
+    "day4-1": {
+      "title": "Day 4-1: 15km 길치 조깅 경험",
       "sentences": [
         {
           "id": "day4_park_1",
@@ -380,7 +557,12 @@
           "tip": "[구어 표현] complete 대신 do a half marathon으로 가볍고 자연스럽게 발화 | 15k [피프틴 케이]",
           "audio_url": "audio/day4_park_8.mp3",
           "image_url": "images/day4_park_8.jpg"
-        },
+        }
+      ]
+    },
+    "day4-2": {
+      "title": "Day 4-2: YB 락콘서트 경험",
+      "sentences": [
         {
           "id": "day4_concert_1",
           "en": "Actually, I have a really <mark>memorable experience</mark> related to music — it was a rock concert I attended <mark>before I got married</mark>.",
@@ -437,8 +619,8 @@
         }
       ]
     },
-    "day5": {
-      "title": "Day 5: 해외 여행 (일본 온천 가족여행 & 렌트카)",
+    "day5-1": {
+      "title": "Day 5-1: 일본 전통 온천 료칸",
       "sentences": [
         {
           "id": "day5_japan_1",
@@ -493,7 +675,12 @@
           "tip": "[연음] Best of all ➔ [베스-터-볼], moment of it ➔ [모-먼-터-빗], all of us ➔ [올-러-버스]",
           "audio_url": "audio/day5_japan_6.mp3",
           "image_url": "images/day5_japan_6.jpg"
-        },
+        }
+      ]
+    },
+    "day5-2": {
+      "title": "Day 5-2: 렌트카 가족 여행",
+      "sentences": [
         {
           "id": "day5_rental_1",
           "en": "Whenever we prepare for a trip, <mark>my sisters and I split up the work</mark> so everything goes smoothly.",
@@ -618,8 +805,8 @@
         }
       ]
     },
-    "day7": {
-      "title": "Day 7: 롤플레이 실전 (질문하기 & 문제해결)",
+    "day7-1": {
+      "title": "Day 7-1: 롤플레이 1 - 공원 조깅 제안",
       "sentences": [
         {
           "id": "day7_rp1_1",
@@ -665,7 +852,12 @@
           "tip": "[원어민 표현] pick you up in my car에서 군더더기 in my car 삭제 | pick you up [피큐업]",
           "audio_url": "audio/day7_rp1_5.mp3",
           "image_url": "images/day7_rp1_5.jpg"
-        },
+        }
+      ]
+    },
+    "day7-2": {
+      "title": "Day 7-2: 롤플레이 2 - 약속 변경 및 보상",
+      "sentences": [
         {
           "id": "day7_rp2_1",
           "en": "Hey Min-su, it's Hyuk again. <mark>I'm really sorry, but something unexpected just came up</mark> and <mark>I don't think I can make it</mark> to the park tomorrow morning.",

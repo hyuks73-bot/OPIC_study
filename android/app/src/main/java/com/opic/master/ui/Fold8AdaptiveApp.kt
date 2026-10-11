@@ -121,19 +121,42 @@ data class DayMeta(
 )
 
 val DEFAULT_DAYS = listOf(
-    DayMeta("day1", "Day 1", "서베이 전략 & 기초 입트기", "📋"),
-    DayMeta("day2", "Day 2", "묘사 패턴 (수변공원 & 내 방)", "🌊"),
-    DayMeta("day3", "Day 3", "루틴 패턴 (조깅 & 음악감상)", "🏃"),
-    DayMeta("day4", "Day 4", "과거 경험 (15km 조깅 & YB 락콘서트)", "🎸"),
-    DayMeta("day5", "Day 5", "해외 여행 (일본 온천 가족여행 & 렌트카)", "🚗"),
-    DayMeta("day6", "Day 6", "휴일 루틴 & 홈 스테이케이션", "🏖️"),
-    DayMeta("day7", "Day 7", "롤플레이 실전 (질문하기 & 문제해결)", "🎭")
+    DayMeta("transitions", "만능 전환어", "만능 전환어 & 연결 표현", "✨"),
+    DayMeta("day1", "Day 1", "Day 1: 서베이 전략 & 기초 입트기", "📋"),
+    DayMeta("day2-1", "Day 2-1", "Day 2-1: 수변공원 묘사", "🌊"),
+    DayMeta("day2-2", "Day 2-2", "Day 2-2: 내 방 묘사", "🛏️"),
+    DayMeta("day3-1", "Day 3-1", "Day 3-1: 수변공원 조깅 루틴", "🏃‍♂️"),
+    DayMeta("day3-2", "Day 3-2", "Day 3-2: 음악 감상 루틴", "🎵"),
+    DayMeta("day4-1", "Day 4-1", "Day 4-1: 15km 길치 조깅 경험", "🏃"),
+    DayMeta("day4-2", "Day 4-2", "Day 4-2: YB 락콘서트 경험", "🎸"),
+    DayMeta("day5-1", "Day 5-1", "Day 5-1: 일본 전통 온천 료칸", "♨️"),
+    DayMeta("day5-2", "Day 5-2", "Day 5-2: 렌트카 가족 여행", "🚗"),
+    DayMeta("day6", "Day 6", "Day 6: 휴일 루틴 & 홈 스테이케이션", "🏖️"),
+    DayMeta("day7-1", "Day 7-1", "Day 7-1: 롤플레이 1 - 공원 조깅 제안", "📞"),
+    DayMeta("day7-2", "Day 7-2", "Day 7-2: 롤플레이 2 - 약속 변경 및 보상", "⚠️")
 )
 
 val NATURAL_DAY_COMPARATOR = Comparator<String> { a, b ->
-    val numA = a.filter { it.isDigit() }.toIntOrNull() ?: 0
-    val numB = b.filter { it.isDigit() }.toIntOrNull() ?: 0
-    if (numA != numB) numA.compareTo(numB) else a.compareTo(b)
+    fun dayOrder(key: String): Pair<Int, Int> {
+        if (key.equals("transitions", ignoreCase = true)) return Pair(0, 0)
+        val match = Regex("^day(\\d+)(?:-(\\d+))?$", RegexOption.IGNORE_CASE).matchEntire(key)
+        return if (match != null) {
+            val major = match.groupValues[1].toIntOrNull() ?: 999
+            val minor = match.groupValues[2].takeIf { it.isNotEmpty() }?.toIntOrNull() ?: 0
+            Pair(major, minor)
+        } else {
+            Pair(999, 999)
+        }
+    }
+    val orderA = dayOrder(a)
+    val orderB = dayOrder(b)
+    if (orderA.first != orderB.first) {
+        orderA.first.compareTo(orderB.first)
+    } else if (orderA.second != orderB.second) {
+        orderA.second.compareTo(orderB.second)
+    } else {
+        a.compareTo(b)
+    }
 }
 
 private val HTML_TAG_REGEX = Regex("<.*?>")
@@ -745,7 +768,8 @@ fun MemoryGuideDialog(
         }
     }
 
-    val currentStoryGuide = storyGuidesMap[selectedDayKey]
+    val baseDayKey = selectedDayKey.substringBefore("-")
+    val currentStoryGuide = storyGuidesMap[selectedDayKey] ?: storyGuidesMap[baseDayKey]
 
     val mindmapAssetUrl = remember(selectedDayKey) {
         "file:///android_asset/images/${selectedDayKey}_summary_mindmap.jpg"
@@ -909,7 +933,12 @@ fun MemoryGuideDialog(
                             }
 
                             // 2. Sections (sec1, sec2)
-                            listOfNotNull(currentStoryGuide.sec1, currentStoryGuide.sec2).forEach { section ->
+                            val relevantSections = when {
+                                selectedDayKey.endsWith("-1") -> listOfNotNull(currentStoryGuide.sec1)
+                                selectedDayKey.endsWith("-2") -> listOfNotNull(currentStoryGuide.sec2)
+                                else -> listOfNotNull(currentStoryGuide.sec1, currentStoryGuide.sec2)
+                            }
+                            relevantSections.forEach { section ->
                                 Surface(
                                     color = Color(0xFF131D33),
                                     shape = RoundedCornerShape(12.dp),
@@ -997,12 +1026,37 @@ fun MemoryGuideDialog(
                                 Spacer(modifier = Modifier.height(12.dp))
                             }
                         } else {
-                            Text(
-                                text = "선택된 Day의 스토리 가이드 정보가 없습니다.",
-                                color = Color(0xFF94A3B8),
-                                fontSize = 12.sp,
-                                modifier = Modifier.padding(vertical = 16.dp)
-                            )
+                            if (selectedDayKey == "transitions") {
+                                Surface(
+                                    color = Color(0xFF131D33),
+                                    shape = RoundedCornerShape(12.dp),
+                                    border = BorderStroke(1.dp, Color(0xFF1E293B)),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Column(modifier = Modifier.padding(14.dp)) {
+                                        Text(
+                                            text = "✨ 만능 전환어 & 연결 표현 가이드",
+                                            color = Color(0xFF38BDF8),
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 14.sp
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Text(
+                                            text = "만능 전환어는 어떤 질문에도 당황하지 않고 자연스럽게 발화를 시작할 수 있는 핵심 치트키 표현입니다.\n\n각 질문 유형(위치, 경험, 취향 등)에 맞는 첫 문장 전환어를 입에 익혀두면 OPIc 시험에서 IH 등급 달성이 훨씬 수월해집니다.",
+                                            color = Color(0xFFE2E8F0),
+                                            fontSize = 12.5.sp,
+                                            lineHeight = 18.sp
+                                        )
+                                    }
+                                }
+                            } else {
+                                Text(
+                                    text = "선택된 Day의 스토리 가이드 정보가 없습니다.",
+                                    color = Color(0xFF94A3B8),
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.padding(vertical = 16.dp)
+                                )
+                            }
                         }
                     }
 
@@ -1010,12 +1064,23 @@ fun MemoryGuideDialog(
                         val mindmapPartUrls = remember(selectedDayKey) {
                             when (selectedDayKey) {
                                 "day1" -> listOf("file:///android_asset/mindmaps/day1.jpg")
+                                "day2-1" -> listOf("file:///android_asset/mindmaps/day2_part1.jpg")
+                                "day2-2" -> listOf("file:///android_asset/mindmaps/day2_part2.jpg")
                                 "day2" -> listOf("file:///android_asset/mindmaps/day2_part1.jpg", "file:///android_asset/mindmaps/day2_part2.jpg")
+                                "day3-1" -> listOf("file:///android_asset/mindmaps/day3_part1.jpg")
+                                "day3-2" -> listOf("file:///android_asset/mindmaps/day3_part2.jpg")
                                 "day3" -> listOf("file:///android_asset/mindmaps/day3_part1.jpg", "file:///android_asset/mindmaps/day3_part2.jpg")
+                                "day4-1" -> listOf("file:///android_asset/mindmaps/day4_part1.jpg")
+                                "day4-2" -> listOf("file:///android_asset/mindmaps/day4_part2.jpg")
                                 "day4" -> listOf("file:///android_asset/mindmaps/day4_part1.jpg", "file:///android_asset/mindmaps/day4_part2.jpg")
+                                "day5-1" -> listOf("file:///android_asset/mindmaps/day5_part1.jpg")
+                                "day5-2" -> listOf("file:///android_asset/mindmaps/day5_part2.jpg")
                                 "day5" -> listOf("file:///android_asset/mindmaps/day5_part1.jpg", "file:///android_asset/mindmaps/day5_part2.jpg")
                                 "day6" -> listOf("file:///android_asset/mindmaps/day6.jpg")
+                                "day7-1" -> listOf("file:///android_asset/mindmaps/day7_part1.jpg")
+                                "day7-2" -> listOf("file:///android_asset/mindmaps/day7_part2.jpg")
                                 "day7" -> listOf("file:///android_asset/mindmaps/day7_part1.jpg", "file:///android_asset/mindmaps/day7_part2.jpg")
+                                "transitions" -> emptyList()
                                 else -> listOf("file:///android_asset/images/${selectedDayKey}_summary_mindmap.jpg")
                             }
                         }
@@ -1030,31 +1095,41 @@ fun MemoryGuideDialog(
                                 modifier = Modifier.padding(10.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                mindmapPartUrls.forEachIndexed { idx, url ->
-                                    if (idx > 0) {
-                                        Spacer(modifier = Modifier.height(10.dp))
+                                if (mindmapPartUrls.isNotEmpty()) {
+                                    mindmapPartUrls.forEachIndexed { idx, url ->
+                                        if (idx > 0) {
+                                            Spacer(modifier = Modifier.height(10.dp))
+                                        }
+                                        AsyncImage(
+                                            model = ImageRequest.Builder(context)
+                                                .data(url)
+                                                .crossfade(true)
+                                                .build(),
+                                            contentDescription = "${currentMeta.tabLabel} 스토리 암기 마인드맵 ${idx + 1}",
+                                            contentScale = ContentScale.FillWidth,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clip(RoundedCornerShape(8.dp))
+                                        )
                                     }
-                                    AsyncImage(
-                                        model = ImageRequest.Builder(context)
-                                            .data(url)
-                                            .crossfade(true)
-                                            .build(),
-                                        contentDescription = "${currentMeta.tabLabel} 스토리 암기 마인드맵 ${idx + 1}",
-                                        contentScale = ContentScale.FillWidth,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .clip(RoundedCornerShape(8.dp))
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                    Text(
+                                        text = "💡 키워드 연상 흐름으로 답변 스토리라인을 머릿속에 시각화하세요.",
+                                        color = Color(0xFF94A3B8),
+                                        fontSize = 11.sp,
+                                        textAlign = TextAlign.Center
+                                    )
+                                } else {
+                                    Text(
+                                        text = if (selectedDayKey == "transitions") "✨ 만능 전환어는 별도 마인드맵 없이 표현 목록으로 구성되어 있습니다." else "해당 Day의 마인드맵 이미지가 없습니다.",
+                                        color = Color(0xFF94A3B8),
+                                        fontSize = 12.sp,
+                                        modifier = Modifier.padding(vertical = 16.dp),
+                                        textAlign = TextAlign.Center
                                     )
                                 }
-
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                                Text(
-                                    text = "💡 키워드 연상 흐름으로 답변 스토리라인을 머릿속에 시각화하세요.",
-                                    color = Color(0xFF94A3B8),
-                                    fontSize = 11.sp,
-                                    textAlign = TextAlign.Center
-                                )
                             }
                         }
                     }
