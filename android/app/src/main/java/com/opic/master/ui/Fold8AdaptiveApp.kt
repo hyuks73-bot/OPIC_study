@@ -121,13 +121,13 @@ data class DayMeta(
 )
 
 val DEFAULT_DAYS = listOf(
-    DayMeta("day1", "Day 1", "서베이 & 2룸 아파트", "📋"),
-    DayMeta("day2", "Day 2", "수변 공원 & 침실 묘사", "🌊"),
-    DayMeta("day3", "Day 3", "주말 루틴 & 자전거", "🏃"),
-    DayMeta("day4", "Day 4", "과거 경험 & 롤플레이", "🎸"),
-    DayMeta("day5", "Day 5", "렌터카 & 가족 여행", "🚗"),
-    DayMeta("day6", "Day 6", "휴일 루틴 & 홈캉스", "🏖️"),
-    DayMeta("day7", "Day 7", "롤플레이 실전 (Q11 & Q12)", "🎭")
+    DayMeta("day1", "Day 1", "서베이 전략 & 기초 입트기", "📋"),
+    DayMeta("day2", "Day 2", "묘사 패턴 (수변공원 & 내 방)", "🌊"),
+    DayMeta("day3", "Day 3", "루틴 패턴 (조깅 & 음악감상)", "🏃"),
+    DayMeta("day4", "Day 4", "과거 경험 (15km 조깅 & YB 락콘서트)", "🎸"),
+    DayMeta("day5", "Day 5", "해외 여행 (일본 온천 가족여행 & 렌트카)", "🚗"),
+    DayMeta("day6", "Day 6", "휴일 루틴 & 홈 스테이케이션", "🏖️"),
+    DayMeta("day7", "Day 7", "롤플레이 실전 (질문하기 & 문제해결)", "🎭")
 )
 
 val NATURAL_DAY_COMPARATOR = Comparator<String> { a, b ->

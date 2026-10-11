@@ -1,16 +1,16 @@
 {
   "day1": {
     "title": "Day 1: 서베이 전략 & 기초 입트기",
-    "chain": "🏠 2룸 아파트 혼자 산다 ➔ 🎬 취미 3개(영화/공원/음악) ➔ 🏃‍♂️ 주말 공원 조깅 ➔ 🛋️ 집에서 홈캉스 & 🎸 라이브 콘서트!",
+    "chain": "🏠 가족과 함께 4룸 아파트 ➔ 🎬 취미 3개(영화/공원/음악) ➔ 🏃‍♂️ 주말 공원 조깅 ➔ 🛋️ 집에서 홈캉스 & 🎸 라이브 콘서트!",
     "sec1": [
       "Topic 1: 서베이 전략 & 기초 입트기",
       [
         [
           "day1_1",
           "1️⃣ 주거 형태",
-          "LIVE ALONE",
-          "I live alone in...",
-          "two-bedroom apartment (방 2개 아파트)"
+          "LIVE WITH FAMILY",
+          "I live with my family in...",
+          "four-bedroom apartment (방 4개 아파트)"
         ],
         [
           "day1_2",
@@ -31,7 +31,7 @@
           "4️⃣ 홈캉스 선호",
           "PREFER",
           "I prefer...",
-          "staycation at home & listening to soft music"
+          "staying home & listening to quiet music"
         ],
         [
           "day1_5",
@@ -55,14 +55,14 @@
           "1️⃣ 위치 소개",
           "LOVELY PARK",
           "Well, speaking of...",
-          "waterfront park very close to my house"
+          "waterfront park right near my place"
         ],
         [
           "park_2",
           "2️⃣ 5km 길이",
           "STRETCHES",
           "It's quite long...",
-          "stretches for about 5km along the water"
+          "goes for about 5km along the water"
         ],
         [
           "park_3",
@@ -76,14 +76,14 @@
           "4️⃣ 운동 시간",
           "TAKES AN HOUR",
           "A round trip...",
-          "takes about an hour, just right exercise"
+          "takes about an hour, perfect workout"
         ],
         [
           "park_5",
           "5️⃣ 꽃과 나무",
           "LOVE MOST",
           "What I love most is...",
-          "beautiful flowers & lush trees along trail"
+          "pretty flowers & green trees along path"
         ],
         [
           "park_6",
@@ -97,7 +97,7 @@
           "7️⃣ 루틴 유지",
           "STICK TO ROUTINE",
           "So, thanks to...",
-          "stick to weekend running & stay in shape"
+          "keep running every weekend & stay healthy"
         ],
         [
           "park_8",

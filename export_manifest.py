@@ -27,7 +27,7 @@ if app_version.count('.') == 1:
 # e.g., <button class="tab-btn" onclick="switchTab('day1')">📋 Day 1 서베이 전략</button>
 tab_pattern = re.findall(r'onclick="switchTab\(\'([^\']+)\'\)"[^>]*>([^<]+)</button>', content)
 
-# Fallback polished titles for Days
+# Standard titles for Days (Maintains 100% Android & Manifest compatibility)
 default_titles = {
     'day1': 'Day 1: 서베이 전략 & 기초 입트기',
     'day2': 'Day 2: 묘사 패턴 (수변공원 & 내 방)',
@@ -38,20 +38,7 @@ default_titles = {
     'day7': 'Day 7: 롤플레이 실전 (질문하기 & 문제해결)'
 }
 
-manifest_days = {}
-
-# Populate detected tabs from index.html
-for tab_id, tab_label in tab_pattern:
-    if tab_id == '${tabId}' or not tab_id.startswith('day'):
-        continue
-    clean_label = tab_label.strip()
-    title = default_titles.get(tab_id, clean_label)
-    manifest_days[tab_id] = {'title': title, 'sentences': []}
-
-# If no tabs detected from HTML buttons, use default Days
-if not manifest_days:
-    for k, v in default_titles.items():
-        manifest_days[k] = {'title': v, 'sentences': []}
+manifest_days = {k: {'title': v, 'sentences': []} for k, v in default_titles.items()}
 
 # 3. Known legacy variable mappings + dynamic day regex
 legacy_mapping = {
